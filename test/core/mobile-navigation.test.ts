@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { mobileNavShouldLock } from '../../src/client/core/mobile-navigation.js';
+import { mobileNavShouldLock } from '../../src/client/core/mobile-navigation.ts';
 
 test('page scrolling is locked only for an open mobile navigation drawer', () => {
   assert.equal(mobileNavShouldLock(true, true), true);

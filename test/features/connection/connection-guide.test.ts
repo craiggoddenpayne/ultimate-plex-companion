@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { connectionAdvice, extractPlexToken } from '../../../src/client/features/connection/connection-guide.js';
-import { friendlyConnectionError } from '../../../src/server/core/errors.js';
+import { connectionAdvice, extractPlexToken } from '../../../src/client/features/connection/connection-guide.ts';
+import { friendlyConnectionError } from '../../../src/server/core/errors.ts';
 
 test('connection guide extracts either a token or the token within an XML URL', () => {
   assert.equal(extractPlexToken('abc123'), 'abc123');

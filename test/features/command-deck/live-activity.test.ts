@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { compactStreamList, compactStreamMarkup } from '../../../src/client/features/command-deck/live-activity-view.js';
+import { compactStreamList, compactStreamMarkup } from '../../../src/client/features/command-deck/live-activity-view.ts';
 
 test('dashboard live activity renders Plex artwork and playback information', () => {
   const markup = compactStreamMarkup({

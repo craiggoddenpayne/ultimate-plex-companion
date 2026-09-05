@@ -3,27 +3,27 @@ import { readFile, writeFile, mkdir, stat, access, rename, unlink } from 'node:f
 import { extname, join, normalize, dirname, basename, relative, resolve, isAbsolute } from 'node:path';
 import { spawn } from 'node:child_process';
 import { randomUUID } from 'node:crypto';
-import { composeFeatureRouters } from './core/router.js';
-import { createPlexClient } from './core/plex-client.js';
-import { normalizePlexConfig } from './core/validation.js';
-import { createAutomationRoutes } from './features/automations/routes.js';
-import { createCodecRoutes } from './features/codec-studio/routes.js';
-import { createCommandDeckRoutes } from './features/command-deck/routes.js';
-import { createCompanionRoutes } from './features/companion/routes.js';
-import { createConnectionRoutes } from './features/connection/routes.js';
-import { createDiscoveryRoutes } from './features/discovery/routes.js';
-import { createFutureLabRoutes } from './features/future-lab/routes.js';
-import { createLibraryRoutes } from './features/library/routes.js';
-import { createMetadataRoutes } from './features/metadata/routes.js';
-import { createPlaylistRoutes } from './features/playlists/routes.js';
-import { createPlexRoutes } from './features/plex/routes.js';
-import { createRecommendationRoutes } from './features/recommendations/routes.js';
-import { createTelemetryRoutes } from './features/telemetry/routes.js';
-import { createUtilityRoutes } from './features/utility-suite/routes.js';
-import { createAutomationEngine } from './features/automations/automation-server.js';
-import { createOptimizationStore } from './features/codec-studio/optimization-store-server.js';
-import { optimizationEta, requestOptimizationCancellation } from './features/codec-studio/optimization-queue-server.js';
-import { conversionTarget, isLegacyCodec, supportedTargets, videoArguments } from './features/codec-studio/codec-modernizer-server.js';
+import { composeFeatureRouters } from './core/router.ts';
+import { createPlexClient } from './core/plex-client.ts';
+import { normalizePlexConfig } from './core/validation.ts';
+import { createAutomationRoutes } from './features/automations/routes.ts';
+import { createCodecRoutes } from './features/codec-studio/routes.ts';
+import { createCommandDeckRoutes } from './features/command-deck/routes.ts';
+import { createCompanionRoutes } from './features/companion/routes.ts';
+import { createConnectionRoutes } from './features/connection/routes.ts';
+import { createDiscoveryRoutes } from './features/discovery/routes.ts';
+import { createFutureLabRoutes } from './features/future-lab/routes.ts';
+import { createLibraryRoutes } from './features/library/routes.ts';
+import { createMetadataRoutes } from './features/metadata/routes.ts';
+import { createPlaylistRoutes } from './features/playlists/routes.ts';
+import { createPlexRoutes } from './features/plex/routes.ts';
+import { createRecommendationRoutes } from './features/recommendations/routes.ts';
+import { createTelemetryRoutes } from './features/telemetry/routes.ts';
+import { createUtilityRoutes } from './features/utility-suite/routes.ts';
+import { createAutomationEngine } from './features/automations/automation-server.ts';
+import { createOptimizationStore } from './features/codec-studio/optimization-store-server.ts';
+import { optimizationEta, requestOptimizationCancellation } from './features/codec-studio/optimization-queue-server.ts';
+import { conversionTarget, isLegacyCodec, supportedTargets, videoArguments } from './features/codec-studio/codec-modernizer-server.ts';
 
 const port = Number(process.env.PORT || 8080);
 const staticRoot = join(process.cwd(), 'dist');
@@ -33,7 +33,7 @@ const envConfig = process.env.PLEX_URL && process.env.PLEX_TOKEN
   ? { plexUrl: process.env.PLEX_URL, token: process.env.PLEX_TOKEN }
   : null;
 
-const mime = { '.html':'text/html; charset=utf-8', '.js':'text/javascript; charset=utf-8', '.css':'text/css; charset=utf-8', '.svg':'image/svg+xml', '.png':'image/png', '.webp':'image/webp', '.woff2':'font/woff2' };
+const mime = { '.html':'text/html; charset=utf-8', '.ts':'text/javascript; charset=utf-8', '.css':'text/css; charset=utf-8', '.svg':'image/svg+xml', '.png':'image/png', '.webp':'image/webp', '.woff2':'font/woff2' };
 
 function json(res, status, body) {
   res.writeHead(status, { 'Content-Type':'application/json; charset=utf-8', 'Cache-Control':'no-store', 'X-Content-Type-Options':'nosniff' });

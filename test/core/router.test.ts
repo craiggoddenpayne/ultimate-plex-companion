@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { composeFeatureRouters } from '../../src/server/core/router.js';
+import { composeFeatureRouters } from '../../src/server/core/router.ts';
 
 test('feature routers stop at the first handler that owns a request', async () => {
   const visited = [];

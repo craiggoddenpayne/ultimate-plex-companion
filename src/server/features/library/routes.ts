@@ -1,6 +1,6 @@
-import { refreshRequested, requirePlex } from '../../core/router.js';
-import { invalidateLibraryInsights, libraryInsights } from './library-insights-server.js';
-import { deleteOverlap } from './library-overlap-server.js';
+import { refreshRequested, requirePlex } from '../../core/router.ts';
+import { invalidateLibraryInsights, libraryInsights } from './library-insights-server.ts';
+import { deleteOverlap } from './library-overlap-server.ts';
 
 export function createLibraryRoutes() {
   return async context => {

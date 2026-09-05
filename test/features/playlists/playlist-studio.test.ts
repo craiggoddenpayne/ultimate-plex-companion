@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { buildPlaylistGenerators, composePlaylist, createGeneratedPlaylist, normalizeComposerCriteria, playlistComposerFacets, playlistCreatePath } from '../../../src/server/features/playlists/playlist-studio-server.js';
+import { buildPlaylistGenerators, composePlaylist, createGeneratedPlaylist, normalizeComposerCriteria, playlistComposerFacets, playlistCreatePath } from '../../../src/server/features/playlists/playlist-studio-server.ts';
 
 const movie=(id,title,extra={})=>({ratingKey:String(id),type:'movie',title,duration:100*60_000,audienceRating:8,viewCount:0,Genre:[],Media:[{videoResolution:'1080'}],...extra});
 

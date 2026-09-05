@@ -1,5 +1,5 @@
-import { requestOptions, requirePlex } from '../../core/router.js';
-import { personalRecommendations } from './recommendations-server.js';
+import { requestOptions, requirePlex } from '../../core/router.ts';
+import { personalRecommendations } from './recommendations-server.ts';
 
 export function createRecommendationRoutes() {
   return async context => {

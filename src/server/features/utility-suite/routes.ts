@@ -1,5 +1,5 @@
-import { refreshRequested, requirePlex } from '../../core/router.js';
-import { utilitySuite } from './utility-suite-server.js';
+import { refreshRequested, requirePlex } from '../../core/router.ts';
+import { utilitySuite } from './utility-suite-server.ts';
 
 export function createUtilityRoutes() {
   return async context => {

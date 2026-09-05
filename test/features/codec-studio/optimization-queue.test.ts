@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { clearOptimizationHistory, optimizationEta, optimizationSummary, reorderQueuedJob, requestOptimizationCancellation, updateQueuedJob } from '../../../src/server/features/codec-studio/optimization-queue-server.js';
+import { clearOptimizationHistory, optimizationEta, optimizationSummary, reorderQueuedJob, requestOptimizationCancellation, updateQueuedJob } from '../../../src/server/features/codec-studio/optimization-queue-server.ts';
 
 test('optimization queue supports summaries, ETA, ordering and safe state changes', () => {
   const jobs = new Map<string, any>([

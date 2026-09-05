@@ -1,7 +1,7 @@
 import { readFile, writeFile, mkdir } from 'node:fs/promises';
 import { join } from 'node:path';
 import { randomUUID } from 'node:crypto';
-import { arrivalReport, healthReport, metadataReport, previewReports, qualityReport, refreshReport, streamReport } from './automation-report-server.js';
+import { arrivalReport, healthReport, metadataReport, previewReports, qualityReport, refreshReport, streamReport } from './automation-report-server.ts';
 
 const FREQUENCIES = new Set(['manual', 'hourly', 'every6h', 'daily', 'weekly']);
 const TYPES = new Set(["quality_guardian", "library_refresh", "health_snapshot", "arrival_digest", "metadata_sentinel", "stream_sentinel"]);

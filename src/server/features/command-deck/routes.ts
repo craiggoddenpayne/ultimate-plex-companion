@@ -1,5 +1,5 @@
-import { requirePlex } from '../../core/router.js';
-import { commandDeck } from './command-deck-server.js';
+import { requirePlex } from '../../core/router.ts';
+import { commandDeck } from './command-deck-server.ts';
 
 export function createCommandDeckRoutes() {
   return async context => {

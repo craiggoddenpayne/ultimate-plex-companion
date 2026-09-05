@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { buildArchiveAnomalies, buildMemoryLane, buildMoodWeather, buildRuntimeWormhole } from '../../../src/server/features/future-lab/future-lab-experiments.js';
+import { buildArchiveAnomalies, buildMemoryLane, buildMoodWeather, buildRuntimeWormhole } from '../../../src/server/features/future-lab/future-lab-experiments.ts';
 
 const now = Date.UTC(2026, 8, 5, 12) / 1000;
 const items = [

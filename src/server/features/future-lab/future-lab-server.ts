@@ -1,4 +1,4 @@
-import { buildArchiveAnomalies, buildMemoryLane, buildMoodWeather, buildRuntimeWormhole } from './future-lab-experiments.js';
+import { buildArchiveAnomalies, buildMemoryLane, buildMoodWeather, buildRuntimeWormhole } from './future-lab-experiments.ts';
 
 let labCache;
 

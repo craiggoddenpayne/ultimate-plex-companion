@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { COMPANION_THEMES, normalizeThemePreferences } from '../../src/shared/theme-model.js';
+import { COMPANION_THEMES, normalizeThemePreferences } from '../../src/shared/theme-model.ts';
 
 test('theme collection has fifteen valid and unique palettes', () => {
   assert.equal(COMPANION_THEMES.length, 15);

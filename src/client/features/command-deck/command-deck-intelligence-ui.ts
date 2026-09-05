@@ -1,4 +1,4 @@
-import { activityVisual } from './activity-view.js';
+import { activityVisual } from './activity-view.ts';
 
 const escape=value=>String(value??'').replace(/[&<>'"]/g,char=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[char]));
 const ago=value=>{const seconds=Math.max(0,Math.floor(Date.now()/1000-Number(value||0)));return seconds<3600?`${Math.max(1,Math.floor(seconds/60))}m ago`:seconds<86400?`${Math.floor(seconds/3600)}h ago`:`${Math.floor(seconds/86400)}d ago`};

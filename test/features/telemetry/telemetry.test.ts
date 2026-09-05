@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { sessionDetail } from '../../../src/server/features/telemetry/telemetry-server.js';
-import { sessionMarkup, sessionFormatters } from '../../../src/client/features/telemetry/stream-session-view.js';
+import { sessionDetail } from '../../../src/server/features/telemetry/telemetry-server.ts';
+import { sessionMarkup, sessionFormatters } from '../../../src/client/features/telemetry/stream-session-view.ts';
 
 const plexSession = {
   ratingKey: '42',

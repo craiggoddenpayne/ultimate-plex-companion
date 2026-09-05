@@ -1,4 +1,4 @@
-import { renderAutomationReports } from './automation-report-ui.js';
+import { renderAutomationReports } from './automation-report-ui.ts';
 const autoState = { data:null, loaded:false };
 const autoIcon = {
   bolt:'<svg viewBox="0 0 24 24"><path d="m13 2-9 12h8l-1 8 9-12h-8z"/></svg>',

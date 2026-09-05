@@ -1,7 +1,7 @@
 import { isAbsolute } from 'node:path';
-import { requirePlex } from '../../core/router.js';
-import { supportedTargets } from './codec-modernizer-server.js';
-import { clearOptimizationHistory, optimizationSummary, updateQueuedJob } from './optimization-queue-server.js';
+import { requirePlex } from '../../core/router.ts';
+import { supportedTargets } from './codec-modernizer-server.ts';
+import { clearOptimizationHistory, optimizationSummary, updateQueuedJob } from './optimization-queue-server.ts';
 
 export function createCodecRoutes(queue) {
   return async context => {

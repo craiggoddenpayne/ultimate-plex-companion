@@ -1,5 +1,5 @@
-import { requirePlex } from '../../core/router.js';
-import { peopleTelemetry, streamTelemetry } from './telemetry-server.js';
+import { requirePlex } from '../../core/router.ts';
+import { peopleTelemetry, streamTelemetry } from './telemetry-server.ts';
 
 export function createTelemetryRoutes() {
   return async context => {

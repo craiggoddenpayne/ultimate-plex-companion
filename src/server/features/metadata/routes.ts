@@ -1,7 +1,7 @@
-import { refreshRequested, requirePlex } from '../../core/router.js';
-import { invalidateLibraryInsights } from '../library/library-insights-server.js';
-import { invalidateMetadataCenter, metadataCenter } from './metadata-center-server.js';
-import { metadataUpdate, publicMetadata } from './metadata-helper-server.js';
+import { refreshRequested, requirePlex } from '../../core/router.ts';
+import { invalidateLibraryInsights } from '../library/library-insights-server.ts';
+import { invalidateMetadataCenter, metadataCenter } from './metadata-center-server.ts';
+import { metadataUpdate, publicMetadata } from './metadata-helper-server.ts';
 
 export function createMetadataRoutes() {
   return async context => {

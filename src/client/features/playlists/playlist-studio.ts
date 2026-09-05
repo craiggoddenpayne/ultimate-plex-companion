@@ -1,4 +1,4 @@
-import { renderPlaylistComposer } from './playlist-composer.js';
+import { renderPlaylistComposer } from './playlist-composer.ts';
 
 const playlistState = { data:null, selected:null, filter:'All' };
 const playlistEscape = value => String(value ?? '').replace(/[&<>'"]/g, character => ({

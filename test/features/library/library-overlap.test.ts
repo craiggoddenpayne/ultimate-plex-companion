@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { buildEditionInsights, deleteOverlap } from '../../../src/server/features/library/library-overlap-server.js';
+import { buildEditionInsights, deleteOverlap } from '../../../src/server/features/library/library-overlap-server.ts';
 
 function media(id,file,resolution,size,codec='h264') {
   return { id:String(id), videoResolution:resolution, videoCodec:codec, audioCodec:'aac', audioChannels:6, bitrate:12000, width:1920, height:1080, duration:7200000, Part:[{ file, size }] };

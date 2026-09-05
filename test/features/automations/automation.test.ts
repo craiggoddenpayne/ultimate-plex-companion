@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { mkdtemp, rm } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { createAutomationEngine, nextOccurrence } from '../../../src/server/features/automations/automation-server.js';
+import { createAutomationEngine, nextOccurrence } from '../../../src/server/features/automations/automation-server.ts';
 
 test('automation rules persist, preview safely and execute Plex actions', async t => {
   const configDir = await mkdtemp(join(tmpdir(), 'plex-automations-'));

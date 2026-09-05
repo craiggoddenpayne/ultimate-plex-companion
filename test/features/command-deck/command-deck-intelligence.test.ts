@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { buildDeckIntelligence } from '../../../src/server/features/command-deck/command-deck-intelligence-server.js';
+import { buildDeckIntelligence } from '../../../src/server/features/command-deck/command-deck-intelligence-server.ts';
 
 test('Command Deck derives weighted taste and weekly comparison',()=>{
   const now=2_000_000_000;

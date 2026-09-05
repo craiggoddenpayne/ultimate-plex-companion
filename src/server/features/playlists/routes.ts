@@ -1,5 +1,5 @@
-import { requirePlex } from '../../core/router.js';
-import { createGeneratedPlaylist, playlistStudio, previewPlaylistComposition } from './playlist-studio-server.js';
+import { requirePlex } from '../../core/router.ts';
+import { createGeneratedPlaylist, playlistStudio, previewPlaylistComposition } from './playlist-studio-server.ts';
 
 export function createPlaylistRoutes() {
   return async context => {
