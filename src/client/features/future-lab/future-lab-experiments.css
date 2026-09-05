@@ -70,6 +70,26 @@
   color: var(--muted, #737b86);
   font-size: 8px;
 }
+.lab-version-warning {
+  min-height: 525px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 30px;
+  text-align: center;
+}
+.lab-version-warning h2 {
+  max-width: 520px;
+  margin: 12px 0 8px;
+  font-size: 22px;
+}
+.lab-version-warning p {
+  max-width: 540px;
+  color: var(--muted, #747c87);
+  font-size: 9px;
+  line-height: 1.7;
+}
 .lab-media-grid {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));

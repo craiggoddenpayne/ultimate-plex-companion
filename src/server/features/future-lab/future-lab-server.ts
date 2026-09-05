@@ -133,6 +133,7 @@ export async function futureLab(config, dependencies, force = false) {
     }));
   const now = Math.floor(Date.now() / 1000);
   const data = {
+    schemaVersion: 2,
     generatedAt: new Date().toISOString(),
     catalogSize: items.length,
     historySample: history.length,

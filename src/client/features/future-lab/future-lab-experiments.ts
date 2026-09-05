@@ -206,3 +206,20 @@ export const futureLabExperiments = {
   runtime: runtimeView,
   anomalies: anomalyView,
 };
+
+const experimentDataKeys = {
+  memory: 'memoryLane',
+  mood: 'moodWeather',
+  runtime: 'runtimeWormhole',
+  anomalies: 'archiveAnomalies',
+};
+
+export function renderFutureLabExperiment(tab, data) {
+  const view = futureLabExperiments[tab];
+  const dataKey = experimentDataKeys[tab];
+  if (!view || !dataKey) return '<div class="lab-empty"><b>Unknown experiment</b></div>';
+  if (!data?.[dataKey]) {
+    return '<section class="lab-view lab-version-warning"><span class="card-label">SERVER UPDATE REQUIRED</span><h2>This experiment is waiting for its analysis model.</h2><p>The browser has newer Future Lab features than the running server. Restart or update Ultimate Plex Companion, then select <b>Recalculate</b>.</p></section>';
+  }
+  return view(data);
+}

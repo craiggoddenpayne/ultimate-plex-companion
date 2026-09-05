@@ -6,6 +6,8 @@ import {
   buildMoodWeather,
   buildRuntimeWormhole,
 } from '../../../src/server/features/future-lab/future-lab-experiments.ts';
+import { futureLab } from '../../../src/server/features/future-lab/future-lab-server.ts';
+import { renderFutureLabExperiment } from '../../../src/client/features/future-lab/future-lab-experiments.ts';
 
 const now = Date.UTC(2026, 8, 5, 12) / 1000;
 const items = [
@@ -106,4 +108,24 @@ test('Archive Anomalies finds rare genres, one-off directors and buried gems', (
   assert.equal(result.highRatedWaiting, 3);
   assert.equal(result.buriedGems[0].title, 'Bright Future');
   assert.equal(result.oldestUnwatched[0].title, 'Long Orbit');
+});
+
+test('Future Lab response includes every experiment model', async () => {
+  const result = await futureLab(
+    {},
+    {
+      discoveryCatalog: async () => items,
+      plexFetch: async () => ({ MediaContainer: { Metadata: history } }),
+    },
+    true,
+  );
+  assert.equal(result.schemaVersion, 2);
+  for (const key of ['memoryLane', 'moodWeather', 'runtimeWormhole', 'archiveAnomalies']) assert.ok(result[key]);
+});
+
+test('new experiment tabs explain a stale server payload instead of crashing', () => {
+  const staleMarkup = renderFutureLabExperiment('mood', {});
+  assert.match(staleMarkup, /SERVER UPDATE REQUIRED/);
+  const currentMarkup = renderFutureLabExperiment('mood', { moodWeather: buildMoodWeather(items, history, now) });
+  assert.match(currentMarkup, /30-DAY MOOD WEATHER/);
 });

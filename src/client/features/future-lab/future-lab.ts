@@ -1,4 +1,4 @@
-import { futureLabExperiments } from './future-lab-experiments.ts';
+import { renderFutureLabExperiment } from './future-lab-experiments.ts';
 
 const labState = { data: null, tab: 'constellation' };
 const labEscape = (value) =>
@@ -268,9 +268,9 @@ function renderLab() {
     capsule: capsuleView,
     serendipity: serendipityView,
     oracle: oracleView,
-    ...futureLabExperiments,
   };
-  stage.innerHTML = views[labState.tab](labState.data);
+  const view = views[labState.tab];
+  stage.innerHTML = view ? view(labState.data) : renderFutureLabExperiment(labState.tab, labState.data);
   if (labState.tab === 'constellation') requestAnimationFrame(() => drawGraph(labState.data.graph));
 }
 async function loadLab(force = false) {
