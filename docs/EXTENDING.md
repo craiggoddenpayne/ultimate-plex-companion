@@ -6,24 +6,24 @@ Create matching feature folders when the capability has both browser and server 
 
 ```text
 src/client/features/my-feature/
-├── my-feature.js
+├── my-feature.ts
 └── my-feature.css
 
 src/server/features/my-feature/
-├── my-feature-server.js
-└── routes.js
+├── my-feature-server.ts
+└── routes.ts
 
 test/features/my-feature/
-└── my-feature.test.js
+└── my-feature.test.ts
 ```
 
-Register a navigable surface in `src/shared/feature-registry.js`. Import browser behavior and styles once from `src/client/main.js`; do not add individual tags to `index.html`.
+Register a navigable surface in `src/shared/feature-registry.ts`. Import browser behavior and styles once from `src/client/main.ts`; do not add individual tags to `index.html`.
 
 ## Add backend behavior
 
 Keep business logic independent from HTTP and inject its dependencies:
 
-```js
+```ts
 export async function myFeature(config, { plexFetch, libraryItems }) {
   const data = await plexFetch(config, '/library/sections');
   return { count:data.MediaContainer?.size || 0 };
@@ -32,8 +32,8 @@ export async function myFeature(config, { plexFetch, libraryItems }) {
 
 Expose it through a feature router that returns `true` only when it handles the request:
 
-```js
-import { requirePlex } from '../../core/router.js';
+```ts
+import { requirePlex } from '../../core/router.ts';
 
 export function createMyFeatureRoutes() {
   return async context => {
@@ -45,7 +45,7 @@ export function createMyFeatureRoutes() {
 }
 ```
 
-Add the router factory to the composition list in `src/server/index.js`. Shared validation belongs in `src/server/core/validation.js`; Plex network behavior belongs in `src/server/core/plex-client.js`.
+Add the router factory to the composition list in `src/server/index.ts`. Shared validation belongs in `src/server/core/validation.ts`; Plex network behavior belongs in `src/server/core/plex-client.ts`.
 
 ## Testing
 

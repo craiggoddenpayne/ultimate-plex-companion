@@ -11,7 +11,7 @@ Thanks for helping make Ultimate Plex Companion better. Contributions should pre
 
 ## Development setup
 
-Requirements: Node.js 22+, npm and, for codec features, FFmpeg/FFprobe.
+Requirements: Node.js 22.18+, npm and, for codec features, FFmpeg/FFprobe.
 
 ```bash
 npm ci
@@ -30,7 +30,7 @@ npm run build
 
 ## Adding a feature
 
-1. Register the surface in `src/shared/feature-registry.js` when it needs navigation.
+1. Register the surface in `src/shared/feature-registry.ts` when it needs navigation.
 2. Keep Plex/data logic in a focused `src/server/features/<name>` module with dependency injection.
 3. Keep browser behavior and styles together in `src/client/features/<name>`.
 4. Expose the minimum JSON needed by the browser; never return the Plex token or raw private paths without a clear user-facing need.

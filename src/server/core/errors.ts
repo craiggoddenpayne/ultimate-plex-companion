@@ -1,4 +1,4 @@
-export function friendlyConnectionError(error) {
+export function friendlyConnectionError(error: any): string {
   if (error?.name === 'AbortError') return 'Plex did not respond within 8 seconds. Check port 32400 and the container network.';
   const code = error?.cause?.code || error?.code || '';
   if (code === 'ECONNREFUSED') return 'Could not reach Plex at that address. If Companion runs in Docker, do not use localhost for a Plex server running on the host.';

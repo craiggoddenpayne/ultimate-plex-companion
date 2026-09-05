@@ -1,6 +1,6 @@
 # Ultimate Plex Companion
 
-[![CI](https://github.com/craiggoddenpayne/ultimate-plex-companion/actions/workflows/ci.yml/badge.svg)](https://github.com/craiggoddenpayne/ultimate-plex-companion/actions/workflows/ci.yml) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE) [![Node.js 22+](https://img.shields.io/badge/Node.js-22%2B-5FA04E.svg)](package.json)
+[![CI](https://github.com/craiggoddenpayne/ultimate-plex-companion/actions/workflows/ci.yml/badge.svg)](https://github.com/craiggoddenpayne/ultimate-plex-companion/actions/workflows/ci.yml) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE) [![Node.js 22.18+](https://img.shields.io/badge/Node.js-22.18%2B-5FA04E.svg)](package.json) [![TypeScript](https://img.shields.io/badge/TypeScript-5.9-3178C6.svg)](tsconfig.json)
 
 A futuristic, local-first command centre for Plex. It combines live playback telemetry, explainable discovery, library health, metadata repair, playlist generation, automations and guarded codec optimization in one Docker-ready application.
 
@@ -32,7 +32,7 @@ Docker Desktop users can normally reach Plex on the host at `http://host.docker.
 
 ## Local development
 
-Requirements: Node.js 22+, npm and FFmpeg/FFprobe for codec features.
+Requirements: Node.js 22.18+, npm and FFmpeg/FFprobe for codec features.
 
 ```bash
 npm ci
@@ -75,7 +75,9 @@ Codec conversions create a separate MKV, preserve audio/subtitles/chapters/metad
 
 ## Extending the project
 
-Feature navigation is defined centrally in `src/shared/feature-registry.js`. Browser and server capabilities are grouped into matching folders under `src`, with mirrored tests under `test`.
+Feature navigation is defined centrally in `src/shared/feature-registry.ts`. Browser and server capabilities are grouped into matching TypeScript folders under `src`, with mirrored TypeScript tests under `test`.
+
+`npm run check` performs a no-emit TypeScript compile across the browser, server, shared modules and tests. The small root `server.js` compatibility entry remains intentionally stable for Docker and existing deployments; application logic lives in TypeScript.
 
 Start with [architecture](docs/ARCHITECTURE.md), [extension patterns](docs/EXTENDING.md) and [contribution guidance](CONTRIBUTING.md).
 

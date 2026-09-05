@@ -28,7 +28,7 @@ test('saves Plex credentials securely and returns a live overview', async t => {
   });
   const mockPort = await listen(mock);
   const appPortProbe = createServer(); const appPort = await listen(appPortProbe); await close(appPortProbe);
-  const app = spawn(process.execPath, ['server.ts'], { cwd:process.cwd(), env:{ ...process.env, PORT:String(appPort), CONFIG_DIR:configDir }, stdio:'ignore' });
+  const app = spawn(process.execPath, ['server.js'], { cwd:process.cwd(), env:{ ...process.env, PORT:String(appPort), CONFIG_DIR:configDir }, stdio:'ignore' });
   t.after(async () => { app.kill(); await close(mock); await rm(configDir, { recursive:true, force:true }); });
   await new Promise(resolve => setTimeout(resolve, 180));
 

@@ -12,6 +12,7 @@ RUN apk add --no-cache ffmpeg
 COPY --from=build /app/dist ./dist
 COPY --from=build /app/server.js /app/package.json ./
 COPY --from=build /app/src/server ./src/server
+COPY --from=build /app/src/shared ./src/shared
 RUN mkdir -p /data && chown -R node:node /app /data
 USER node
 EXPOSE 8080
