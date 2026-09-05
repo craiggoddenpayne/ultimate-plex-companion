@@ -11,7 +11,7 @@ Thanks for helping make Ultimate Plex Companion better. Contributions should pre
 
 ## Development setup
 
-Requirements: Node.js 22.18+, npm and, for codec features, FFmpeg/FFprobe.
+Requirements: Node.js 24+, npm and, for codec features, FFmpeg/FFprobe. The repository includes an `.nvmrc` for local version selection.
 
 ```bash
 npm ci

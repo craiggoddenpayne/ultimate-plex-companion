@@ -1,6 +1,6 @@
 # Ultimate Plex Companion
 
-[![CI](https://github.com/craiggoddenpayne/ultimate-plex-companion/actions/workflows/ci.yml/badge.svg)](https://github.com/craiggoddenpayne/ultimate-plex-companion/actions/workflows/ci.yml) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE) [![Node.js 22.18+](https://img.shields.io/badge/Node.js-22.18%2B-5FA04E.svg)](package.json) [![TypeScript](https://img.shields.io/badge/TypeScript-5.9-3178C6.svg)](tsconfig.json)
+[![CI](https://github.com/craiggoddenpayne/ultimate-plex-companion/actions/workflows/ci.yml/badge.svg)](https://github.com/craiggoddenpayne/ultimate-plex-companion/actions/workflows/ci.yml) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE) [![Node.js 24+](https://img.shields.io/badge/Node.js-24%2B-5FA04E.svg)](package.json) [![TypeScript](https://img.shields.io/badge/TypeScript-7-3178C6.svg)](tsconfig.json)
 
 A futuristic, local-first command centre for Plex. It combines live playback telemetry, explainable discovery, library health, metadata repair, playlist generation, automations and guarded codec optimization in one Docker-ready application.
 
@@ -32,7 +32,7 @@ Docker Desktop users can normally reach Plex on the host at `http://host.docker.
 
 ## Local development
 
-Requirements: Node.js 22.18+, npm and FFmpeg/FFprobe for codec features.
+Requirements: Node.js 24+, npm and FFmpeg/FFprobe for codec features. Run `nvm use` to select the repository's declared Node release when using nvm.
 
 ```bash
 npm ci

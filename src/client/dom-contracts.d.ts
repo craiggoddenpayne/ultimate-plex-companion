@@ -13,7 +13,7 @@ interface Element {
   elements: any;
   focus(options?: FocusOptions): void;
   getContext(contextId: '2d', options?: CanvasRenderingContext2DSettings): CanvasRenderingContext2D | null;
-  hidden: boolean;
+  hidden: boolean | 'until-found';
   height: number;
   onchange: ((this: GlobalEventHandlers, event: Event) => unknown) | null;
   onclick: ((this: GlobalEventHandlers, event: MouseEvent) => unknown) | null;
