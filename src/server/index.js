@@ -3,23 +3,27 @@ import { readFile, writeFile, mkdir, stat, access, rename, unlink } from 'node:f
 import { extname, join, normalize, dirname, basename, relative, resolve, isAbsolute } from 'node:path';
 import { spawn } from 'node:child_process';
 import { randomUUID } from 'node:crypto';
-import { friendlyConnectionError } from './features/connection/connection-error-server.js';
-import { commandDeck } from './features/command-deck/command-deck-server.js';
-import { streamTelemetry, peopleTelemetry } from './features/telemetry/telemetry-server.js';
-import { futureLab } from './features/future-lab/future-lab-server.js';
-import { personalRecommendations } from './features/recommendations/recommendations-server.js';
-import { createGeneratedPlaylist, playlistStudio } from './features/playlists/playlist-studio-server.js';
+import { composeFeatureRouters } from './core/router.js';
+import { createPlexClient } from './core/plex-client.js';
+import { normalizePlexConfig } from './core/validation.js';
+import { createAutomationRoutes } from './features/automations/routes.js';
+import { createCodecRoutes } from './features/codec-studio/routes.js';
+import { createCommandDeckRoutes } from './features/command-deck/routes.js';
+import { createCompanionRoutes } from './features/companion/routes.js';
+import { createConnectionRoutes } from './features/connection/routes.js';
+import { createDiscoveryRoutes } from './features/discovery/routes.js';
+import { createFutureLabRoutes } from './features/future-lab/routes.js';
+import { createLibraryRoutes } from './features/library/routes.js';
+import { createMetadataRoutes } from './features/metadata/routes.js';
+import { createPlaylistRoutes } from './features/playlists/routes.js';
+import { createPlexRoutes } from './features/plex/routes.js';
+import { createRecommendationRoutes } from './features/recommendations/routes.js';
+import { createTelemetryRoutes } from './features/telemetry/routes.js';
+import { createUtilityRoutes } from './features/utility-suite/routes.js';
 import { createAutomationEngine } from './features/automations/automation-server.js';
-import { universalSearch, answerCompanion, companionNotifications } from './features/companion/companion-server.js';
-import { invalidateLibraryInsights, libraryInsights } from './features/library/library-insights-server.js';
-import { deleteOverlap } from './features/library/library-overlap-server.js';
 import { createOptimizationStore } from './features/codec-studio/optimization-store-server.js';
-import { clearOptimizationHistory, optimizationEta, optimizationSummary, updateQueuedJob } from './features/codec-studio/optimization-queue-server.js';
-import { plexItemUrl } from './features/plex/plex-link-server.js';
+import { optimizationEta } from './features/codec-studio/optimization-queue-server.js';
 import { conversionTarget, isLegacyCodec, supportedTargets, videoArguments } from './features/codec-studio/codec-modernizer-server.js';
-import { metadataUpdate, publicMetadata } from './features/metadata/metadata-helper-server.js';
-import { utilitySuite } from './features/utility-suite/utility-suite-server.js';
-import { invalidateMetadataCenter, metadataCenter } from './features/metadata/metadata-center-server.js';
 
 const port = Number(process.env.PORT || 8080);
 const staticRoot = join(process.cwd(), 'dist');
@@ -45,14 +49,7 @@ async function body(req) {
   return JSON.parse(raw || '{}');
 }
 
-function normalizeConfig(input) {
-  const url = new URL(String(input.plexUrl || '').trim());
-  if (!['http:', 'https:'].includes(url.protocol)) throw new Error('Plex URL must use http:// or https://.');
-  if (url.username || url.password) throw new Error('Do not include credentials in the Plex URL.');
-  const token = String(input.token || '').trim();
-  if (!token) throw new Error('A Plex access token is required.');
-  return { plexUrl: url.toString().replace(/\/$/, ''), token };
-}
+const normalizeConfig = normalizePlexConfig;
 
 function optimizationSettings(config = {}) {
   const stored = config.optimization || {};
@@ -74,63 +71,10 @@ async function savedConfig() {
   catch (error) { if (error.code === 'ENOENT') return null; throw error; }
 }
 
-async function plexFetch(config, path) {
-  const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), 8_000);
-  try {
-    const response = await fetch(`${config.plexUrl}${path}`, {
-      signal: controller.signal,
-      headers: {
-        Accept: 'application/json',
-        'X-Plex-Token': config.token,
-        'X-Plex-Product': 'Ultimate Plex Companion',
-        'X-Plex-Version': '0.1.0',
-        'X-Plex-Client-Identifier': 'ultimate-plex-companion',
-      },
-    });
-    if (!response.ok) throw new Error(response.status === 401 ? 'Plex rejected the access token.' : `Plex returned HTTP ${response.status}.`);
-    const type = response.headers.get('content-type') || '';
-    if (!type.includes('json')) throw new Error('Plex did not return JSON. Check that this URL points to Plex Media Server.');
-    return response.json();
-  } catch (error) {
-    throw new Error(friendlyConnectionError(error));
-  } finally { clearTimeout(timeout); }
-}
-
-async function plexCommand(config, path, method = 'GET') {
-  const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), 8_000);
-  try {
-    const response = await fetch(config.plexUrl + path, {
-      method, signal:controller.signal,
-      headers:{
-        'X-Plex-Token':config.token,
-        'X-Plex-Product':'Ultimate Plex Companion',
-        'X-Plex-Version':'0.1.0',
-        'X-Plex-Client-Identifier':'ultimate-plex-companion',
-      },
-    });
-    if (!response.ok) throw new Error(response.status === 401 ? 'Plex rejected the access token.' : 'Plex returned HTTP ' + response.status + '.');
-  } catch (error) {
-    if (error.name === 'AbortError') throw new Error('Plex did not respond within 8 seconds.');
-    throw error;
-  } finally { clearTimeout(timeout); }
-}
-
-async function plexDelete(config, path) {
-  const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), 12_000);
-  try {
-    const response = await fetch(config.plexUrl + path, { method:'DELETE', signal:controller.signal, headers:{ 'X-Plex-Token':config.token, 'X-Plex-Product':'Ultimate Plex Companion', 'X-Plex-Version':'0.1.0', 'X-Plex-Client-Identifier':'ultimate-plex-companion', 'X-Plex-Pms-Api-Version':'1.0.0' } });
-    if (!response.ok) {
-      if (response.status === 401 || response.status === 403) throw new Error('Plex refused deletion. Confirm you are the server owner and Allow Media Deletion is enabled in Plex.');
-      throw new Error('Plex could not delete this media version (HTTP ' + response.status + '). Nothing was changed.');
-    }
-  } catch (error) {
-    if (error.name === 'AbortError') throw new Error('Plex did not confirm deletion within 12 seconds. Refresh Atlas before trying again.');
-    throw error;
-  } finally { clearTimeout(timeout); }
-}
+const plexClient = createPlexClient();
+const plexFetch = plexClient.fetchJson;
+const plexCommand = plexClient.command;
+const plexDelete = plexClient.deleteMedia;
 
 async function inspectPlex(config) {
   const [root, identity] = await Promise.all([plexFetch(config, '/'), plexFetch(config, '/identity')]);
@@ -293,13 +237,17 @@ async function servePlexArt(res, ratingKey) {
   try {
     const config = await savedConfig();
     if (!config || !/^\d+$/.test(ratingKey)) throw new Error('Artwork unavailable.');
-    const controller = new AbortController(); const timeout = setTimeout(() => controller.abort(), 8_000);
-    const response = await fetch(`${config.plexUrl}/library/metadata/${ratingKey}/thumb`, { signal:controller.signal, headers:{ 'X-Plex-Token':config.token, Accept:'image/*' } });
-    clearTimeout(timeout);
-    if (!response.ok) throw new Error('Artwork unavailable.');
-    res.writeHead(200, { 'Content-Type':response.headers.get('content-type') || 'image/jpeg', 'Cache-Control':'private, max-age=86400', 'X-Content-Type-Options':'nosniff' });
+    const response = await plexClient.artwork(config, ratingKey);
+    res.writeHead(200, {
+      'Content-Type':response.headers.get('content-type') || 'image/jpeg',
+      'Cache-Control':'private, max-age=86400',
+      'X-Content-Type-Options':'nosniff',
+    });
     res.end(Buffer.from(await response.arrayBuffer()));
-  } catch { res.writeHead(404); res.end(); }
+  } catch {
+    res.writeHead(404);
+    res.end();
+  }
 }
 
 const jobs = new Map();
@@ -450,211 +398,63 @@ async function replaceOriginal(job, config, confirmed) {
 
 const automationEngine = createAutomationEngine({ configDir, savedConfig, plexFetch, plexCommand, storageAnalysis, overview });
 
+const queueController = {
+  jobs,
+  publicJob,
+  activeJob:() => activeJob,
+  isPaused:() => queuePaused,
+  persist:persistOptimizationJobs,
+  runNext:runNextJob,
+  create:createOptimizationJob,
+  replace:replaceOriginal,
+  async setPaused(paused) {
+    queuePaused = paused;
+    await persistOptimizationJobs();
+    if (!queuePaused) runNextJob();
+  },
+};
+
+const featureRouter = composeFeatureRouters([
+  createPlexRoutes(),
+  createConnectionRoutes(),
+  createMetadataRoutes(),
+  createLibraryRoutes(),
+  createUtilityRoutes(),
+  createCompanionRoutes(automationEngine),
+  createRecommendationRoutes(),
+  createPlaylistRoutes(),
+  createAutomationRoutes(automationEngine),
+  createFutureLabRoutes(),
+  createTelemetryRoutes(),
+  createCommandDeckRoutes(),
+  createDiscoveryRoutes(),
+  createCodecRoutes(queueController),
+]);
+
+function requestContext(req, res, pathname) {
+  return {
+    req, res, pathname, json, body, envConfig, configDir, access,
+    savedConfig, normalizeConfig, optimizationSettings, inspectPlex,
+    plexFetch, plexCommand, plexDelete, libraryItems, overview,
+    storageAnalysis, discoveryCatalog, discoveryRecommendations,
+    runProcess,
+    getJobs:() => [...jobs.values()].map(publicJob),
+    invalidateCaches() { storageScanCache = null; discoveryCache = null; },
+    async saveConfig(config) {
+      await mkdir(configDir, { recursive:true });
+      await writeFile(configFile, `${JSON.stringify(config, null, 2)}\n`, { mode:0o600 });
+    },
+  };
+}
+
 async function api(req, res, pathname) {
   try {
-    if (pathname === '/api/health') return json(res, 200, { ok: true });
-    const plexOpenMatch = pathname.match(/^\/api\/plex\/open\/(\d+)/);
-    if (plexOpenMatch && plexOpenMatch[0] === pathname && req.method === 'GET') {
-      const config = await savedConfig();
-      if (!config) return json(res, 428, { error:'Plex is not configured.' });
-      const identity = await inspectPlex(config);
-      res.writeHead(302, { Location:plexItemUrl(identity.machineIdentifier, plexOpenMatch[1]), 'Cache-Control':'no-store', 'Referrer-Policy':'no-referrer' });
-      return res.end();
-    }
-    if (pathname === '/api/config' && req.method === 'GET') {
-      const config = await savedConfig();
-      return json(res, 200, { configured: Boolean(config), plexUrl: config?.plexUrl || '', tokenSource: envConfig ? 'environment' : config ? 'saved' : 'none' });
-    }
-    if (pathname === '/api/config/test' && req.method === 'POST') {
-      const config = normalizeConfig(await body(req));
-      return json(res, 200, { ok: true, server: await inspectPlex(config) });
-    }
-    if (pathname === '/api/config' && req.method === 'POST') {
-      if (envConfig) return json(res, 409, { error: 'Settings are managed by PLEX_URL and PLEX_TOKEN environment variables.' });
-      const previous = await savedConfig();
-      const config = { ...normalizeConfig(await body(req)), optimization: previous?.optimization || optimizationSettings() };
-      const server = await inspectPlex(config);
-      await mkdir(configDir, { recursive: true });
-      await writeFile(configFile, `${JSON.stringify(config, null, 2)}\n`, { mode: 0o600 });
-      storageScanCache = null; discoveryCache = null;
-      return json(res, 200, { ok: true, server });
-    }
-    const metadataKey = pathname.startsWith('/api/library/metadata/') ? pathname.split('/')[4] : '';
-    const metadataMatch = metadataKey && [...metadataKey].every(char => char >= '0' && char <= '9') ? [pathname, metadataKey] : null;
-    if (metadataMatch && req.method === 'GET') {
-      const config=await savedConfig(); if(!config)return json(res,428,{error:'Plex is not configured.'});
-      const data=await plexFetch(config,'/library/metadata/'+metadataMatch[1]);
-      const item=data.MediaContainer?.Metadata?.[0];if(!item)return json(res,404,{error:'Plex metadata record not found.'});
-      return json(res,200,publicMetadata(item));
-    }
-    if (metadataMatch && req.method === 'POST') {
-      const config=await savedConfig(); if(!config)return json(res,428,{error:'Plex is not configured.'});
-      const data=await plexFetch(config,'/library/metadata/'+metadataMatch[1]);
-      const item=data.MediaContainer?.Metadata?.[0];if(!item)return json(res,404,{error:'Plex metadata record not found.'});
-      const update=metadataUpdate(item,await body(req));
-      if(update.changed.some(field=>field!=='artwork'))await plexCommand(config,update.path,'PUT');
-      if(update.posterPath)await plexCommand(config,update.posterPath,'POST');
-      invalidateLibraryInsights(); invalidateMetadataCenter(); storageScanCache=null; discoveryCache=null;
-      return json(res,200,{ok:true,changed:update.changed});
-    }
-    if (pathname === '/api/library/overlaps/delete' && req.method === 'POST') {
-      const config=await savedConfig(); if(!config) return json(res,428,{error:'Plex is not configured.'});
-      const report=await libraryInsights(config,{plexFetch,libraryItems},true);
-      const result=await deleteOverlap(config,{plexFetch,plexDelete,invalidate:invalidateLibraryInsights},await body(req),report);
-      return json(res,200,result);
-    }
-    if (pathname === '/api/library/insights' && req.method === 'GET') {
-      const config=await savedConfig(); if(!config) return json(res,428,{error:'Plex is not configured.'});
-      const force=new URL(req.url,'http://localhost').searchParams.get('refresh')==='1';
-      return json(res,200,await libraryInsights(config,{plexFetch,libraryItems},force));
-    }
-    if (pathname === '/api/metadata-center' && req.method === 'GET') {
-      const config=await savedConfig(); if(!config)return json(res,428,{error:'Plex is not configured.'});
-      const force=new URL(req.url,'http://localhost').searchParams.get('refresh')==='1';
-      return json(res,200,await metadataCenter(config,{plexFetch,libraryItems},force));
-    }
-    if (pathname === '/api/utility-suite' && req.method === 'GET') {
-      const config=await savedConfig(); if(!config) return json(res,428,{error:'Plex is not configured.'});
-      const force=new URL(req.url,'http://localhost').searchParams.get('refresh')==='1';
-      return json(res,200,await utilitySuite(config,{plexFetch,libraryItems},force));
-    }
-    if (pathname === '/api/search' && req.method === 'GET') {
-      const config=await savedConfig(); if(!config) return json(res,428,{error:'Plex is not configured.'});
-      return json(res,200,await universalSearch(config,plexFetch,new URL(req.url,'http://localhost').searchParams.get('q')));
-    }
-    if (pathname === '/api/assistant' && req.method === 'POST') {
-      const config=await savedConfig(); if(!config) return json(res,428,{error:'Plex is not configured.'});
-      return json(res,200,await answerCompanion(config,{plexFetch,overview,storageAnalysis,discoveryRecommendations,streamTelemetry,automationEngine},(await body(req)).question));
-    }
-    if (pathname === '/api/notifications' && req.method === 'GET') {
-      const config=await savedConfig(); if(!config) return json(res,428,{error:'Plex is not configured.'});
-      return json(res,200,await companionNotifications(config,{plexFetch,streamTelemetry,automationEngine,getJobs:()=>[...jobs.values()].map(publicJob)}));
-    }
-    if (pathname === '/api/recommendations' && req.method === 'GET') {
-      const config = await savedConfig();
-      if (!config) return json(res, 428, { error:'Plex is not configured.' });
-      const options = Object.fromEntries(new URL(req.url, 'http://localhost').searchParams);
-      return json(res, 200, await personalRecommendations(config, { plexFetch, discoveryCatalog }, options));
-    }
-    if (pathname === '/api/playlists/studio' && req.method === 'GET') {
-      const config = await savedConfig();
-      if (!config) return json(res, 428, { error:'Plex is not configured.' });
-      return json(res, 200, await playlistStudio(config, { plexFetch, libraryItems }));
-    }
-    if (pathname === '/api/playlists/generate' && req.method === 'POST') {
-      const config = await savedConfig();
-      if (!config) return json(res, 428, { error:'Plex is not configured.' });
-      return json(res, 201, { playlist:await createGeneratedPlaylist(config, { plexFetch, libraryItems, inspectPlex, plexCommand }, await body(req)) });
-    }
-    if (pathname === '/api/automations' && req.method === 'GET') return json(res, 200, await automationEngine.list());
-    if (pathname === '/api/automations' && req.method === 'POST') return json(res, 201, { rule:await automationEngine.create(await body(req)) });
-    if (pathname === '/api/automations/state' && req.method === 'PATCH') return json(res, 200, { paused:await automationEngine.setPaused((await body(req)).paused) });
-    const automationRunMatch = pathname.startsWith('/api/automations/') && pathname.endsWith('/run') ? [pathname, pathname.split('/')[3]] : null;
-    if (automationRunMatch && req.method === 'POST') {
-      const input = await body(req);
-      const run = await automationEngine.run(automationRunMatch[1], { dryRun:input.dryRun === true });
-      return json(res, run.status === 'success' ? 200 : 400, { run });
-    }
-    const automationMatch = pathname.startsWith('/api/automations/') && pathname.split('/').length === 4 ? [pathname, pathname.split('/')[3]] : null;
-    if (automationMatch && req.method === 'PATCH') return json(res, 200, { rule:await automationEngine.update(automationMatch[1], await body(req)) });
-    if (automationMatch && req.method === 'DELETE') { await automationEngine.remove(automationMatch[1]); return json(res, 200, { ok:true }); }
-    if (pathname === '/api/lab' && req.method === 'GET') {
-      const config = await savedConfig();
-      if (!config) return json(res, 428, { error:'Plex is not configured.' });
-      const force = new URL(req.url, 'http://localhost').searchParams.get('refresh') === '1';
-      return json(res, 200, await futureLab(config, { plexFetch, discoveryCatalog }, force));
-    }
-    if (pathname === '/api/streams' && req.method === 'GET') {
-      const config = await savedConfig();
-      if (!config) return json(res, 428, { error:'Plex is not configured.' });
-      return json(res, 200, await streamTelemetry(config, plexFetch));
-    }
-    if (pathname === '/api/people' && req.method === 'GET') {
-      const config = await savedConfig();
-      if (!config) return json(res, 428, { error:'Plex is not configured.' });
-      const days = new URL(req.url, 'http://localhost').searchParams.get('days');
-      return json(res, 200, await peopleTelemetry(config, plexFetch, days));
-    }
-    if (pathname === '/api/command-deck' && req.method === 'GET') {
-      const config = await savedConfig();
-      if (!config) return json(res, 428, { error:'Plex is not configured.' });
-      return json(res, 200, await commandDeck(config, { plexFetch, overview, libraryItems }));
-    }
-    if (pathname === '/api/overview' && req.method === 'GET') {
-      const config = await savedConfig();
-      if (!config) return json(res, 428, { error: 'Plex is not configured.' });
-      return json(res, 200, await overview(config));
-    }
-    if (pathname === '/api/analysis/storage' && req.method === 'GET') {
-      const config = await savedConfig();
-      if (!config) return json(res, 428, { error: 'Plex is not configured.' });
-      const force = new URL(req.url, 'http://localhost').searchParams.get('refresh') === '1';
-      return json(res, 200, await storageAnalysis(config, force));
-    }
-    if (pathname === '/api/discovery' && req.method === 'GET') {
-      const config = await savedConfig();
-      if (!config) return json(res, 428, { error:'Plex is not configured.' });
-      const options = Object.fromEntries(new URL(req.url, 'http://localhost').searchParams);
-      return json(res, 200, await discoveryRecommendations(config, options));
-    }
-    if (pathname === '/api/optimization/config' && req.method === 'GET') {
-      const config = await savedConfig();
-      const settings = optimizationSettings(config || {});
-      let encoderAvailable=true,targets=[];
-      try { await runProcess('ffprobe',['-version']); const capability=await runProcess('ffmpeg',['-hide_banner','-encoders']); targets=supportedTargets(capability.stdout+' '+capability.stderr); } catch { encoderAvailable=false; targets=supportedTargets(''); }
-      return json(res,200,{...settings,encoderAvailable,targets,managed:Boolean(process.env.PLEX_MEDIA_ROOT||process.env.MEDIA_ROOT)});
-    }
-    if (pathname === '/api/optimization/config' && req.method === 'POST') {
-      const config = await savedConfig();
-      if (!config) return json(res, 428, { error:'Plex is not configured.' });
-      if (process.env.PLEX_MEDIA_ROOT || process.env.MEDIA_ROOT) return json(res, 409, { error:'Media paths are managed by environment variables.' });
-      const input = await body(req);
-      const settings = optimizationSettings({ optimization:input });
-      if (!isAbsolute(settings.plexPathRoot) || !isAbsolute(settings.mediaPathRoot)) throw new Error('Both media roots must be absolute paths.');
-      await access(settings.mediaPathRoot);
-      await mkdir(configDir, { recursive:true });
-      await writeFile(configFile, `${JSON.stringify({ plexUrl:config.plexUrl, token:config.token, optimization:settings }, null, 2)}\n`, { mode:0o600 });
-      return json(res, 200, { ...settings, ok:true });
-    }
-    if (pathname === '/api/optimization/jobs' && req.method === 'GET') return json(res, 200, { jobs:[...jobs.values()].map(publicJob), paused:queuePaused, summary:optimizationSummary(jobs, activeJob) });
-    if (pathname === '/api/optimization/queue' && req.method === 'PATCH') {
-      const input = await body(req);
-      if (typeof input.paused !== 'boolean') throw new Error('Paused must be true or false.');
-      queuePaused = input.paused;
-      await persistOptimizationJobs();
-      if (!queuePaused) runNextJob();
-      return json(res, 200, { paused:queuePaused, summary:optimizationSummary(jobs, activeJob) });
-    }
-    if (pathname === '/api/optimization/queue/clear' && req.method === 'POST') {
-      if ((await body(req)).confirmed !== true) throw new Error('Confirm history cleanup before continuing.');
-      const removed = clearOptimizationHistory(jobs);
-      await persistOptimizationJobs();
-      return json(res, 200, { removed, summary:optimizationSummary(jobs, activeJob) });
-    }
-    if (pathname === '/api/optimization/jobs' && req.method === 'POST') {
-      const config = await savedConfig();
-      if (!config) return json(res, 428, { error:'Plex is not configured.' });
-      const input = await body(req);
-      return json(res, 202, { job:await createOptimizationJob(config, input.ratingKey, input.targetCodec) });
-    }
-    const actionMatch = pathname.match(/^\/api\/optimization\/jobs\/([a-f0-9-]+)\/action/);
-    if (actionMatch && actionMatch[0] === pathname && req.method === 'POST') {
-      const input = await body(req);
-      const job = updateQueuedJob(jobs, actionMatch[1], input.action);
-      await persistOptimizationJobs();
-      if (input.action === 'retry') runNextJob();
-      return json(res, 200, { job:publicJob(job), summary:optimizationSummary(jobs, activeJob) });
-    }
-    const replaceMatch = pathname.match(/^\/api\/optimization\/jobs\/([a-f0-9-]+)\/replace$/);
-    if (replaceMatch && req.method === 'POST') {
-      const config = await savedConfig(); const job = jobs.get(replaceMatch[1]);
-      if (!job) return json(res, 404, { error:'Optimization job not found.' });
-      return json(res, 200, { job:await replaceOriginal(job, config, (await body(req)).confirmed) });
-    }
-    return json(res, 404, { error: 'Not found.' });
+    if (pathname === '/api/health') return json(res, 200, { ok:true });
+    if (await featureRouter(requestContext(req, res, pathname))) return;
+    return json(res, 404, { error:'Not found.' });
   } catch (error) {
     const message = error.cause?.code === 'ECONNREFUSED' ? 'Could not reach Plex at that address.' : error.message;
-    return json(res, 400, { error: message || 'The request failed.' });
+    return json(res, 400, { error:message || 'The request failed.' });
   }
 }
 

@@ -11,7 +11,7 @@ ENV NODE_ENV=production PORT=8080 CONFIG_DIR=/data
 RUN apk add --no-cache ffmpeg
 COPY --from=build /app/dist ./dist
 COPY --from=build /app/server.js /app/package.json ./
-COPY --from=build /app/*-server.js ./
+COPY --from=build /app/src/server ./src/server
 RUN mkdir -p /data && chown -R node:node /app /data
 USER node
 EXPOSE 8080

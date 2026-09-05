@@ -75,7 +75,7 @@ Codec conversions create a separate MKV, preserve audio/subtitles/chapters/metad
 
 ## Extending the project
 
-Feature navigation is defined centrally in `feature-registry.js`. Domain logic lives in dependency-injected `*-server.js` modules, browser behavior in focused feature modules and tests in `test/`.
+Feature navigation is defined centrally in `src/shared/feature-registry.js`. Browser and server capabilities are grouped into matching folders under `src`, with mirrored tests under `test`.
 
 Start with [architecture](docs/ARCHITECTURE.md), [extension patterns](docs/EXTENDING.md) and [contribution guidance](CONTRIBUTING.md).
 

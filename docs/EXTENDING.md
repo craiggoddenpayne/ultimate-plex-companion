@@ -1,27 +1,55 @@
 # Extending the companion
 
-## Add a navigation surface
+## Add a feature
 
-Add one object to `feature-registry.js`. The registry validates unique, URL-safe IDs and automatically feeds the navigation and placeholder-page renderer.
+Create matching feature folders when the capability has both browser and server behavior:
 
-Create `my-feature.js` and `my-feature.css`, then include them in `index.html`. The browser module should locate `#my-feature-page`, replace its placeholder content, load data only when needed and render a useful disconnected/error state.
+```text
+src/client/features/my-feature/
+├── my-feature.js
+└── my-feature.css
+
+src/server/features/my-feature/
+├── my-feature-server.js
+└── routes.js
+
+test/features/my-feature/
+└── my-feature.test.js
+```
+
+Register a navigable surface in `src/shared/feature-registry.js`. Import browser behavior and styles once from `src/client/main.js`; do not add individual tags to `index.html`.
 
 ## Add backend behavior
 
-Prefer a focused domain module:
+Keep business logic independent from HTTP and inject its dependencies:
 
 ```js
 export async function myFeature(config, { plexFetch, libraryItems }) {
   const data = await plexFetch(config, '/library/sections');
-  return { count: data.MediaContainer?.size || 0 };
+  return { count:data.MediaContainer?.size || 0 };
 }
 ```
 
-The module should not read global environment state or start servers. Compose it from `server.js`, validate request input at the boundary and return a deliberately public shape.
+Expose it through a feature router that returns `true` only when it handles the request:
+
+```js
+import { requirePlex } from '../../core/router.js';
+
+export function createMyFeatureRoutes() {
+  return async context => {
+    if (context.pathname !== '/api/my-feature' || context.req.method !== 'GET') return false;
+    const config = await requirePlex(context);
+    if (config) context.json(context.res, 200, await myFeature(config, context));
+    return true;
+  };
+}
+```
+
+Add the router factory to the composition list in `src/server/index.js`. Shared validation belongs in `src/server/core/validation.js`; Plex network behavior belongs in `src/server/core/plex-client.js`.
 
 ## Testing
 
-Test domain modules with injected fake Plex responses. Cover empty libraries, malformed metadata, authorization boundaries and confirmation guards. The integration test owns a temporary mock Plex server and verifies the public API without real credentials.
+Test domain modules with injected fake Plex responses. Cover empty libraries, malformed metadata, authorization boundaries and confirmation guards. Add router tests when HTTP matching or status behavior is non-trivial. The integration test owns a temporary mock Plex server and verifies public behavior without real credentials.
 
 ## Plex mutations
 

@@ -9,6 +9,9 @@ and this project intends to follow [Semantic Versioning](https://semver.org/spec
 
 ### Added
 
+- Feature-oriented client and server source tree with composable route adapters.
+- Shared Plex transport, validation and error-handling core.
+- Tests organized to mirror core, feature and integration boundaries.
 - Initial open-source project structure, contribution guidance and CI.
 - Central feature registry and extension documentation.
 - Playlist Studio with previewable, criteria-driven Plex playlist generators.
