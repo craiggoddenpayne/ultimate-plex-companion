@@ -1,5 +1,5 @@
-import { initStarfield } from './starfield-engine.js';
-import { featureSets, navigation as nav, pageCopy } from './feature-registry.js';
+import { initStarfield } from './core/starfield-engine.js';
+import { featureSets, navigation as nav, pageCopy } from '../shared/feature-registry.js';
 const icons = {
   grid: '<path d="M4 4h6v6H4zM14 4h6v6h-6zM4 14h6v6H4zM14 14h6v6h-6z"/>',
   library: '<path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v15H6.5A2.5 2.5 0 0 0 4 20.5z"/><path d="M4 5.5v15A2.5 2.5 0 0 1 6.5 18H20"/>',

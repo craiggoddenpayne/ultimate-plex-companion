@@ -1,4 +1,4 @@
-import { COMPANION_THEMES, normalizeThemePreferences } from './theme-model.js';
+import { COMPANION_THEMES, normalizeThemePreferences } from '../../shared/theme-model.js';
 
 const storageKey='ultimate-plex-companion:appearance';
 const themeEscape=value=>String(value??'').replace(/[&<>'"]/g,char=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[char]));
