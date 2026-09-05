@@ -1,5 +1,7 @@
 # Ultimate Plex Companion
 
+[![CI](https://github.com/craiggoddenpayne/ultimate-plex-companion/actions/workflows/ci.yml/badge.svg)](https://github.com/craiggoddenpayne/ultimate-plex-companion/actions/workflows/ci.yml) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE) [![Node.js 22+](https://img.shields.io/badge/Node.js-22%2B-5FA04E.svg)](package.json)
+
 A futuristic, local-first command centre for Plex. It combines live playback telemetry, explainable discovery, library health, metadata repair, playlist generation, automations and guarded codec optimization in one Docker-ready application.
 
 > [!WARNING]
@@ -77,10 +79,16 @@ Feature navigation is defined centrally in `feature-registry.js`. Domain logic l
 
 Start with [architecture](docs/ARCHITECTURE.md), [extension patterns](docs/EXTENDING.md) and [contribution guidance](CONTRIBUTING.md).
 
+## Contributing
+
+Contributions are welcome. Start with [CONTRIBUTING.md](CONTRIBUTING.md), which covers local setup, tests, feature structure and safety expectations. Use the issue templates for bugs and proposals, read [SUPPORT.md](SUPPORT.md) for help, and report vulnerabilities through the private process in [SECURITY.md](SECURITY.md).
+
+Run `npm run ci` before opening a pull request. New Plex mutations must provide a read-only preview, server-side validation and explicit confirmation.
+
 ## Project status
 
 This is pre-1.0 software. Interfaces and stored data may change between releases. Review the [security policy](SECURITY.md) before deployment.
 
 ## License
 
-A public open-source license must be selected before the first GitHub release.
+Released under the [MIT License](LICENSE). Plex is a trademark of Plex, Inc. This independent project is not affiliated with or endorsed by Plex.
