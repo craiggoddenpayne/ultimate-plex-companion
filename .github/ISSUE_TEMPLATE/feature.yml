@@ -1,0 +1,29 @@
+name: Feature request
+description: Propose an improvement or new companion surface
+title: "[Feature]: "
+labels: [enhancement]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem to solve
+      description: Describe the user need rather than only the interface.
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed behavior
+    validations:
+      required: true
+  - type: dropdown
+    id: plex_access
+    attributes:
+      label: Plex access required
+      options: [Read only, Creates or updates Plex data, Deletes media or Plex data, Unsure]
+    validations:
+      required: true
+  - type: textarea
+    id: safety
+    attributes:
+      label: Safety and privacy considerations

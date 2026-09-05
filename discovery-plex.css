@@ -1,0 +1,7 @@
+.discovery-open-icon{position:absolute;z-index:4;right:8px;bottom:8px;width:29px;height:29px;display:grid;place-items:center;border:1px solid #deb15b88;border-radius:50%;background:#17130de8;color:#ffc966;box-shadow:0 0 18px #f5ad2e20;cursor:pointer;transition:.2s}
+.discovery-open-icon:hover{transform:scale(1.08);border-color:#ffd47d;box-shadow:0 0 24px #f5ad2e48}
+.discovery-open-icon svg{width:13px;height:13px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.detail-actions{display:flex;align-items:center;gap:8px;margin-top:18px}
+.open-in-plex{display:inline-flex;align-items:center;gap:8px;padding:10px 14px;border:1px solid #f5ad2e;border-radius:6px;background:#f5ad2e;color:#17120a;font-size:9px;font-weight:800;text-decoration:none;box-shadow:0 0 20px #f5ad2e1c;transition:.2s}
+.open-in-plex:hover{transform:translateY(-1px);background:#ffc45c;box-shadow:0 0 28px #f5ad2e35}
+.open-in-plex svg{width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}

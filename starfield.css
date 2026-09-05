@@ -1,0 +1,49 @@
+/* Low-cost ambient starfield: one canvas, capped DPR and a 25fps paint cycle. */
+body {
+  background: radial-gradient(ellipse at 64% -14%, #151a2b 0, #080a0f 50%);
+}
+
+#starfield {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0.96;
+  filter: saturate(1.25) brightness(1.18);
+}
+
+.cosmic-haze {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse 52% 35% at 73% 0, #74502018 0, transparent 72%),
+    radial-gradient(ellipse 38% 50% at 4% 94%, #24476412 0, transparent 75%);
+  mix-blend-mode: screen;
+}
+
+.app-shell {
+  position: relative;
+  z-index: 1;
+}
+
+.sidebar {
+  background: #0b0d12ec;
+  backdrop-filter: blur(18px);
+}
+
+.topbar {
+  background: #080a0fce;
+}
+
+.metric-card,
+.panel,
+.feature-grid article,
+.blueprint {
+  box-shadow: 0 12px 35px #00000020;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #starfield { opacity: 0.6; }
+}
