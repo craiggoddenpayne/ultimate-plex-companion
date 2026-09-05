@@ -6,16 +6,13 @@
   "description": "A futuristic command centre for Plex",
   "scripts": {
     "dev": "vite --host 0.0.0.0",
-    "server": "tsx server.js",
-    "start": "tsx server.js",
+    "server": "node server.js",
+    "start": "node server.js",
     "build": "vite build",
     "test": "tsx --test test/core/*.test.ts test/features/**/*.test.ts test/integration/*.test.ts",
     "preview": "vite preview --host 0.0.0.0",
     "check": "tsc --noEmit",
     "ci": "npm run check && npm test && npm run build"
-  },
-  "dependencies": {
-    "tsx": "^4.20.5"
   },
   "devDependencies": {
     "@types/node": "^24.3.0",
