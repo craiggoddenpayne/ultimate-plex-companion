@@ -37,12 +37,14 @@ export async function commandDeck(config, dependencies) {
   const recentAdded = (recentData.MediaContainer?.Metadata || []).map(item => ({
     type:'added', title:item.title || item.grandparentTitle || 'New item',
     detail:`Added to ${item.librarySectionTitle || 'Plex'}`, at:Number(item.addedAt || 0), ratingKey:item.ratingKey,
+    poster:item.ratingKey ? `/api/art/${encodeURIComponent(item.ratingKey)}` : null,
   }));
   const recentWatched = matched.slice(0,12).map(({record,media}) => ({
     type:'watched', title:record.grandparentTitle || record.title || media.title,
     detail:record.type === 'episode' ? `Watched S${String(record.parentIndex || 0).padStart(2,'0')} E${String(record.index || 0).padStart(2,'0')}` : 'Watched', at:Number(record.viewedAt || 0),
+    poster:(record.ratingKey || media.ratingKey) ? `/api/art/${encodeURIComponent(record.ratingKey || media.ratingKey)}` : null,
   }));
-  const live = base.sessions.map(session => ({ type:'stream', title:session.title, detail:`${session.user} · ${session.mode}`, at:Math.floor(Date.now()/1000) }));
+  const live = base.sessions.map(session => ({ type:'stream', title:session.title, detail:`${session.user} · ${session.mode}`, at:Math.floor(Date.now()/1000), poster:session.poster || (session.ratingKey ? `/api/art/${encodeURIComponent(session.ratingKey)}` : null) }));
   const activity = [...live,...recentAdded,...recentWatched].sort((a,b) => b.at-a.at).slice(0,20);
   const latency = plexLatency;
   const transcodes = base.sessions.filter(session => session.mode === 'Transcoding').length;

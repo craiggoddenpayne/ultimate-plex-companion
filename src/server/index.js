@@ -110,6 +110,7 @@ async function overview(config) {
       meta: [item.year, item.Media?.[0]?.videoResolution?.toUpperCase(), mode].filter(Boolean).join(' · '),
       user, device: player.title || player.product || 'Plex client', progress: Math.min(100, Math.max(0, progress)),
       tone: ['amber','violet','cyan'][index % 3], size: Number(part.size || 0), mode,
+      ratingKey:item.ratingKey || null, poster:item.ratingKey ? `/api/art/${encodeURIComponent(item.ratingKey)}` : null,
     };
   });
   return { server, libraries, libraryCount: libraries.length, titleCount: libraries.reduce((sum, item) => sum + item.count, 0), sessions, syncedAt: new Date().toISOString() };

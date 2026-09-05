@@ -1,10 +1,6 @@
 import { bindCommandDeckDetails, renderTasteIntelligence } from './command-deck-intelligence-ui.js';
+import { activityVisual } from './activity-view.js';
 const deckEscape = value => String(value == null ? '' : value).replace(/[&<>'"]/g, char => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', "'":'&#39;', '"':'&quot;' })[char]);
-const activityIcons = {
-  stream:'<svg class="icon" viewBox="0 0 24 24"><path d="m8 5 11 7-11 7z"/></svg>',
-  added:'<svg class="icon" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>',
-  watched:'<svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="m10 8 6 4-6 4z"/></svg>'
-};
 
 function timeAgo(timestamp) {
   const seconds = Math.max(0, Math.floor(Date.now() / 1000 - Number(timestamp || 0)));
@@ -55,7 +51,7 @@ function updateDeck(data) {
   renderTasteIntelligence(data.taste, dashboard.querySelector('.taste-body'));
 
   const activity = dashboard.querySelector('.activity-list');
-  activity.innerHTML = data.activity.length ? data.activity.slice(0,6).map(item => '<div><span class="activity-icon">' + (activityIcons[item.type] || activityIcons.added) + '</span><p><b>' + deckEscape(item.title) + '</b><small>' + deckEscape(item.detail) + '</small></p><time>' + timeAgo(item.at) + '</time></div>').join('') : '<div class="deck-empty">No recent activity from Plex.</div>';
+  activity.innerHTML = data.activity.length ? data.activity.slice(0,6).map(item => '<div>' + activityVisual(item) + '<p><b>' + deckEscape(item.title) + '</b><small>' + deckEscape(item.detail) + '</small></p><time>' + timeAgo(item.at) + '</time></div>').join('') : '<div class="deck-empty">No recent activity from Plex.</div>';
 
   bindCommandDeckDetails(data);
 
