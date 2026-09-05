@@ -1,3 +1,5 @@
+import { buildArchiveAnomalies, buildMemoryLane, buildMoodWeather, buildRuntimeWormhole } from './future-lab-experiments.js';
+
 let labCache;
 
 function countTags(items, field) {
@@ -45,6 +47,7 @@ export async function futureLab(config, dependencies, force=false) {
   const peakHour=hours.sort((a,b)=>b.count-a.count)[0]||{hour:20,count:0};const peakDay=days.sort((a,b)=>b.count-a.count)[0]||{day:6,count:0};
   const oldest=[...items].sort((a,b)=>a.year-b.year).slice(0,5).map(item=>({title:item.title,year:item.year,ratingKey:item.ratingKey,poster:`/api/art/${item.ratingKey}`}));
   const newest=[...items].sort((a,b)=>Number(b.addedAt||0)-Number(a.addedAt||0)).slice(0,5).map(item=>({title:item.title,year:item.year,addedAt:item.addedAt,ratingKey:item.ratingKey,poster:`/api/art/${item.ratingKey}`}));
-  const data={generatedAt:new Date().toISOString(),catalogSize:items.length,historySample:history.length,graph:buildGraph(items),eras:decadeData,oldest,newest,doubleFeature:deterministicPair(items),oracle:{peakHour:peakHour.hour,peakHourPlays:peakHour.count,peakDay:peakDay.day,peakDayPlays:peakDay.count,favouriteGenre:favouriteGenres[0]?.[0]||'Still emerging',favouriteGenreCount:favouriteGenres[0]?.[1]||0,watchedMovies:viewedItems.length,unwatchedMovies:items.length-viewedItems.length,confidence:history.length?Math.min(96,65+Math.round(Math.log10(history.length)*10)):50}};
+  const now=Math.floor(Date.now()/1000);
+  const data={generatedAt:new Date().toISOString(),catalogSize:items.length,historySample:history.length,graph:buildGraph(items),eras:decadeData,oldest,newest,doubleFeature:deterministicPair(items),oracle:{peakHour:peakHour.hour,peakHourPlays:peakHour.count,peakDay:peakDay.day,peakDayPlays:peakDay.count,favouriteGenre:favouriteGenres[0]?.[0]||'Still emerging',favouriteGenreCount:favouriteGenres[0]?.[1]||0,watchedMovies:viewedItems.length,unwatchedMovies:items.length-viewedItems.length,confidence:history.length?Math.min(96,65+Math.round(Math.log10(history.length)*10)):50},memoryLane:buildMemoryLane(items,history,now),moodWeather:buildMoodWeather(items,history,now),runtimeWormhole:buildRuntimeWormhole(items),archiveAnomalies:buildArchiveAnomalies(items,now)};
   labCache={createdAt:Date.now(),data};return data;
 }

@@ -24,6 +24,7 @@ import './features/telemetry/telemetry.css';
 import './features/telemetry/stream-session-details.css';
 import './features/profile/profile.css';
 import './features/future-lab/future-lab.css';
+import './features/future-lab/future-lab-experiments.css';
 import './features/recommendations/recommendations.css';
 import './features/playlists/playlist-studio.css';
 import './features/playlists/playlist-signals.css';
