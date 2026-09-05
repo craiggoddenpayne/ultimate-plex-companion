@@ -18,7 +18,7 @@ function scoreSimilar(seed,item){
   return{score:Math.min(99,Math.round(55+shared.length*9+rating*2+(unwatched?8:0))),shared,rating,unwatched};
 }
 
-export async function personalRecommendations(config,dependencies,options={}){
+export async function personalRecommendations(config,dependencies,options:any={}){
   const includeWatched=options.includeWatched==='true';const force=options.refresh==='1';const cacheKey=includeWatched?'all':'unwatched';
   if(!force&&recommendationCache&&recommendationCache.key===cacheKey&&Date.now()-recommendationCache.createdAt<10*60_000)return recommendationCache.data;
   const{plexFetch,discoveryCatalog}=dependencies;const catalog=await discoveryCatalog(config,force);const seeds=selectSeeds(catalog);const ownedKeys=new Set(catalog.map(item=>String(item.ratingKey)));const used=new Set(seeds.map(item=>String(item.ratingKey)));

@@ -1,4 +1,4 @@
-function compactItem(item, hub = {}) {
+function compactItem(item, hub: any = {}) {
   const episode = item.type === 'episode';
   const title = episode && item.grandparentTitle ? `${item.grandparentTitle} · ${item.title || 'Episode'}` : item.title || item.name || 'Unknown';
   const detail = episode

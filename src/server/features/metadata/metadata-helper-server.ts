@@ -14,7 +14,7 @@ export function publicMetadata(item){
   return{ratingKey:String(item.ratingKey||''),libraryKey:String(item.librarySectionID||''),type:item.type||'movie',title:item.title||'',parentTitle:item.grandparentTitle||'',summary:item.summary||'',year:item.year||null,genres,tagline:item.tagline||'',contentRating:item.contentRating||'',studio:item.studio||'',originallyAvailableAt:item.originallyAvailableAt||'',poster:item.thumb?`/api/art/${item.ratingKey}`:null,missing};
 }
 
-export function metadataUpdate(item,input={}){
+export function metadataUpdate(item,input:any={}){
   const ratingKey=String(item.ratingKey||'');
   const libraryKey=String(item.librarySectionID||input.libraryKey||'');
   const type=typeCodes[item.type]||Number(input.typeCode)||1;
@@ -29,7 +29,7 @@ export function metadataUpdate(item,input={}){
     params.set(`${field}.value`,value);params.set(`${field}.locked`,'1');changed.push(field);
   }
   if('year' in input){const year=Number(input.year);if(!Number.isInteger(year)||year<1870||year>2200)throw new Error('Year must be between 1870 and 2200.');params.set('year.value',String(year));params.set('year.locked','1');changed.push('year')}
-  if('genres' in input){const genres=[...new Set((Array.isArray(input.genres)?input.genres:String(input.genres).split(',')).map(value=>cleanText(value,80)).filter(Boolean))].slice(0,12);if(!genres.length)throw new Error('Add at least one genre.');params.set('genre.locked','1');genres.forEach((genre,index)=>params.set(`genre[${index}].tag.tag`,genre));changed.push('genres')}
+  if('genres' in input){const genres:string[]=[...new Set<string>((Array.isArray(input.genres)?input.genres:String(input.genres).split(',')).map(value=>cleanText(value,80)).filter(Boolean))].slice(0,12);if(!genres.length)throw new Error('Add at least one genre.');params.set('genre.locked','1');genres.forEach((genre,index)=>params.set(`genre[${index}].tag.tag`,genre));changed.push('genres')}
   let posterUrl=null;if('posterUrl' in input&&cleanText(input.posterUrl,2048)){const parsed=new URL(cleanText(input.posterUrl,2048));if(!['http:','https:'].includes(parsed.protocol))throw new Error('Artwork must use an HTTP or HTTPS URL.');posterUrl=parsed.toString();changed.push('artwork')}
   if(!changed.length)throw new Error('Make at least one metadata change.');
   return{path:`/library/sections/${libraryKey}/all?${params}`,posterPath:posterUrl?`/library/metadata/${ratingKey}/posters?${new URLSearchParams({url:posterUrl})}`:null,changed};

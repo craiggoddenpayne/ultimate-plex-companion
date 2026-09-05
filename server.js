@@ -1,2 +1,2 @@
 // Stable runtime entry point retained for Docker, npm scripts and existing deployments.
-import './src/server/index.js';
+import './src/server/index.ts';

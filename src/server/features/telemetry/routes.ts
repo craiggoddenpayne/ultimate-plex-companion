@@ -8,7 +8,7 @@ export function createTelemetryRoutes() {
     const config = await requirePlex(context);
     if (!config) return true;
     if (pathname === '/api/streams') json(res, 200, await streamTelemetry(config, context.plexFetch));
-    else json(res, 200, await peopleTelemetry(config, context.plexFetch, new URL(req.url, 'http://localhost').searchParams.get('days')));
+    else json(res, 200, await peopleTelemetry(config, context.plexFetch, Number(new URL(req.url, 'http://localhost').searchParams.get('days') || 30)));
     return true;
   };
 }

@@ -51,7 +51,7 @@ async function body(req) {
 
 const normalizeConfig = normalizePlexConfig;
 
-function optimizationSettings(config = {}) {
+function optimizationSettings(config: any = {}) {
   const stored = config.optimization || {};
   return {
     plexPathRoot: process.env.PLEX_MEDIA_ROOT || stored.plexPathRoot || '/media',
@@ -275,7 +275,7 @@ function publicJob(job) {
   return etaSeconds === null ? safe : { ...safe, etaSeconds };
 }
 
-function runProcess(command, args, onLine, onSpawn) {
+function runProcess(command, args, onLine = null, onSpawn = null): Promise<any> {
   return new Promise((resolveProcess, reject) => {
     const child = spawn(command, args, { stdio:['ignore','pipe','pipe'] });
     onSpawn?.(child);

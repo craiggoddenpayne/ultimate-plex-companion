@@ -36,13 +36,13 @@ function nextOccurrence(schedule, from = new Date()) {
   return next.toISOString();
 }
 
-function normalizeSchedule(input = {}) {
+function normalizeSchedule(input: any = {}) {
   const frequency = FREQUENCIES.has(input.frequency) ? input.frequency : 'daily';
   const time = /^([01]\d|2[0-3]):[0-5]\d$/.test(input.time || '') ? input.time : '03:00';
   return { frequency, time, weekday:Math.min(6, Math.max(0, Number(input.weekday ?? 1))) };
 }
 
-function cleanRule(input, existing = {}) {
+function cleanRule(input: any, existing: any = {}): any {
   const type = TYPES.has(input.type || existing.type) ? (input.type || existing.type) : null;
   if (!type) throw new Error('Unknown automation type.');
   const fallback = templates.find(item => item.type === type);
@@ -136,7 +136,7 @@ export function createAutomationEngine({ configDir, savedConfig, plexFetch, plex
     if (!rule) throw new Error('Automation not found.');
     if (running.has(id)) throw new Error('This automation is already running.');
     running.add(id);
-    const entry = { id:randomUUID(), ruleId:id, ruleName:rule.name, type:rule.type, trigger, dryRun:Boolean(dryRun), status:'running', startedAt:new Date().toISOString() };
+    const entry: any = { id:randomUUID(), ruleId:id, ruleName:rule.name, type:rule.type, trigger, dryRun:Boolean(dryRun), status:'running', startedAt:new Date().toISOString() };
     data.runs.unshift(entry); data.runs = data.runs.slice(0, 100); await save();
     try {
       entry.result = await perform(rule, Boolean(dryRun));

@@ -17,7 +17,7 @@ const typeMeta = {
   stream_sentinel:{ label:"Stream Sentinel", icon:"clock", verb:"Sample playback", note:"Read-only transcode pressure snapshot" },
 };
 
-function autoRequest(path, options={}) {
+function autoRequest(path, options:any={}) {
   return fetch(path, { ...options, headers:{ 'Content-Type':'application/json', ...(options.headers||{}) } }).then(async response => {
     const data = await response.json();
     if (!response.ok) throw new Error(data.error || data.run?.error || 'Automation request failed.');
@@ -30,7 +30,7 @@ function relativeTime(value) {
   const seconds=Math.round((Date.parse(value)-Date.now())/1000), abs=Math.abs(seconds);
   if(abs<60)return seconds<0?'just now':'in under a minute';
   const units=abs<3600?['minute',60]:abs<86400?['hour',3600]:['day',86400];
-  const amount=Math.round(abs/units[1]); return seconds<0?`${amount} ${units[0]}${amount===1?'':'s'} ago`:`in ${amount} ${units[0]}${amount===1?'':'s'}`;
+  const amount=Math.round(abs/Number(units[1])); return seconds<0?`${amount} ${units[0]}${amount===1?'':'s'} ago`:`in ${amount} ${units[0]}${amount===1?'':'s'}`;
 }
 
 function scheduleLabel(rule) {

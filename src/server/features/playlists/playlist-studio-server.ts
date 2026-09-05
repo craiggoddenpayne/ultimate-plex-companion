@@ -61,7 +61,7 @@ const composerTypes = new Set(['all','movie','episode']);
 const composerWatchStates = new Set(['all','unwatched','watched','in-progress']);
 const composerSorts = new Set(['rating','newest','shortest','recently-added']);
 
-export function normalizeComposerCriteria(input = {}) {
+export function normalizeComposerCriteria(input: any = {}) {
   const type = composerTypes.has(input.type) ? input.type : 'all';
   const watchState = composerWatchStates.has(input.watchState) ? input.watchState : 'all';
   const sort = composerSorts.has(input.sort) ? input.sort : 'rating';
@@ -75,7 +75,7 @@ export function normalizeComposerCriteria(input = {}) {
   return { type, watchState, genre, decade, minRating, maxMinutes, resolution:resolutionFilter, sort };
 }
 
-export function composePlaylist(items, input = {}) {
+export function composePlaylist(items, input: any = {}) {
   const criteria = normalizeComposerCriteria(input);
   const expectedGenre = criteria.genre.toLowerCase();
   const matches = items.filter(item => {
@@ -106,9 +106,9 @@ export function composePlaylist(items, input = {}) {
 
 export function playlistComposerFacets(items) {
   const usable = items.filter(item => item.ratingKey && ['movie','episode'].includes(item.type));
-  const genreCounts = new Map();
+  const genreCounts = new Map<string, number>();
   for (const item of usable) for (const value of genres(item)) genreCounts.set(value, (genreCounts.get(value) || 0) + 1);
-  const availableDecades = [...new Set(usable.map(item => Math.floor(year(item) / 10) * 10).filter(value => value >= 1900 && value <= 2090))].sort((a,b)=>b-a);
+  const availableDecades:number[] = [...new Set<number>(usable.map(item => Math.floor(year(item) / 10) * 10).filter(value => value >= 1900 && value <= 2090))].sort((a,b)=>b-a);
   return {
     genres:[...genreCounts].sort((a,b)=>b[1]-a[1]||a[0].localeCompare(b[0])).map(([value,count])=>({ value,count })),
     decades:availableDecades,

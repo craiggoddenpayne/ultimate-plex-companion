@@ -61,5 +61,5 @@ async function toggleProfile(event){
 
 const profileButton=document.querySelector('.profile');
 if(profileButton){profileButton.setAttribute('aria-haspopup','menu');profileButton.setAttribute('aria-expanded','false');profileButton.addEventListener('click',toggleProfile);getProfileData().then(updateProfileIdentity).catch(()=>{});}
-document.addEventListener('click',event=>{const menu=document.querySelector('#profile-popover');if(menu&&!menu.contains(event.target)&&!profileButton.contains(event.target)){menu.remove();profileButton.setAttribute('aria-expanded','false');}});
+document.addEventListener('click',event=>{const target=event.target as Node;const menu=document.querySelector('#profile-popover');if(menu&&!menu.contains(target)&&!profileButton.contains(target)){menu.remove();profileButton.setAttribute('aria-expanded','false');}});
 document.addEventListener('keydown',event=>{if(event.key==='Escape'){document.querySelector('#profile-popover')?.remove();document.querySelector('#profile-modal')?.remove();profileButton?.setAttribute('aria-expanded','false');}});
