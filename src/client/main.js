@@ -26,6 +26,7 @@ import './features/profile/profile.css';
 import './features/future-lab/future-lab.css';
 import './features/recommendations/recommendations.css';
 import './features/playlists/playlist-studio.css';
+import './features/playlists/playlist-signals.css';
 import './features/automations/automation.css';
 import './features/automations/automation-reports.css';
 import './features/automations/automation-paths.css';

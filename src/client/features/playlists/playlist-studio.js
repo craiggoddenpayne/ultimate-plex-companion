@@ -1,4 +1,4 @@
-const playlistState = { data:null, selected:null };
+const playlistState = { data:null, selected:null, filter:'All' };
 const playlistEscape = value => String(value ?? '').replace(/[&<>'"]/g, character => ({
   '&':'&amp;', '<':'&lt;', '>':'&gt;', "'":'&#39;', '"':'&quot;',
 }[character]));
@@ -30,6 +30,7 @@ function studioShell() {
         <div><span>AUTO-GENERATE</span><h2>Choose a signal</h2><p>Buttons are enabled only when your library has matching titles.</p></div>
         <button id="playlist-refresh" type="button">Refresh criteria</button>
       </header>
+      <nav class="playlist-signal-filters" id="playlist-signal-filters" aria-label="Filter playlist signals"></nav>
       <div class="playlist-generators" id="playlist-generators-grid" aria-live="polite">
         <div class="playlist-loading"><i></i><span>Reading Plex criteria…</span></div>
       </div>
@@ -60,6 +61,17 @@ function generatorCard(generator) {
     </article>`;
 }
 
+function renderGeneratorGrid() {
+  const data = playlistState.data;
+  const grid = document.querySelector('#playlist-generators-grid');
+  if (!data || !grid) return;
+  const visible = playlistState.filter === 'All' ? data.generators : data.generators.filter(item => item.category === playlistState.filter);
+  grid.innerHTML = visible.map(generatorCard).join('') || '<div class="playlist-empty">No signals are available in this category.</div>';
+  grid.querySelectorAll('[data-playlist-generate]').forEach(button => {
+    button.addEventListener('click', () => openGenerator(data.generators.find(item => item.id === button.dataset.playlistGenerate)));
+  });
+}
+
 function renderStudio() {
   const data = playlistState.data;
   if (!data) return;
@@ -67,11 +79,19 @@ function renderStudio() {
   document.querySelector('#playlist-generators').textContent = data.generators.filter(item => item.available).length;
   document.querySelector('#playlist-existing-count').textContent = data.existing.length;
 
-  const grid = document.querySelector('#playlist-generators-grid');
-  grid.innerHTML = data.generators.map(generatorCard).join('');
-  grid.querySelectorAll('[data-playlist-generate]').forEach(button => {
-    button.addEventListener('click', () => openGenerator(data.generators.find(item => item.id === button.dataset.playlistGenerate)));
-  });
+  const categories = ['All', ...new Set(data.generators.map(item => item.category).filter(Boolean))];
+  if (!categories.includes(playlistState.filter)) playlistState.filter = 'All';
+  const filters = document.querySelector('#playlist-signal-filters');
+  filters.innerHTML = categories.map(category => {
+    const count = category === 'All' ? data.generators.length : data.generators.filter(item => item.category === category).length;
+    return `<button type="button" data-playlist-filter="${playlistEscape(category)}" class="${playlistState.filter === category ? 'active' : ''}">${playlistEscape(category)} <b>${count}</b></button>`;
+  }).join('');
+  filters.querySelectorAll('[data-playlist-filter]').forEach(button => button.addEventListener('click', () => {
+    playlistState.filter = button.dataset.playlistFilter;
+    filters.querySelectorAll('button').forEach(item => item.classList.toggle('active', item === button));
+    renderGeneratorGrid();
+  }));
+  renderGeneratorGrid();
 
   const existing = document.querySelector('#playlist-existing');
   existing.innerHTML = data.existing.length
