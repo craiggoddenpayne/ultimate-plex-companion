@@ -3,7 +3,7 @@ const cSpark='<svg viewBox="0 0 24 24"><path d="m12 3 1.3 4.7L18 9l-4.7 1.3L12 1
 const cSearch='<svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg>';
 let searchTimer,searchResults=[],searchIndex=-1;
 
-async function cRequest(path,options={}){const response=await fetch(path,{...options,headers:{'Content-Type':'application/json',...(options.headers||{})}});const data=await response.json();if(!response.ok)throw new Error(data.error||'Companion could not complete that request.');return data}
+async function cRequest(path,options:any={}){const response=await fetch(path,{...options,headers:{'Content-Type':'application/json',...(options.headers||{})}});const data=await response.json();if(!response.ok)throw new Error(data.error||'Companion could not complete that request.');return data}
 function cAgo(value){const seconds=Math.max(0,Math.round((Date.now()-Date.parse(value))/1000));if(seconds<60)return'now';if(seconds<3600)return Math.floor(seconds/60)+'m';if(seconds<86400)return Math.floor(seconds/3600)+'h';return Math.floor(seconds/86400)+'d'}
 
 function searchShell(){const host=document.querySelector('.search');if(!host||document.querySelector('#universe-search'))return;host.insertAdjacentHTML('beforeend','<section id="universe-search" class="universe-search"><div class="search-idle">'+cSearch+'<span>Search every connected Plex library</span><small>TYPE AT LEAST 2 CHARACTERS</small></div></section>')}

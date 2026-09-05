@@ -136,7 +136,7 @@ function assistantModal() {
   return `<div class="modal-wrap" id="assistant-modal"><div class="modal-backdrop" data-action="close"></div><section class="assistant-modal"><button class="modal-close" data-action="close">×</button><span class="assistant-glyph">${icon('spark')}</span><span class="eyebrow">COMPANION INTELLIGENCE</span><h2>What would you like to know?</h2><div class="ask-input"><input autofocus placeholder="Ask about your library, streams or people…"><button data-action="send">${icon('arrow')}</button></div><div class="prompt-chips"><button>What should we watch tonight?</button><button>Why is Plex transcoding?</button><button>Find storage I can reclaim</button></div><p class="privacy-note">Answers stay inside your network. Your viewing data is yours.</p></section></div>`;
 }
 
-function settingsModal(config = {}) {
+function settingsModal(config: any = {}) {
   const managed = config.tokenSource === 'environment';
   return `<div class="modal-wrap" id="settings-modal"><div class="modal-backdrop" data-action="close"></div><section class="settings-modal">
     <button class="modal-close" data-action="close">×</button>
@@ -151,7 +151,7 @@ function settingsModal(config = {}) {
   </section></div>`;
 }
 
-async function request(path, options) {
+async function request(path, options: any = {}) {
   const response = await fetch(path, { ...options, headers: { 'Content-Type':'application/json', ...(options?.headers || {}) } });
   const result = await response.json().catch(() => ({}));
   if (!response.ok) throw new Error(result.error || `Request failed (${response.status})`);
@@ -160,7 +160,7 @@ async function request(path, options) {
 
 async function openSettings() {
   document.querySelector('#settings-modal')?.remove();
-  let config = {};
+  let config: any = {};
   try { config = await request('/api/config'); } catch {}
   document.body.insertAdjacentHTML('beforeend', settingsModal(config));
   const modal = document.querySelector('#settings-modal');

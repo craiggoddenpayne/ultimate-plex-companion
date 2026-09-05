@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { clearOptimizationHistory, optimizationEta, optimizationSummary, reorderQueuedJob, requestOptimizationCancellation, updateQueuedJob } from '../../../src/server/features/codec-studio/optimization-queue-server.js';
 
 test('optimization queue supports summaries, ETA, ordering and safe state changes', () => {
-  const jobs = new Map([
+  const jobs = new Map<string, any>([
     ['active', { id:'active', state:'encoding', progress:25, startedAt:'2026-01-01T00:00:00.000Z', targetLabel:'HEVC', estimatedSaving:100 }],
     ['one', { id:'one', state:'queued', progress:0, targetLabel:'AV1', estimatedSaving:200 }],
     ['two', { id:'two', state:'queued', progress:0, targetLabel:'HEVC', estimatedSaving:300 }],
@@ -35,7 +35,7 @@ test('optimization queue refuses actions against active work', () => {
 });
 
 test('cancellation is immediate for waiting jobs and requested safely for active encodes', () => {
-  const jobs = new Map([
+  const jobs = new Map<string, any>([
     ['waiting', { id:'waiting', state:'queued', progress:0 }],
     ['active', { id:'active', state:'encoding', progress:48 }],
     ['ready', { id:'ready', state:'ready', progress:100 }],

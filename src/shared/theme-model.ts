@@ -22,7 +22,7 @@ export const COMPANION_THEMES = [
 
 export const EFFECT_LEVELS = ['full', 'ambient', 'still'];
 
-export function normalizeThemePreferences(input = {}) {
+export function normalizeThemePreferences(input: any = {}) {
   // Accept the common misspelling while storing the canonical Darcula id.
   const requestedTheme = input.theme === 'darkula' ? 'darcula' : input.theme;
   const theme = COMPANION_THEMES.some((item) => item.id === requestedTheme) ? requestedTheme : 'solaris';

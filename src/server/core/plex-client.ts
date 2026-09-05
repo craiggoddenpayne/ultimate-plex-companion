@@ -12,7 +12,7 @@ function timeoutSignal(milliseconds) {
 }
 
 export function createPlexClient(fetchImpl = fetch) {
-  async function request(config, path, options = {}) {
+  async function request(config, path, options: any = {}) {
     const timeout = timeoutSignal(options.timeout || 8_000);
     try {
       return await fetchImpl(config.plexUrl + path, {

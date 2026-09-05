@@ -112,7 +112,7 @@ export function buildMoodWeather(items, history, nowSeconds = Math.floor(Date.no
 export function buildRuntimeWormhole(items) {
   const timed = items.filter(item => minutes(item) > 0);
   const unwatched = timed.filter(item => !Number(item.viewCount || 0));
-  const definitions = [
+  const definitions: [string, number, number][] = [
     ['Short signal', 0, 45], ['Compact', 45, 90], ['Feature', 90, 120], ['Epic', 120, 180], ['Event horizon', 180, Infinity],
   ];
   const buckets = definitions.map(([label, min, max]) => {

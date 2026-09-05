@@ -43,7 +43,7 @@ export function createOptimizationStore(configDir) {
     return { jobs, recovered, paused:saved?.paused === true };
   }
 
-  function save(jobs, options = {}) {
+  function save(jobs, options: any = {}) {
     const snapshot = JSON.stringify({ version:2, savedAt:new Date().toISOString(), paused:options.paused === true, jobs:[...jobs.values()] }, null, 2) + '\n';
     pendingWrite = pendingWrite.catch(() => {}).then(async () => {
       await mkdir(configDir, { recursive:true });
