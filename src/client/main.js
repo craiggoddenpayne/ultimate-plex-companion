@@ -33,6 +33,7 @@ import './styles/theme-surfaces.css';
 import './styles/neon-borders.css';
 import './styles/mobile-layout.css';
 import './features/playlists/playlist-studio-mobile.css';
+import './styles/theme-collection.css';
 
 // Browser modules progressively enhance surfaces created by app.js.
 import './core/themes.js';
