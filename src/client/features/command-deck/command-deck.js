@@ -1,5 +1,6 @@
 import { bindCommandDeckDetails, renderTasteIntelligence } from './command-deck-intelligence-ui.js';
 import { activityVisual } from './activity-view.js';
+import { compactStreamList } from './live-activity-view.js';
 const deckEscape = value => String(value == null ? '' : value).replace(/[&<>'"]/g, char => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', "'":'&#39;', '"':'&quot;' })[char]);
 
 function timeAgo(timestamp) {
@@ -43,6 +44,7 @@ function updateDeck(data) {
   dashboard.querySelector('#library-summary').textContent='Titles across '+data.libraryCount+' '+(data.libraryCount===1?'library':'libraries');
   const streamBars=dashboard.querySelector('.stream-bars');
   streamBars.innerHTML=(data.sessions.length?data.sessions:Array.from({length:8},()=>({progress:4}))).slice(0,8).map(session=>'<i style="height:'+Math.max(8,session.progress||4)+'%"></i>').join('');
+  dashboard.querySelector('#stream-list').innerHTML=compactStreamList(data.sessions);
 
   const bars = dashboard.querySelector('.watch-bars');
   const peak = Math.max(1, ...data.watch.daily.map(day => day.minutes));

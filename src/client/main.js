@@ -18,6 +18,7 @@ import './features/discovery/discovery-plex.css';
 import './features/command-deck/command-deck.css';
 import './features/command-deck/command-deck-intelligence.css';
 import './features/command-deck/activity-visuals.css';
+import './features/command-deck/live-activity.css';
 import './features/utility-suite/utility-suite.css';
 import './features/telemetry/telemetry.css';
 import './features/telemetry/stream-session-details.css';

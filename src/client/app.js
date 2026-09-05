@@ -1,5 +1,6 @@
 import { initStarfield } from './core/starfield-engine.js';
 import { featureSets, navigation as nav, pageCopy } from '../shared/feature-registry.js';
+import { compactStreamList } from './features/command-deck/live-activity-view.js';
 const icons = {
   grid: '<path d="M4 4h6v6H4zM14 4h6v6h-6zM4 14h6v6H4zM14 14h6v6h-6z"/>',
   library: '<path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v15H6.5A2.5 2.5 0 0 0 4 20.5z"/><path d="M4 5.5v15A2.5 2.5 0 0 1 6.5 18H20"/>',
@@ -68,16 +69,6 @@ function arcChart() {
     <svg viewBox="0 0 180 110"><defs><linearGradient id="arc" x1="0" x2="1"><stop stop-color="#ffaf24"/><stop offset="1" stop-color="#ffe08a"/></linearGradient></defs><path class="arc-bg" d="M20 95a70 70 0 0 1 140 0"/><path class="arc-value" pathLength="100" d="M20 95a70 70 0 0 1 140 0"/></svg>
     <div><strong>94</strong><span>OPTIMAL</span></div><i class="orbit-dot"></i>
   </div>`;
-}
-
-function streamCard(s) {
-  return `<article class="stream-card ${s.tone}">
-    <div class="poster"><span>${icon('play')}</span></div>
-    <div class="stream-main"><div class="stream-title"><div><h3>${s.title}</h3><p>${s.meta}</p></div><span class="live-pill">LIVE</span></div>
-      <div class="stream-person"><span class="mini-avatar">${s.user[0]}</span><span>${s.user}<small>${s.device}</small></span><b>${s.progress}%</b></div>
-      <div class="progress"><i style="width:${s.progress}%"></i></div>
-    </div>
-  </article>`;
 }
 
 function dashboard() {
@@ -204,7 +195,7 @@ async function loadPlexOverview() {
     document.querySelector('#stream-count').textContent = data.sessions.length;
     document.querySelector('#nav-stream-count').textContent = data.sessions.length;
     document.querySelector('#stream-summary').textContent = data.sessions.length ? `${data.sessions.length - transcodes} direct · ${transcodes} ${transcodes === 1 ? 'transcode' : 'transcodes'}` : 'No active sessions';
-    document.querySelector('#stream-list').innerHTML = data.sessions.length ? data.sessions.map(session => streamCard(Object.fromEntries(Object.entries(session).map(([key,value]) => [key, escapeHtml(value)])))).join('') : '<div class="empty-state connected">Plex is connected. Nothing is playing right now.</div>';
+    document.querySelector('#stream-list').innerHTML = compactStreamList(data.sessions);
     loadStorageSignal();
   } catch (error) {
     dot.className = 'status-dot pending'; serverName.textContent = error.message === 'Plex is not configured.' ? 'Not connected' : 'Plex unavailable'; serverState.textContent = error.message === 'Plex is not configured.' ? 'SET UP' : 'RETRY';
