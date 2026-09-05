@@ -22,7 +22,7 @@ import { createTelemetryRoutes } from './features/telemetry/routes.js';
 import { createUtilityRoutes } from './features/utility-suite/routes.js';
 import { createAutomationEngine } from './features/automations/automation-server.js';
 import { createOptimizationStore } from './features/codec-studio/optimization-store-server.js';
-import { optimizationEta } from './features/codec-studio/optimization-queue-server.js';
+import { optimizationEta, requestOptimizationCancellation } from './features/codec-studio/optimization-queue-server.js';
 import { conversionTarget, isLegacyCodec, supportedTargets, videoArguments } from './features/codec-studio/codec-modernizer-server.js';
 
 const port = Number(process.env.PORT || 8080);
@@ -253,6 +253,7 @@ async function servePlexArt(res, ratingKey) {
 const jobs = new Map();
 const optimizationStore = createOptimizationStore(configDir);
 let activeJob = null;
+let activeOptimizationProcess = null;
 let queuePaused = false;
 let lastJobPersistAt = 0;
 
@@ -273,9 +274,10 @@ function publicJob(job) {
   return etaSeconds === null ? safe : { ...safe, etaSeconds };
 }
 
-function runProcess(command, args, onLine) {
+function runProcess(command, args, onLine, onSpawn) {
   return new Promise((resolveProcess, reject) => {
     const child = spawn(command, args, { stdio:['ignore','pipe','pipe'] });
+    onSpawn?.(child);
     let stdout = '', stderr = '';
     child.stdout.on('data', chunk => { stdout += chunk; onLine?.(chunk.toString()); });
     child.stderr.on('data', chunk => { stderr = `${stderr}${chunk}`.slice(-12_000); });
@@ -311,9 +313,11 @@ async function prepareJob(config, ratingKey) {
 
 async function encodeJob(job, config) {
   try {
+    if (job.cancelRequested || job.state === 'cancelled') throw Object.assign(new Error('Optimization cancelled.'), { code:'OPTIMIZATION_CANCELLED' });
     const target=conversionTarget(job.targetCodec);job.targetCodec=target.key;job.targetLabel=target.label;
     job.state = 'preparing'; job.updatedAt = new Date().toISOString(); await persistOptimizationJobs();
     const prepared = await prepareJob(config, job.ratingKey);
+    if (job.cancelRequested) throw Object.assign(new Error('Optimization cancelled.'), { code:'OPTIMIZATION_CANCELLED' });
     const source = await probe(prepared.sourcePath);
     const sourceSize = Number(source.format?.size || prepared.version.size);
     const duration = Number(source.format?.duration || 0);
@@ -328,15 +332,20 @@ async function encodeJob(job, config) {
     }
     Object.assign(job, { title:prepared.item.title || job.title, sourcePath:prepared.sourcePath, outputPath, plexDirectory:prepared.plexDirectory, sourceSize, duration, state:'encoding', progress:0, startedAt:new Date().toISOString(), updatedAt:new Date().toISOString() });
     await persistOptimizationJobs();
+    if (job.cancelRequested) throw Object.assign(new Error('Optimization cancelled.'), { code:'OPTIMIZATION_CANCELLED' });
     const args = ['-hide_banner','-nostdin','-n','-i',prepared.sourcePath,'-map','0','-map_metadata','0','-map_chapters','0','-c','copy',...videoArguments(target.key,prepared.settings),'-progress','pipe:1','-nostats',outputPath];
-    await runProcess('ffmpeg', args, text => {
-      const match = text.match(/out_time_us=(\d+)/);
-      if (match && duration) job.progress = Math.min(99, Math.round(Number(match[1]) / 1_000_000 / duration * 100));
-      job.updatedAt = new Date().toISOString();
-      if (Date.now() - lastJobPersistAt > 2000) { lastJobPersistAt = Date.now(); persistOptimizationJobs().catch(() => {}); }
-    });
+    try {
+      await runProcess('ffmpeg', args, text => {
+        const match = text.match(/out_time_us=(\d+)/);
+        if (match && duration) job.progress = Math.min(99, Math.round(Number(match[1]) / 1_000_000 / duration * 100));
+        job.updatedAt = new Date().toISOString();
+        if (Date.now() - lastJobPersistAt > 2000) { lastJobPersistAt = Date.now(); persistOptimizationJobs().catch(() => {}); }
+      }, child => { activeOptimizationProcess = child; });
+    } finally { activeOptimizationProcess = null; }
+    if (job.cancelRequested) throw Object.assign(new Error('Optimization cancelled.'), { code:'OPTIMIZATION_CANCELLED' });
     job.state = 'verifying'; job.progress = 99; await persistOptimizationJobs();
     const output = await probe(outputPath);
+    if (job.cancelRequested) throw Object.assign(new Error('Optimization cancelled.'), { code:'OPTIMIZATION_CANCELLED' });
     const outputSize = Number(output.format?.size || 0);
     const outputDuration = Number(output.format?.duration || 0);
     const sourceStreams = (source.streams || []).reduce((counts, stream) => ({ ...counts, [stream.codec_type]:(counts[stream.codec_type] || 0) + 1 }), {});
@@ -352,7 +361,11 @@ async function encodeJob(job, config) {
     Object.assign(job, { state:'ready', progress:100, outputSize, saving:sourceSize-outputSize, savingPercent:Math.round((sourceSize-outputSize)/sourceSize*100), verified:true, updatedAt:new Date().toISOString() });
     await persistOptimizationJobs();
   } catch (error) {
-    job.state = 'failed'; job.error = error.message; job.updatedAt = new Date().toISOString();
+    if (job.cancelRequested || error.code === 'OPTIMIZATION_CANCELLED') {
+      if (job.outputPath) await unlink(job.outputPath).catch(unlinkError => { if (unlinkError.code !== 'ENOENT') console.error(`Could not remove cancelled optimization output: ${unlinkError.message}`); });
+      job.state = 'cancelled'; job.progress = 0; job.cancelledAt = new Date().toISOString(); job.updatedAt = job.cancelledAt;
+      delete job.cancelRequested; delete job.error; delete job.startedAt; delete job.outputPath;
+    } else { job.state = 'failed'; job.error = error.message; job.updatedAt = new Date().toISOString(); }
     await persistOptimizationJobs();
   } finally { activeJob = null; await persistOptimizationJobs(); runNextJob(); }
 }
@@ -407,6 +420,17 @@ const queueController = {
   runNext:runNextJob,
   create:createOptimizationJob,
   replace:replaceOriginal,
+  async cancel(id) {
+    const job = requestOptimizationCancellation(jobs, id, activeJob);
+    await persistOptimizationJobs();
+    const processToStop = job.cancelRequested ? activeOptimizationProcess : null;
+    if (processToStop?.exitCode === null) {
+      processToStop.kill('SIGTERM');
+      const forceStop = setTimeout(() => { if (processToStop.exitCode === null && processToStop.signalCode === null) processToStop.kill('SIGKILL'); }, 5000);
+      forceStop.unref?.();
+    }
+    return publicJob(job);
+  },
   async setPaused(paused) {
     queuePaused = paused;
     await persistOptimizationJobs();

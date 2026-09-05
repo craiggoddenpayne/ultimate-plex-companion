@@ -64,6 +64,16 @@ export function updateQueuedJob(jobs, id, action, now = new Date().toISOString()
   throw new Error('Unknown queue action.');
 }
 
+export function requestOptimizationCancellation(jobs, id, activeJob = null, now = new Date().toISOString()) {
+  const job = jobs.get(id);
+  if (!job) throw new Error('Optimization job not found.');
+  if (job.state === 'queued' && activeJob !== id) return updateQueuedJob(jobs, id, 'cancel', now);
+  if (activeJob !== id || !['queued','preparing','encoding','verifying'].includes(job.state)) throw new Error('Only a queued or active optimization can be cancelled.');
+  job.cancelRequested = true;
+  job.updatedAt = now;
+  return job;
+}
+
 export function clearOptimizationHistory(jobs) {
   let removed = 0;
   for (const [id, job] of jobs) if (finishedStates.has(job.state)) { jobs.delete(id); removed++; }

@@ -275,10 +275,31 @@ function openReplacement(job) {
 
 function optimizationStatus(job) {
   const conversion=(job.sourceCodec&&job.targetLabel?job.sourceCodec+' → '+job.targetLabel+' · ':'');
+  if (job.cancelRequested) return 'Stopping safely · original media will be preserved';
   if (job.state === 'failed') return escapeHtml(job.error);
+  if (job.state === 'cancelled') return 'Cancelled · partial output removed · original preserved';
   if (job.state === 'ready') return conversion+formatBytes(job.saving) + ' measured saving · verified';
   if (job.state === 'replaced') return formatBytes(job.reclaimed) + ' reclaimed';
   return conversion+(job.progress || 0) + '% complete' + (job.resumeCount ? ' · resumed safely' : '');
+}
+
+async function cancelOptimization(job, button) {
+  const active = ['preparing','encoding','verifying'].includes(job.state);
+  const warning = active
+    ? `This will stop the current encode and remove its partial output. The original media will remain untouched.`
+    : 'This will remove the job from the conversion queue. No media files will be changed.';
+  if (!window.confirm(`Are you sure you want to cancel “${job.title}”?\n\n${warning}`)) return;
+  button.disabled = true;
+  button.textContent = active ? 'Stopping…' : 'Cancelling…';
+  try {
+    await request(`/api/optimization/jobs/${encodeURIComponent(job.id)}/action`, { method:'POST', body:JSON.stringify({ action:'cancel' }) });
+    toast(`${job.title}: cancellation requested`);
+    pollOptimizationJobs();
+  } catch (error) {
+    button.disabled = false;
+    button.textContent = 'Cancel';
+    toast(error.message);
+  }
 }
 
 async function pollOptimizationJobs() {
@@ -288,9 +309,16 @@ async function pollOptimizationJobs() {
     const container = document.querySelector('#optimization-jobs');
     if (!container) return;
     const active = data.jobs.some(job => ['queued','preparing','encoding','verifying'].includes(job.state));
-    document.querySelector('#queue-state').textContent = active ? 'Working' : data.jobs.length ? 'Up to date' : 'Idle';
-    container.innerHTML = data.jobs.length ? data.jobs.slice().reverse().map(job => `<article class="job-card ${job.state}"><div class="job-status"><span>${escapeHtml(job.state)}</span><b>${escapeHtml(job.title)}</b><small>${optimizationStatus(job)}</small></div><div class="job-progress"><i style="width:${job.progress || 0}%"></i></div>${job.state === 'ready' ? '<button class="replace-button">Review & replace</button>' : ''}</article>`).join('') : '<div class="jobs-empty">Choose “Convert codec” on a candidate to begin. Jobs run one at a time.</div>';
-    container.querySelectorAll('.job-card').forEach((card, index) => { const job = data.jobs.slice().reverse()[index]; card.querySelector('.replace-button')?.addEventListener('click', () => openReplacement(job)); });
+    document.querySelector('#queue-state').textContent = data.jobs.some(job => job.cancelRequested) ? 'Stopping' : active ? 'Working' : data.jobs.length ? 'Up to date' : 'Idle';
+    const orderedJobs = data.jobs.slice().reverse();
+    container.innerHTML = orderedJobs.length ? orderedJobs.map(job => {
+      const cancellable = ['queued','preparing','encoding','verifying'].includes(job.state);
+      const action = job.state === 'ready'
+        ? '<button class="replace-button">Review & replace</button>'
+        : cancellable ? `<button class="cancel-job-button" ${job.cancelRequested ? 'disabled' : ''}>${job.cancelRequested ? 'Stopping…' : 'Cancel'}</button>` : '';
+      return `<article class="job-card ${job.state} ${job.cancelRequested ? 'cancelling' : ''}"><div class="job-status"><span>${escapeHtml(job.cancelRequested ? 'cancelling' : job.state)}</span><b>${escapeHtml(job.title)}</b><small>${optimizationStatus(job)}</small></div><div class="job-progress"><i style="width:${job.progress || 0}%"></i></div>${action}</article>`;
+    }).join('') : '<div class="jobs-empty">Choose “Convert codec” on a candidate to begin. Jobs run one at a time.</div>';
+    container.querySelectorAll('.job-card').forEach((card, index) => { const job = orderedJobs[index]; card.querySelector('.replace-button')?.addEventListener('click', () => openReplacement(job)); card.querySelector('.cancel-job-button')?.addEventListener('click', event => cancelOptimization(job, event.currentTarget)); });
     if (active) jobPollTimer = setTimeout(pollOptimizationJobs, 3000);
   } catch { jobPollTimer = setTimeout(pollOptimizationJobs, 3000); }
 }

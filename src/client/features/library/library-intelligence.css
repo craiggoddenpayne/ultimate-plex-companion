@@ -56,8 +56,11 @@
 .candidate-row > span strong { display: block; color: #c4c8ce; font-size: 9px; }
 .candidate-row u { display: block; width: 58px; height: 2px; margin-top: 6px; overflow: hidden; border-radius: 2px; background: #2b3038; text-decoration: none; }
 .candidate-row u i { display: block; height: 100%; background: linear-gradient(90deg, #977032, #f5ad2e); }
-.encode-button, .replace-button { border: 1px solid #4a3a24; border-radius: 6px; padding: 7px 9px; color: #e0ab51; background: #251d13; font-size: 8px; cursor: pointer; }
+.encode-button, .replace-button, .cancel-job-button { border: 1px solid #4a3a24; border-radius: 6px; padding: 7px 9px; color: #e0ab51; background: #251d13; font-size: 8px; cursor: pointer; }
 .encode-button:hover, .replace-button:hover { border-color: #8d682e; background: #302316; }
+.cancel-job-button { border-color: #60363d; color: #e28c98; background: #28171b; }
+.cancel-job-button:hover { border-color: #a74b58; color: #ffb0ba; background: #351a20; }
+.cancel-job-button:disabled { opacity: .5; cursor: wait; }
 .jobs-panel { margin-top: 12px; }
 .queue-state { border: 1px solid #303640; border-radius: 12px; padding: 4px 8px; color: #858d98; font: 8px 'DM Mono'; }
 .optimization-jobs { display: flex; flex-direction: column; gap: 7px; }
@@ -73,6 +76,9 @@
 .job-card.ready .job-progress i, .job-card.replaced .job-progress i { background: #63dba2; }
 .job-card.failed { border-color: #4b292e; }
 .job-card.failed .job-status span { color: #ed7f89; }
+.job-card.cancelling { border-color: #70434a; }
+.job-card.cancelling .job-progress i { animation: cancel-pulse .8s ease-in-out infinite alternate; background: #e67683; }
+@keyframes cancel-pulse { to { opacity: .35; } }
 .safety-strip { display: flex; align-items: flex-start; gap: 15px; margin-top: 12px; padding: 18px 21px; border: 1px solid #29323b; border-radius: 9px; background: #10151a; }
 .safety-strip > span { color: #54ccc7; }
 .safety-strip > span .icon { width: 18px; }

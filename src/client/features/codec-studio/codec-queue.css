@@ -16,6 +16,7 @@
 .studio-job.ready{background:linear-gradient(90deg,#12271d88,transparent)}
 .studio-job.failed{background:linear-gradient(90deg,#2a151988,transparent)}
 .studio-job.cancelled{opacity:.62}
+.studio-job:has(button:disabled):not(.cancelled) { border-left: 1px solid #a84d59; background: linear-gradient(90deg,#35191f88,transparent); }
 .studio-job-actions{display:flex;gap:5px;margin-top:9px}
 .studio-job-actions button:first-child{margin-left:auto}
 .studio-job-actions button[data-studio-action="cancel"]{border-color:#59353b;color:#d78d97}

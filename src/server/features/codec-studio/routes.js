@@ -60,7 +60,9 @@ export function createCodecRoutes(queue) {
     const action = pathname.match(/^\/api\/optimization\/jobs\/([a-f0-9-]+)\/action$/);
     if (action && req.method === 'POST') {
       const input = await context.body(req);
-      const job = updateQueuedJob(queue.jobs, action[1], input.action);
+      const job = input.action === 'cancel'
+        ? await queue.cancel(action[1])
+        : updateQueuedJob(queue.jobs, action[1], input.action);
       await queue.persist();
       if (input.action === 'retry') queue.runNext();
       json(res, 200, { job:queue.publicJob(job), summary:optimizationSummary(queue.jobs, queue.activeJob()) });

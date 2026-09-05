@@ -24,6 +24,15 @@ export function createOptimizationStore(configDir) {
     let recovered = 0;
     for (const job of jobs) {
       if (!resumableStates.has(job.state)) continue;
+      if (job.cancelRequested) {
+        job.state = 'cancelled';
+        job.progress = 0;
+        job.cancelledAt = new Date().toISOString();
+        delete job.cancelRequested;
+        job.updatedAt = job.cancelledAt;
+        recovered++;
+        continue;
+      }
       job.state = 'queued';
       job.progress = 0;
       job.recovered = true;

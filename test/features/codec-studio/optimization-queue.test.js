@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { clearOptimizationHistory, optimizationEta, optimizationSummary, reorderQueuedJob, updateQueuedJob } from '../../../src/server/features/codec-studio/optimization-queue-server.js';
+import { clearOptimizationHistory, optimizationEta, optimizationSummary, reorderQueuedJob, requestOptimizationCancellation, updateQueuedJob } from '../../../src/server/features/codec-studio/optimization-queue-server.js';
 
 test('optimization queue supports summaries, ETA, ordering and safe state changes', () => {
   const jobs = new Map([
@@ -32,4 +32,18 @@ test('optimization queue refuses actions against active work', () => {
   const jobs = new Map([['active', { id:'active', state:'encoding', progress:20 }]]);
   assert.throws(() => updateQueuedJob(jobs, 'active', 'cancel'), /Only a queued job/);
   assert.throws(() => reorderQueuedJob(jobs, 'active', 'up'), /Only queued jobs/);
+});
+
+test('cancellation is immediate for waiting jobs and requested safely for active encodes', () => {
+  const jobs = new Map([
+    ['waiting', { id:'waiting', state:'queued', progress:0 }],
+    ['active', { id:'active', state:'encoding', progress:48 }],
+    ['ready', { id:'ready', state:'ready', progress:100 }],
+  ]);
+  requestOptimizationCancellation(jobs, 'waiting', 'active', '2026-09-05T12:00:00.000Z');
+  assert.equal(jobs.get('waiting').state, 'cancelled');
+  requestOptimizationCancellation(jobs, 'active', 'active', '2026-09-05T12:01:00.000Z');
+  assert.equal(jobs.get('active').state, 'encoding');
+  assert.equal(jobs.get('active').cancelRequested, true);
+  assert.throws(() => requestOptimizationCancellation(jobs, 'ready', 'active'), /Only a queued or active optimization/);
 });
