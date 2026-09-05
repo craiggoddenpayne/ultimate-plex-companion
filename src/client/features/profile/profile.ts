@@ -64,7 +64,9 @@ function menuMarkup(data) {
     profileIcons.settings +
     '<span><b>Appearance &amp; themes</b><small>Palette and visual energy</small></span></button><button role="menuitem" data-profile-action="privacy">' +
     profileIcons.shield +
-    '<span><b>Privacy & data</b><small>What stays local</small></span></button><button role="menuitem" data-profile-action="refresh">' +
+    '<span><b>Privacy & data</b><small>What stays local</small></span></button><button role="menuitem" data-profile-action="diagnostics">' +
+    profileIcons.shield +
+    '<span><b>Download diagnostics</b><small>Redacted setup and error logs</small></span></button><button role="menuitem" data-profile-action="refresh">' +
     profileIcons.refresh +
     '<span><b>Refresh companion</b><small>Reload every signal</small></span></button><footer>ULTIMATE PLEX COMPANION <b>0.1.0</b></footer></div>'
   );
@@ -161,6 +163,27 @@ function bindMenu(data) {
   menu.querySelector('[data-profile-action="themes"]').addEventListener('click', () => {
     menu.remove();
     document.dispatchEvent(new CustomEvent('opencompanionthemes'));
+  });
+  menu.querySelector('[data-profile-action="diagnostics"]').addEventListener('click', async (event) => {
+    const button = event.currentTarget as HTMLButtonElement;
+    const status = button.querySelector('small');
+    status.textContent = 'Collecting redacted logs…';
+    button.disabled = true;
+    try {
+      const response = await apiFetch('/api/diagnostics');
+      if (!response.ok) throw new Error((await response.json()).error || 'Diagnostics could not be collected.');
+      const blob = await response.blob();
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(blob);
+      link.download = `ultimate-plex-companion-diagnostics-${new Date().toISOString().slice(0, 10)}.json`;
+      link.click();
+      URL.revokeObjectURL(link.href);
+      status.textContent = 'Downloaded safely';
+    } catch (error) {
+      status.textContent = error.message;
+    } finally {
+      button.disabled = false;
+    }
   });
   menu.querySelector('[data-profile-action="refresh"]').addEventListener('click', () => {
     const button = menu.querySelector('[data-profile-action="refresh"] small');

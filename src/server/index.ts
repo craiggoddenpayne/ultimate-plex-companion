@@ -1,5 +1,6 @@
 import { createServer } from 'node:http';
-import { readFile, stat, access, rename, unlink } from 'node:fs/promises';
+import { constants as fsConstants } from 'node:fs';
+import { readFile, stat, access, rename, unlink, mkdir } from 'node:fs/promises';
 import { extname, join, dirname, basename, relative, resolve, isAbsolute } from 'node:path';
 import { spawn } from 'node:child_process';
 import { randomUUID } from 'node:crypto';
@@ -10,12 +11,15 @@ import { readJsonFile, writeJsonAtomic } from './core/atomic-json-store.ts';
 import { applySecurityHeaders, errorResponse, readJsonBody, sendJson } from './core/http.ts';
 import { resolveWithin } from './core/safe-path.ts';
 import { contentTypeFor } from './core/static-files.ts';
+import { createLogger } from './core/logger.ts';
+import { friendlyConnectionError } from './core/errors.ts';
 import { createAutomationRoutes } from './features/automations/routes.ts';
 import { createCodecRoutes } from './features/codec-studio/routes.ts';
 import { createCommandDeckRoutes } from './features/command-deck/routes.ts';
 import { createCompanionRoutes } from './features/companion/routes.ts';
 import { createConnectionRoutes } from './features/connection/routes.ts';
 import { createDiscoveryRoutes } from './features/discovery/routes.ts';
+import { createDiagnosticsRoutes } from './features/diagnostics/routes.ts';
 import { createFutureLabRoutes } from './features/future-lab/routes.ts';
 import { createLibraryRoutes } from './features/library/routes.ts';
 import { createMetadataRoutes } from './features/metadata/routes.ts';
@@ -38,6 +42,8 @@ const port = Number(process.env.PORT || 8080);
 const staticRoot = join(process.cwd(), 'dist');
 const configDir = process.env.CONFIG_DIR || join(process.cwd(), 'data');
 const configFile = join(configDir, 'config.json');
+const logger = createLogger({ level: process.env.LOG_LEVEL });
+const startupState: Record<string, unknown> = { complete: false, checks: {} };
 const envConfig =
   process.env.PLEX_URL && process.env.PLEX_TOKEN
     ? { plexUrl: process.env.PLEX_URL, token: process.env.PLEX_TOKEN }
@@ -77,7 +83,7 @@ async function savedConfig() {
   }
 }
 
-const plexClient = createPlexClient();
+const plexClient = createPlexClient(fetch, logger.child({ component: 'plex' }));
 const plexFetch = plexClient.fetchJson;
 const plexCommand = plexClient.command;
 const plexDelete = plexClient.deleteMedia;
@@ -343,7 +349,8 @@ async function servePlexArt(res, ratingKey) {
       'X-Content-Type-Options': 'nosniff',
     });
     res.end(Buffer.from(await response.arrayBuffer()));
-  } catch {
+  } catch (error) {
+    logger.debug('artwork.proxy_failed', { ratingKey, error });
     res.writeHead(404);
     res.end();
   }
@@ -364,8 +371,13 @@ async function restoreOptimizationJobs() {
     for (const job of restored.jobs) jobs.set(job.id, job);
     queuePaused = restored.paused;
     if (restored.recovered) await persistOptimizationJobs();
+    logger.info('optimization.queue_restored', {
+      jobs: restored.jobs.length,
+      recovered: restored.recovered,
+      paused: restored.paused,
+    });
   } catch (error) {
-    console.error(error.message);
+    logger.error('optimization.queue_restore_failed', { error });
   }
 }
 
@@ -440,6 +452,7 @@ async function prepareJob(config, ratingKey) {
 
 async function encodeJob(job, config) {
   try {
+    logger.info('optimization.started', { jobId: job.id, ratingKey: job.ratingKey, targetCodec: job.targetCodec });
     if (job.cancelRequested || job.state === 'cancelled')
       throw Object.assign(new Error('Optimization cancelled.'), { code: 'OPTIMIZATION_CANCELLED' });
     const target = conversionTarget(job.targetCodec);
@@ -572,12 +585,18 @@ async function encodeJob(job, config) {
       updatedAt: new Date().toISOString(),
     });
     await persistOptimizationJobs();
+    logger.info('optimization.ready', {
+      jobId: job.id,
+      ratingKey: job.ratingKey,
+      savingBytes: job.saving,
+      savingPercent: job.savingPercent,
+    });
   } catch (error) {
     if (job.cancelRequested || error.code === 'OPTIMIZATION_CANCELLED') {
       if (job.outputPath)
         await unlink(job.outputPath).catch((unlinkError) => {
           if (unlinkError.code !== 'ENOENT')
-            console.error(`Could not remove cancelled optimization output: ${unlinkError.message}`);
+            logger.error('optimization.cancel_cleanup_failed', { jobId: job.id, error: unlinkError });
         });
       job.state = 'cancelled';
       job.progress = 0;
@@ -587,10 +606,12 @@ async function encodeJob(job, config) {
       delete job.error;
       delete job.startedAt;
       delete job.outputPath;
+      logger.info('optimization.cancelled', { jobId: job.id, ratingKey: job.ratingKey });
     } else {
       job.state = 'failed';
       job.error = error.message;
       job.updatedAt = new Date().toISOString();
+      logger.error('optimization.failed', { jobId: job.id, ratingKey: job.ratingKey, error });
     }
     await persistOptimizationJobs();
   } finally {
@@ -641,6 +662,7 @@ async function createOptimizationJob(config, ratingKey, targetCodec = 'hevc') {
   };
   jobs.set(job.id, job);
   await persistOptimizationJobs();
+  logger.info('optimization.queued', { jobId: job.id, ratingKey: job.ratingKey, targetCodec: target.key });
   runNextJob();
   return publicJob(job);
 }
@@ -671,6 +693,11 @@ async function replaceOriginal(job, config, confirmed) {
   job.reclaimed = job.saving;
   job.updatedAt = new Date().toISOString();
   await persistOptimizationJobs();
+  logger.info('optimization.original_replaced', {
+    jobId: job.id,
+    ratingKey: job.ratingKey,
+    reclaimedBytes: job.reclaimed,
+  });
   storageScanCache = null;
   plexFetch(config, `/library/sections/${encodeURIComponent(job.libraryKey || 'all')}/refresh`).catch(() => {});
   return publicJob(job);
@@ -683,6 +710,7 @@ const automationEngine = createAutomationEngine({
   plexCommand,
   storageAnalysis,
   overview,
+  logger: logger.child({ component: 'automations' }),
 });
 
 const queueController = {
@@ -697,6 +725,7 @@ const queueController = {
   async cancel(id) {
     const job = requestOptimizationCancellation(jobs, id, activeJob);
     await persistOptimizationJobs();
+    logger.info('optimization.cancellation_requested', { jobId: job.id, state: job.state });
     const processToStop = job.cancelRequested ? activeOptimizationProcess : null;
     if (processToStop?.exitCode === null) {
       processToStop.kill('SIGTERM');
@@ -710,11 +739,13 @@ const queueController = {
   async setPaused(paused) {
     queuePaused = paused;
     await persistOptimizationJobs();
+    logger.info('optimization.queue_pause_changed', { paused: queuePaused });
     if (!queuePaused) runNextJob();
   },
 };
 
 const featureRouter = composeFeatureRouters([
+  createDiagnosticsRoutes(),
   createPlexRoutes(),
   createConnectionRoutes(),
   createMetadataRoutes(),
@@ -731,6 +762,47 @@ const featureRouter = composeFeatureRouters([
   createCodecRoutes(queueController),
 ]);
 
+function plexOrigin(config) {
+  try {
+    return new URL(config?.plexUrl || '').origin;
+  } catch {
+    return null;
+  }
+}
+
+async function diagnosticSnapshot() {
+  let config = null;
+  let configError = null;
+  try {
+    config = await savedConfig();
+  } catch (error) {
+    configError = error instanceof Error ? error.message : String(error);
+  }
+  const stateCounts = {};
+  for (const job of jobs.values()) stateCounts[job.state] = (stateCounts[job.state] || 0) + 1;
+  return {
+    generatedAt: new Date().toISOString(),
+    application: {
+      node: process.version,
+      platform: process.platform,
+      architecture: process.arch,
+      uptimeSeconds: Math.floor(process.uptime()),
+      pid: process.pid,
+      logLevel: process.env.LOG_LEVEL || 'info',
+    },
+    setup: {
+      ...startupState,
+      configured: Boolean(config),
+      configSource: envConfig ? 'environment' : config ? 'saved' : 'none',
+      plexOrigin: plexOrigin(config),
+      configError,
+      optimization: config ? optimizationSettings(config) : optimizationSettings(),
+    },
+    queue: { paused: queuePaused, activeJob, jobs: jobs.size, stateCounts },
+    logs: logger.entries(),
+  };
+}
+
 function requestContext(req, res, pathname) {
   return {
     req,
@@ -738,6 +810,8 @@ function requestContext(req, res, pathname) {
     pathname,
     json,
     body,
+    logger,
+    diagnostics: diagnosticSnapshot,
     envConfig,
     configDir,
     access,
@@ -761,11 +835,12 @@ function requestContext(req, res, pathname) {
     },
     async saveConfig(config) {
       await writeJsonAtomic(configFile, config);
+      logger.info('setup.configuration_saved', { plexOrigin: plexOrigin(config), source: 'saved' });
     },
   };
 }
 
-async function api(req, res, pathname) {
+async function api(req, res, pathname, requestId) {
   try {
     if (pathname === '/api/health')
       return json(res, 200, {
@@ -778,6 +853,9 @@ async function api(req, res, pathname) {
     return json(res, 404, { error: 'Not found.' });
   } catch (error) {
     const response = errorResponse(error);
+    const context = { requestId, method: req.method, path: pathname, status: response.status, error };
+    if (response.status >= 500) logger.error('http.request_failed', context);
+    else logger.warn('http.request_rejected', context);
     return json(res, response.status, response.body);
   }
 }
@@ -804,37 +882,165 @@ async function serve(res, pathname) {
   }
 }
 
+async function runStartupDiagnostics() {
+  logger.info('startup.begin', {
+    node: process.version,
+    platform: process.platform,
+    architecture: process.arch,
+    pid: process.pid,
+    port,
+    configDir,
+    staticRoot,
+    environment: process.env.NODE_ENV || 'development',
+    logLevel: process.env.LOG_LEVEL || 'info',
+  });
+  const checks: Record<string, unknown> = {};
+  startupState.checks = checks;
+  try {
+    await mkdir(configDir, { recursive: true, mode: 0o700 });
+    await access(configDir, fsConstants.R_OK | fsConstants.W_OK);
+    checks.dataDirectory = 'available';
+    logger.info('startup.data_directory_ready', { configDir });
+  } catch (error) {
+    checks.dataDirectory = 'unavailable';
+    logger.error('startup.data_directory_failed', { configDir, error });
+  }
+  try {
+    await access(join(staticRoot, 'index.html'), fsConstants.R_OK);
+    checks.frontend = 'available';
+    logger.info('startup.frontend_ready', { staticRoot });
+  } catch (error) {
+    checks.frontend = 'missing';
+    logger.error('startup.frontend_missing', { staticRoot, error });
+  }
+  for (const command of ['ffmpeg', 'ffprobe']) {
+    try {
+      const result = await runProcess(command, ['-version']);
+      const version = String(result.stdout || result.stderr)
+        .split('\n', 1)[0]
+        .slice(0, 300);
+      checks[command] = 'available';
+      logger.info('startup.media_tool_ready', { command, version });
+    } catch (error) {
+      checks[command] = 'unavailable';
+      logger.error('startup.media_tool_missing', { command, error });
+    }
+  }
+  let config;
+  try {
+    config = await savedConfig();
+    if (!config) {
+      checks.plexConfiguration = 'missing';
+      logger.warn('startup.plex_not_configured', {
+        advice: 'Open Manage connection, or set both PLEX_URL and PLEX_TOKEN in Docker.',
+      });
+    } else {
+      checks.plexConfiguration = 'available';
+      logger.info('startup.plex_configuration_loaded', {
+        source: envConfig ? 'environment' : 'saved',
+        plexOrigin: plexOrigin(config),
+        optimization: optimizationSettings(config),
+      });
+      const mediaSettings = optimizationSettings(config);
+      try {
+        await access(mediaSettings.mediaPathRoot, fsConstants.R_OK | fsConstants.W_OK);
+        checks.mediaRoot = 'read-write';
+        logger.info('startup.media_root_ready', { mediaPathRoot: mediaSettings.mediaPathRoot });
+      } catch (error) {
+        checks.mediaRoot = 'unavailable';
+        logger.warn('startup.media_root_unavailable', {
+          mediaPathRoot: mediaSettings.mediaPathRoot,
+          plexPathRoot: mediaSettings.plexPathRoot,
+          advice: 'Mount the media directory into Docker and ensure MEDIA_ROOT points to the container path.',
+          error,
+        });
+      }
+      if (!envConfig)
+        try {
+          const details = await stat(configFile);
+          const permissions = details.mode & 0o777;
+          checks.configPermissions = permissions === 0o600 ? 'private' : `mode-${permissions.toString(8)}`;
+          if (permissions !== 0o600)
+            logger.warn('startup.config_permissions_open', {
+              mode: permissions.toString(8),
+              advice: 'Expected config.json permissions to be 600.',
+            });
+        } catch (error) {
+          logger.warn('startup.config_stat_failed', { error });
+        }
+    }
+  } catch (error) {
+    checks.plexConfiguration = 'invalid';
+    logger.error('startup.plex_configuration_invalid', { configFile, error });
+  }
+  if (config)
+    try {
+      const serverInfo = await inspectPlex(config);
+      checks.plexConnection = 'connected';
+      startupState.plexServer = { name: serverInfo.name, version: serverInfo.version };
+      logger.info('startup.plex_connected', { name: serverInfo.name, version: serverInfo.version });
+    } catch (error) {
+      checks.plexConnection = 'failed';
+      logger.error('startup.plex_connection_failed', {
+        plexOrigin: plexOrigin(config),
+        advice: friendlyConnectionError(error),
+        error,
+      });
+    }
+  startupState.complete = true;
+  logger.info('startup.diagnostics_complete', { checks });
+}
+
 await restoreOptimizationJobs();
 
 const server = createServer(async (req, res) => {
   applySecurityHeaders(res);
-  res.setHeader('X-Request-ID', randomUUID());
+  const requestId = randomUUID();
+  const startedAt = performance.now();
+  let requestPath = '/';
+  res.setHeader('X-Request-ID', requestId);
+  res.once('finish', () => {
+    const context = {
+      requestId,
+      method: req.method,
+      path: requestPath,
+      status: res.statusCode,
+      durationMs: Math.round((performance.now() - startedAt) * 10) / 10,
+    };
+    if (requestPath === '/api/health') logger.debug('http.request_completed', context);
+    else if (res.statusCode >= 500) logger.error('http.request_completed', context);
+    else if (res.statusCode >= 400) logger.warn('http.request_completed', context);
+    else logger.info('http.request_completed', context);
+  });
   try {
     const url = new URL(req.url || '/', `http://${req.headers.host || 'localhost'}`);
+    requestPath = url.pathname;
     const artMatch = url.pathname.match(/^\/api\/art\/(\d+)$/);
     if (artMatch) return servePlexArt(res, artMatch[1]);
-    if (url.pathname.startsWith('/api/')) return api(req, res, url.pathname);
+    if (url.pathname.startsWith('/api/')) return api(req, res, url.pathname, requestId);
     return serve(res, decodeURIComponent(url.pathname));
   } catch (error) {
     const response = errorResponse(error);
+    logger.error('http.request_crashed', { requestId, method: req.method, path: requestPath, error });
     return json(res, response.status, response.body);
   }
 });
 
 server.listen(port, '0.0.0.0', () => {
-  console.log('Ultimate Plex Companion listening on http://0.0.0.0:' + port);
+  logger.info('startup.listening', { address: '0.0.0.0', port });
   runNextJob();
+  void runStartupDiagnostics().catch((error) => logger.error('startup.diagnostics_failed', { error }));
 });
 
 let shuttingDown = false;
 function shutdown(signal) {
   if (shuttingDown) return;
   shuttingDown = true;
-  console.log(`Received ${signal}; finishing in-flight requests.`);
+  logger.info('shutdown.started', { signal, activeJob });
   if (activeOptimizationProcess?.exitCode === null) activeOptimizationProcess.kill('SIGTERM');
   server.close(() => {
     persistOptimizationJobs()
-      .catch((error) => console.error(`Could not persist the optimization queue during shutdown: ${error.message}`))
+      .catch((error) => logger.error('shutdown.queue_persist_failed', { error }))
       .finally(() => process.exit(0));
   });
   const forceExit = setTimeout(() => process.exit(1), 10_000);
@@ -843,3 +1049,11 @@ function shutdown(signal) {
 
 process.once('SIGTERM', () => shutdown('SIGTERM'));
 process.once('SIGINT', () => shutdown('SIGINT'));
+process.on('uncaughtException', (error) => {
+  logger.error('process.uncaught_exception', { error });
+  shutdown('uncaughtException');
+});
+process.on('unhandledRejection', (error) => {
+  logger.error('process.unhandled_rejection', { error });
+  shutdown('unhandledRejection');
+});

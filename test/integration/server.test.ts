@@ -142,6 +142,18 @@ test('saves Plex credentials securely and returns a live overview', async (t) =>
   assert.match(health.headers.get('content-security-policy'), /default-src 'self'/);
   assert.match(health.headers.get('x-request-id'), /^[a-f0-9-]+$/);
 
+  const browserError = await fetch(`http://127.0.0.1:${appPort}/api/diagnostics/client-errors`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ message: 'Test browser failure', kind: 'integration-test', route: '/test' }),
+  });
+  assert.equal(browserError.status, 202);
+  const diagnostics = await (await fetch(`http://127.0.0.1:${appPort}/api/diagnostics`)).json();
+  assert.equal(diagnostics.application.node, process.version);
+  assert.equal(diagnostics.setup.configured, true);
+  assert.ok(diagnostics.logs.some((entry) => entry.event === 'client.error'));
+  assert.doesNotMatch(JSON.stringify(diagnostics), /secret-token/);
+
   const invalidJson = await fetch(`http://127.0.0.1:${appPort}/api/config/test`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },

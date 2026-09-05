@@ -18,6 +18,7 @@ services:
       - '${MEDIA_HOST_PATH:-./media}:${MEDIA_CONTAINER_PATH:-/media}'
     environment:
       TZ: '${TZ:-UTC}'
+      LOG_LEVEL: '${LOG_LEVEL:-info}'
       PLEX_URL: '${PLEX_URL:-}'
       PLEX_TOKEN: '${PLEX_TOKEN:-}'
       PLEX_MEDIA_ROOT: '${PLEX_MEDIA_ROOT:-/media}'

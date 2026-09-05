@@ -119,7 +119,15 @@ function cleanRule(input: any, existing: any = {}): any {
   };
 }
 
-export function createAutomationEngine({ configDir, savedConfig, plexFetch, plexCommand, storageAnalysis, overview }) {
+export function createAutomationEngine({
+  configDir,
+  savedConfig,
+  plexFetch,
+  plexCommand,
+  storageAnalysis,
+  overview,
+  logger = null,
+}) {
   const file = join(configDir, 'automations.json');
   let state = null;
   let saving = Promise.resolve();
@@ -228,13 +236,16 @@ export function createAutomationEngine({ configDir, savedConfig, plexFetch, plex
     data.runs.unshift(entry);
     data.runs = data.runs.slice(0, 100);
     await save();
+    logger?.info('automation.started', { runId: entry.id, ruleId: id, type: rule.type, trigger, dryRun });
     try {
       entry.result = await perform(rule, Boolean(dryRun));
       entry.status = 'success';
       if (!dryRun) rule.lastRunAt = new Date().toISOString();
+      logger?.info('automation.completed', { runId: entry.id, ruleId: id, type: rule.type, dryRun });
     } catch (error) {
       entry.status = 'failed';
       entry.error = error.message;
+      logger?.error('automation.failed', { runId: entry.id, ruleId: id, type: rule.type, error });
     } finally {
       entry.finishedAt = new Date().toISOString();
       entry.durationMs = Math.max(0, Date.parse(entry.finishedAt) - Date.parse(entry.startedAt));
@@ -253,7 +264,9 @@ export function createAutomationEngine({ configDir, savedConfig, plexFetch, plex
     if (config)
       try {
         plexLibraries = await libraries(config);
-      } catch {}
+      } catch (error) {
+        logger?.warn('automation.libraries_unavailable', { error });
+      }
     return {
       templates,
       libraries: plexLibraries,
@@ -271,6 +284,7 @@ export function createAutomationEngine({ configDir, savedConfig, plexFetch, plex
     rule.nextRunAt = rule.enabled ? nextOccurrence(rule.schedule) : null;
     data.rules.push(rule);
     await save();
+    logger?.info('automation.created', { ruleId: rule.id, type: rule.type, enabled: rule.enabled });
     return rule;
   }
 
@@ -282,6 +296,7 @@ export function createAutomationEngine({ configDir, savedConfig, plexFetch, plex
     rule.nextRunAt = rule.enabled ? nextOccurrence(rule.schedule) : null;
     data.rules[index] = rule;
     await save();
+    logger?.info('automation.updated', { ruleId: rule.id, type: rule.type, enabled: rule.enabled });
     return rule;
   }
 
@@ -292,12 +307,14 @@ export function createAutomationEngine({ configDir, savedConfig, plexFetch, plex
     data.rules = data.rules.filter((item) => item.id !== id);
     if (data.rules.length === before) throw new Error('Automation not found.');
     await save();
+    logger?.info('automation.deleted', { ruleId: id });
   }
 
   async function setPaused(paused) {
     const data = await load();
     data.paused = Boolean(paused);
     await save();
+    logger?.info('automation.scheduler_changed', { paused: data.paused });
     return data.paused;
   }
 
@@ -307,11 +324,13 @@ export function createAutomationEngine({ configDir, savedConfig, plexFetch, plex
     const now = Date.now();
     for (const rule of data.rules) {
       if (rule.enabled && rule.nextRunAt && Date.parse(rule.nextRunAt) <= now && !running.has(rule.id))
-        run(rule.id, { trigger: 'schedule' }).catch(() => {});
+        run(rule.id, { trigger: 'schedule' }).catch((error) =>
+          logger?.error('automation.schedule_failed', { ruleId: rule.id, error }),
+        );
     }
   }
 
-  const timer = setInterval(() => tick().catch(() => {}), 30_000);
+  const timer = setInterval(() => tick().catch((error) => logger?.error('automation.tick_failed', { error })), 30_000);
   timer.unref();
   return { list, create, update, remove, run, tick, setPaused };
 }

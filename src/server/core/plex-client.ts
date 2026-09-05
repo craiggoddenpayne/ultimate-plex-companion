@@ -1,5 +1,6 @@
 import { friendlyConnectionError } from './errors.ts';
 import type { PlexClient, PlexConfig, PlexMediaContainer, PlexRequestOptions } from '../../shared/plex-types.ts';
+import type { Logger } from './logger.ts';
 
 const defaultHeaders = {
   'X-Plex-Product': 'Ultimate Plex Companion',
@@ -12,7 +13,7 @@ function timeoutSignal(milliseconds: number) {
   return { signal: controller.signal, cancel: setTimeout(() => controller.abort(), milliseconds) };
 }
 
-export function createPlexClient(fetchImpl: typeof fetch = fetch): PlexClient {
+export function createPlexClient(fetchImpl: typeof fetch = fetch, logger?: Logger): PlexClient {
   async function request(config: PlexConfig, path: string, options: PlexRequestOptions = {}) {
     const timeout = timeoutSignal(options.timeout || 8_000);
     try {
@@ -22,6 +23,11 @@ export function createPlexClient(fetchImpl: typeof fetch = fetch): PlexClient {
         headers: { ...defaultHeaders, 'X-Plex-Token': config.token, ...options.headers },
       });
     } catch (error) {
+      logger?.warn('request.network_failed', {
+        method: options.method || 'GET',
+        path: path.split('?', 1)[0],
+        error,
+      });
       if (error.name === 'AbortError') throw new Error('Plex did not respond within 8 seconds.');
       throw new Error(friendlyConnectionError(error));
     } finally {
@@ -31,6 +37,8 @@ export function createPlexClient(fetchImpl: typeof fetch = fetch): PlexClient {
 
   async function fetchJson<T = PlexMediaContainer>(config: PlexConfig, path: string): Promise<T> {
     const response = await request(config, path, { headers: { Accept: 'application/json' } });
+    if (!response.ok)
+      logger?.warn('request.http_failed', { method: 'GET', path: path.split('?', 1)[0], status: response.status });
     if (!response.ok)
       throw new Error(
         response.status === 401 ? 'Plex rejected the access token.' : `Plex returned HTTP ${response.status}.`,
@@ -43,6 +51,8 @@ export function createPlexClient(fetchImpl: typeof fetch = fetch): PlexClient {
   async function command(config: PlexConfig, path: string, method = 'GET') {
     const response = await request(config, path, { method });
     if (!response.ok)
+      logger?.warn('command.http_failed', { method, path: path.split('?', 1)[0], status: response.status });
+    if (!response.ok)
       throw new Error(
         response.status === 401 ? 'Plex rejected the access token.' : `Plex returned HTTP ${response.status}.`,
       );
@@ -54,6 +64,8 @@ export function createPlexClient(fetchImpl: typeof fetch = fetch): PlexClient {
       timeout: 12_000,
       headers: { 'X-Plex-Pms-Api-Version': '1.0.0' },
     });
+    if (!response.ok)
+      logger?.warn('delete.http_failed', { method: 'DELETE', path: path.split('?', 1)[0], status: response.status });
     if (response.ok) return;
     if ([401, 403].includes(response.status))
       throw new Error(
@@ -64,7 +76,10 @@ export function createPlexClient(fetchImpl: typeof fetch = fetch): PlexClient {
 
   async function artwork(config: PlexConfig, ratingKey: string | number) {
     const response = await request(config, `/library/metadata/${ratingKey}/thumb`, { headers: { Accept: 'image/*' } });
-    if (!response.ok) throw new Error('Artwork unavailable.');
+    if (!response.ok) {
+      logger?.debug('artwork.unavailable', { ratingKey: String(ratingKey), status: response.status });
+      throw new Error('Artwork unavailable.');
+    }
     return response;
   }
 

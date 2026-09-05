@@ -42,6 +42,7 @@ import './features/playlists/playlist-studio-mobile.css';
 import './styles/theme-collection.css';
 
 // Browser modules progressively enhance surfaces created by app.js.
+import './core/client-logger.ts';
 import './core/themes.ts';
 import './app.ts';
 import './features/connection/connection-guide.ts';
