@@ -11,3 +11,6 @@ media
 *.log
 npm-debug.log*
 coverage
+src-tauri
+native-shell
+scripts

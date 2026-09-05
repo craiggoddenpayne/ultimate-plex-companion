@@ -11,3 +11,6 @@ npm-debug.log*
 !.env.example
 *.tmp
 *.swp
+/src-tauri/target/
+/src-tauri/gen/
+/src-tauri/tauri.generated.conf.json

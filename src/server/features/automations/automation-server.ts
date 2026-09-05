@@ -318,6 +318,20 @@ export function createAutomationEngine({
     return data.paused;
   }
 
+  async function dataSummary() {
+    const data = await load();
+    return { rules: data.rules.length, runs: data.runs.length, running: running.size, paused: data.paused };
+  }
+
+  async function clearAll() {
+    const before = await dataSummary();
+    if (before.running) throw new Error('Wait for running automations to finish before clearing application data.');
+    state = { rules: [], runs: [], paused: false };
+    await save();
+    logger?.warn('automation.database_cleared', { rules: before.rules, runs: before.runs });
+    return before;
+  }
+
   async function tick() {
     const data = await load();
     if (data.paused) return;
@@ -332,7 +346,7 @@ export function createAutomationEngine({
 
   const timer = setInterval(() => tick().catch((error) => logger?.error('automation.tick_failed', { error })), 30_000);
   timer.unref();
-  return { list, create, update, remove, run, tick, setPaused };
+  return { list, create, update, remove, run, tick, setPaused, dataSummary, clearAll };
 }
 
 export { nextOccurrence };

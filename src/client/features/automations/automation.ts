@@ -389,6 +389,10 @@ function setupAutomations() {
   document.querySelector('[data-nav="automation"]')?.addEventListener('click', () => {
     if (!autoState.loaded) setTimeout(loadAutomations, 100);
   });
+  window.addEventListener('companiondatareset', () => {
+    autoState.loaded = false;
+    if (location.hash === '#automation') loadAutomations();
+  });
   if (location.hash === '#automation') loadAutomations();
 }
 if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', setupAutomations);

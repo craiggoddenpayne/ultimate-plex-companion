@@ -16,9 +16,20 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "check": "tsc --noEmit",
-    "ci": "npm run lint && npm run format:check && npm run check && npm test && npm run build"
+    "ci": "npm run lint && npm run format:check && npm run check && npm test && npm run build",
+    "native:doctor": "node scripts/native-doctor.mjs",
+    "native:check": "node scripts/native-config.mjs macos && tauri build --help",
+    "native:dev": "node scripts/native-config.mjs macos && tauri dev --config src-tauri/tauri.generated.conf.json",
+    "native:init:android": "tauri android init",
+    "native:init:ios": "tauri ios init",
+    "native:build:macos": "node scripts/native-config.mjs macos && tauri build --config src-tauri/tauri.generated.conf.json --bundles app,dmg",
+    "native:build:android": "node scripts/native-config.mjs android && tauri android build --config src-tauri/tauri.generated.conf.json",
+    "native:build:ios": "node scripts/native-config.mjs ios && tauri ios build --config src-tauri/tauri.generated.conf.json",
+    "native:open:android": "node scripts/native-config.mjs android && tauri android dev --config src-tauri/tauri.generated.conf.json --open",
+    "native:open:ios": "node scripts/native-config.mjs ios && tauri ios dev --config src-tauri/tauri.generated.conf.json --open"
   },
   "devDependencies": {
+    "@tauri-apps/cli": "^2.11.4",
     "@types/node": "^24.13.3",
     "oxlint": "^1.81.0",
     "prettier": "^3.9.6",

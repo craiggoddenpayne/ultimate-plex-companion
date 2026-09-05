@@ -53,6 +53,15 @@ test('automation rules persist, preview safely and execute Plex actions', async 
   assert.equal(await persisted.setPaused(false), false);
   await persisted.remove(rule.id);
   assert.equal((await persisted.list()).rules.length, 0);
+
+  const resetRule = await persisted.create({ type: 'health_snapshot', name: 'Temporary snapshot' });
+  await persisted.run(resetRule.id, { dryRun: true });
+  assert.deepEqual(await persisted.dataSummary(), { rules: 1, runs: 3, running: 0, paused: false });
+  const cleared = await persisted.clearAll();
+  assert.equal(cleared.rules, 1);
+  assert.equal(cleared.runs, 3);
+  assert.deepEqual((await persisted.list()).rules, []);
+  assert.deepEqual((await persisted.list()).runs, []);
 });
 
 test('scheduler calculates future hourly, daily and weekly events', () => {

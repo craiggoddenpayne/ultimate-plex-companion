@@ -50,6 +50,8 @@ client/main.ts → feature UI → /api → feature router → domain service →
 
 The browser never receives the Plex token. API handlers validate identifiers and confirmations again on the server. Read-only scans are separated from media mutations. Codec replacement retains the original until the staged output passes verification.
 
+Native applications are deliberately thin Tauri webviews pointed at the deployed server. Remote content receives no Tauri IPC capabilities, so platform APIs are not added to the browser trust boundary. The native package contains neither Plex credentials nor the Node.js/FFmpeg backend.
+
 ## Design constraints
 
 - No external analytics or cloud processing.

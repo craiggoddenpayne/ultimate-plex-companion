@@ -157,6 +157,7 @@ function settingsModal(config: any = {}) {
       <div class="connection-result" id="connection-result">${config.configured ? '<i></i> A Plex connection is configured.' : 'Enter your server details to begin.'}</div>
       <div class="settings-actions">${managed ? '' : '<button type="button" class="test-button" id="test-plex">Test connection</button><button type="submit" class="primary-button" id="save-plex">Save & connect</button>'}</div>
     </form>
+    <section class="data-reset-zone"><div><span>APPLICATION DATA</span><h3>Reset Companion database</h3><p>Clear the encode queue, automation rules and run history. Plex credentials, appearance and every media file stay untouched.</p></div><button type="button" id="open-data-reset">Review reset</button></section>
     <details><summary>Where do I find my Plex token?</summary><p>In Plex Web, open any media item, choose Get Info, then View XML. Copy the value after <strong>X-Plex-Token=</strong> from the address bar.</p></details>
   </section></div>`;
 }
@@ -171,6 +172,53 @@ async function request(path, options: any = {}) {
   return result;
 }
 
+function dataResetModal(data) {
+  const total = Number(data.optimization.jobs) + Number(data.automation.rules) + Number(data.automation.runs);
+  return `<div class="modal-wrap" id="data-reset-modal"><div class="modal-backdrop" data-reset-close></div><section class="settings-modal data-reset-modal"><button class="modal-close" data-reset-close>×</button><span class="assistant-glyph danger">${icon('shield')}</span><span class="eyebrow">LOCAL DATA RESET · MEDIA SAFE</span><h2>Are you sure?</h2><p>This removes Companion’s operational records and cannot be undone. It does not issue any delete request to Plex or touch files on disk.</p><div class="data-reset-counts"><span><b>${data.optimization.jobs}</b>Encode jobs</span><span><b>${data.automation.rules}</b>Automation rules</span><span><b>${data.automation.runs}</b>Run reports</span></div><div class="data-reset-preserved"><b>STAYS IN PLACE</b>${data.preserved.map((item) => `<span>✓ ${escapeHtml(item)}</span>`).join('')}</div>${data.canReset ? '' : '<div class="connection-result error">An optimization or automation is still active. Stop it before resetting.</div>'}<div class="settings-actions"><button class="test-button" data-reset-close>Keep data</button><button class="danger-button" id="confirm-data-reset" ${data.canReset ? '' : 'disabled'}>Clear ${total} records</button></div></section></div>`;
+}
+
+async function openDataReset() {
+  const launcher = document.querySelector('#open-data-reset');
+  launcher.disabled = true;
+  launcher.textContent = 'Inspecting data…';
+  try {
+    const preview = await request('/api/settings/data');
+    document.querySelector('#data-reset-modal')?.remove();
+    document.body.insertAdjacentHTML('beforeend', dataResetModal(preview));
+    const modal = document.querySelector('#data-reset-modal');
+    const close = () => modal.remove();
+    modal.querySelectorAll('[data-reset-close]').forEach((item) => item.addEventListener('click', close));
+    modal.querySelector('#confirm-data-reset')?.addEventListener('click', async (event) => {
+      const button = event.currentTarget as HTMLButtonElement;
+      button.disabled = true;
+      button.textContent = 'Clearing records…';
+      try {
+        const result = await request('/api/settings/data/reset', {
+          method: 'POST',
+          body: JSON.stringify({ confirmed: true }),
+        });
+        close();
+        document.querySelector('#settings-modal')?.remove();
+        window.dispatchEvent(new CustomEvent('companiondatareset', { detail: result.cleared }));
+        await pollOptimizationJobs();
+        toast(
+          `Application data cleared · ${result.cleared.optimizationJobs} queue records and ${result.cleared.automationRuns} run reports removed`,
+        );
+      } catch (error) {
+        button.disabled = false;
+        button.textContent = error.message;
+      }
+    });
+  } catch (error) {
+    toast(error.message);
+  } finally {
+    if (launcher.isConnected) {
+      launcher.disabled = false;
+      launcher.textContent = 'Review reset';
+    }
+  }
+}
+
 async function openSettings() {
   document.querySelector('#settings-modal')?.remove();
   let config: any = {};
@@ -182,6 +230,7 @@ async function openSettings() {
   modal
     .querySelectorAll('[data-action="close"]')
     .forEach((button) => button.addEventListener('click', () => modal.remove()));
+  modal.querySelector('#open-data-reset').addEventListener('click', openDataReset);
   const form = modal.querySelector('#plex-settings-form');
   if (!form || config.tokenSource === 'environment') return;
   const result = modal.querySelector('#connection-result');

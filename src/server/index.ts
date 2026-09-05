@@ -28,9 +28,14 @@ import { createPlexRoutes } from './features/plex/routes.ts';
 import { createRecommendationRoutes } from './features/recommendations/routes.ts';
 import { createTelemetryRoutes } from './features/telemetry/routes.ts';
 import { createUtilityRoutes } from './features/utility-suite/routes.ts';
+import { createDataManagementRoutes } from './features/data-management/routes.ts';
 import { createAutomationEngine } from './features/automations/automation-server.ts';
 import { createOptimizationStore } from './features/codec-studio/optimization-store-server.ts';
-import { optimizationEta, requestOptimizationCancellation } from './features/codec-studio/optimization-queue-server.ts';
+import {
+  optimizationEta,
+  optimizationSummary,
+  requestOptimizationCancellation,
+} from './features/codec-studio/optimization-queue-server.ts';
 import {
   conversionTarget,
   isLegacyCodec,
@@ -742,6 +747,18 @@ const queueController = {
     logger.info('optimization.queue_pause_changed', { paused: queuePaused });
     if (!queuePaused) runNextJob();
   },
+  summary() {
+    return optimizationSummary(jobs, activeJob);
+  },
+  async clearAll() {
+    const summary = optimizationSummary(jobs, activeJob);
+    if (activeJob) throw new Error('Cancel or finish the active optimization before clearing application data.');
+    jobs.clear();
+    queuePaused = false;
+    await persistOptimizationJobs();
+    logger.warn('optimization.database_cleared', { jobs: summary.total });
+    return summary;
+  },
 };
 
 const featureRouter = composeFeatureRouters([
@@ -751,6 +768,7 @@ const featureRouter = composeFeatureRouters([
   createMetadataRoutes(),
   createLibraryRoutes(),
   createUtilityRoutes(),
+  createDataManagementRoutes({ queue: queueController, automations: automationEngine }),
   createCompanionRoutes(automationEngine),
   createRecommendationRoutes(),
   createPlaylistRoutes(),

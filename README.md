@@ -17,6 +17,7 @@ A futuristic, local-first command centre for Plex. It combines live playback tel
 - Persistent, verified HEVC, AV1 and VP9 conversion queues
 - Auditable automations with dry runs and summaries
 - Responsive, themeable command interface
+- Native Tauri bootstrap for macOS, iOS and Android companion clients
 - Local processing with no external analytics
 
 ## Quick start with Docker
@@ -68,6 +69,17 @@ Codec Studio needs the same media files Plex reports. Configure:
 - `HEVC_PRESET`: `fast`, `medium` or `slow`
 
 See [.env.example](.env.example) for a complete template.
+
+## Native applications
+
+The repository includes a lightweight Tauri 2 client for macOS, Android and iOS. Native clients display an existing Docker-hosted Companion instance; Plex credentials, FFmpeg and application data remain on that server.
+
+```bash
+npm run native:doctor
+UPC_APP_URL=https://companion.example.net npm run native:build:macos
+```
+
+Android and iOS need one initialization step before their first build. See [the native app guide](docs/NATIVE_APPS.md) for prerequisites, LAN URL guidance, build commands and signing notes.
 
 ## Safe media operations
 

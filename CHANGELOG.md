@@ -15,3 +15,5 @@ and this project intends to follow [Semantic Versioning](https://semver.org/spec
 - Initial open-source project structure, contribution guidance and CI.
 - Central feature registry and extension documentation.
 - Playlist Studio with previewable, criteria-driven Plex playlist generators.
+- Guarded application-data reset for optimization and automation records.
+- Tauri 2 bootstrap and build scripts for macOS, Android and iOS clients.
