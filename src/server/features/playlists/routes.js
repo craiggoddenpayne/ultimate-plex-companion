@@ -1,5 +1,5 @@
 import { requirePlex } from '../../core/router.js';
-import { createGeneratedPlaylist, playlistStudio } from './playlist-studio-server.js';
+import { createGeneratedPlaylist, playlistStudio, previewPlaylistComposition } from './playlist-studio-server.js';
 
 export function createPlaylistRoutes() {
   return async context => {
@@ -12,6 +12,11 @@ export function createPlaylistRoutes() {
     if (pathname === '/api/playlists/generate' && req.method === 'POST') {
       const config = await requirePlex(context);
       if (config) json(res, 201, { playlist:await createGeneratedPlaylist(config, context, await context.body(req)) });
+      return true;
+    }
+    if (pathname === '/api/playlists/preview' && req.method === 'POST') {
+      const config = await requirePlex(context);
+      if (config) json(res, 200, await previewPlaylistComposition(config, context, await context.body(req)));
       return true;
     }
     return false;

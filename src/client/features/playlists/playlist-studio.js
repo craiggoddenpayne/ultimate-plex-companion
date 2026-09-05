@@ -1,3 +1,5 @@
+import { renderPlaylistComposer } from './playlist-composer.js';
+
 const playlistState = { data:null, selected:null, filter:'All' };
 const playlistEscape = value => String(value ?? '').replace(/[&<>'"]/g, character => ({
   '&':'&amp;', '<':'&lt;', '>':'&gt;', "'":'&#39;', '"':'&quot;',
@@ -25,6 +27,7 @@ function studioShell() {
       <article><span>EXISTING PLAYLISTS</span><b id="playlist-existing-count">—</b><small>Currently in Plex</small></article>
       <article><span>SAFETY</span><b>PREVIEW</b><small>Confirm before creation</small></article>
     </section>
+    <section class="playlist-composer" id="playlist-composer"></section>
     <section class="playlist-section">
       <header>
         <div><span>AUTO-GENERATE</span><h2>Choose a signal</h2><p>Buttons are enabled only when your library has matching titles.</p></div>
@@ -78,6 +81,7 @@ function renderStudio() {
   document.querySelector('#playlist-catalog').textContent = data.catalogSize.toLocaleString();
   document.querySelector('#playlist-generators').textContent = data.generators.filter(item => item.available).length;
   document.querySelector('#playlist-existing-count').textContent = data.existing.length;
+  renderPlaylistComposer(data.composer, () => loadStudio(true));
 
   const categories = ['All', ...new Set(data.generators.map(item => item.category).filter(Boolean))];
   if (!categories.includes(playlistState.filter)) playlistState.filter = 'All';

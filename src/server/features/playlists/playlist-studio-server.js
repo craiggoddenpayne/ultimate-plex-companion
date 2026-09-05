@@ -57,6 +57,76 @@ export function buildPlaylistGenerators(items, now = Date.now()/1000) {
   });
 }
 
+const composerTypes = new Set(['all','movie','episode']);
+const composerWatchStates = new Set(['all','unwatched','watched','in-progress']);
+const composerSorts = new Set(['rating','newest','shortest','recently-added']);
+
+export function normalizeComposerCriteria(input = {}) {
+  const type = composerTypes.has(input.type) ? input.type : 'all';
+  const watchState = composerWatchStates.has(input.watchState) ? input.watchState : 'all';
+  const sort = composerSorts.has(input.sort) ? input.sort : 'rating';
+  const genre = String(input.genre || '').trim().slice(0, 60);
+  const resolutionValue = String(input.resolution || 'all').toLowerCase();
+  const resolutionFilter = ['all','4k','1080','720','sd'].includes(resolutionValue) ? resolutionValue : 'all';
+  const decadeValue = Number(input.decade || 0);
+  const decade = decadeValue >= 1900 && decadeValue <= 2090 && decadeValue % 10 === 0 ? decadeValue : 0;
+  const minRating = Math.min(10, Math.max(0, Number(input.minRating || 0)));
+  const maxMinutes = Math.min(600, Math.max(0, Number(input.maxMinutes || 0)));
+  return { type, watchState, genre, decade, minRating, maxMinutes, resolution:resolutionFilter, sort };
+}
+
+export function composePlaylist(items, input = {}) {
+  const criteria = normalizeComposerCriteria(input);
+  const expectedGenre = criteria.genre.toLowerCase();
+  const matches = items.filter(item => {
+    if (!item.ratingKey || !['movie','episode'].includes(item.type)) return false;
+    if (criteria.type !== 'all' && item.type !== criteria.type) return false;
+    if (criteria.watchState === 'unwatched' && !unwatched(item)) return false;
+    if (criteria.watchState === 'watched' && !watched(item)) return false;
+    if (criteria.watchState === 'in-progress' && !(progress(item) >= .05 && progress(item) < .95)) return false;
+    if (expectedGenre && !genres(item).some(value => value.toLowerCase() === expectedGenre)) return false;
+    if (criteria.decade && !(year(item) >= criteria.decade && year(item) <= criteria.decade + 9)) return false;
+    if (criteria.minRating && rating(item) < criteria.minRating) return false;
+    if (criteria.maxMinutes && (!minutes(item) || minutes(item) > criteria.maxMinutes)) return false;
+    const itemResolution = resolution(item);
+    if (criteria.resolution === '4k' && !itemResolution.includes('4k')) return false;
+    if (criteria.resolution === '1080' && !itemResolution.includes('1080')) return false;
+    if (criteria.resolution === '720' && !itemResolution.includes('720')) return false;
+    if (criteria.resolution === 'sd' && /4k|1080|720/.test(itemResolution)) return false;
+    return true;
+  });
+  const sorters = {
+    rating:(a,b)=>rating(b)-rating(a)||year(b)-year(a),
+    newest:(a,b)=>year(b)-year(a)||rating(b)-rating(a),
+    shortest:(a,b)=>(minutes(a)||Infinity)-(minutes(b)||Infinity)||rating(b)-rating(a),
+    'recently-added':(a,b)=>Number(b.addedAt||0)-Number(a.addedAt||0)||rating(b)-rating(a),
+  };
+  return { criteria, items:matches.sort(sorters[criteria.sort]) };
+}
+
+export function playlistComposerFacets(items) {
+  const usable = items.filter(item => item.ratingKey && ['movie','episode'].includes(item.type));
+  const genreCounts = new Map();
+  for (const item of usable) for (const value of genres(item)) genreCounts.set(value, (genreCounts.get(value) || 0) + 1);
+  const availableDecades = [...new Set(usable.map(item => Math.floor(year(item) / 10) * 10).filter(value => value >= 1900 && value <= 2090))].sort((a,b)=>b-a);
+  return {
+    genres:[...genreCounts].sort((a,b)=>b[1]-a[1]||a[0].localeCompare(b[0])).map(([value,count])=>({ value,count })),
+    decades:availableDecades,
+    resolutions:[...new Set(usable.map(resolution).filter(Boolean))].sort(),
+  };
+}
+
+export async function previewPlaylistComposition(config, dependencies, input) {
+  const items = await catalog(config, dependencies);
+  const composed = composePlaylist(items, input);
+  return {
+    criteria:composed.criteria,
+    count:composed.items.length,
+    totalMinutes:composed.items.reduce((sum,item)=>sum+minutes(item),0),
+    sample:composed.items.slice(0,20).map(publicItem),
+  };
+}
+
 export function playlistCreatePath(machineIdentifier, playlistTitle, ratingKeys) {
   const machine = String(machineIdentifier || '').trim();
   const name = String(playlistTitle || '').trim().replace(/[\r\n]+/g, ' ').slice(0, 80);
@@ -86,13 +156,14 @@ export async function playlistStudio(config, dependencies) {
     const response = await dependencies.plexFetch(config, '/playlists?playlistType=video');
     existing = (response.MediaContainer?.Metadata || response.MediaContainer?.Directory || []).map(item => ({ ratingKey:String(item.ratingKey||''), title:item.title||'Untitled playlist', itemCount:Number(item.leafCount||item.childCount||0), durationMinutes:Math.round(Number(item.duration||0)/60_000), poster:item.thumb?`/api/art/${item.ratingKey}`:'' }));
   } catch { /* Playlist generation remains available if Plex cannot list existing playlists. */ }
-  return { catalogSize:items.length, existing, generators:buildPlaylistGenerators(items).map(publicGenerator), generatedAt:new Date().toISOString() };
+  return { catalogSize:items.length, existing, generators:buildPlaylistGenerators(items).map(publicGenerator), composer:playlistComposerFacets(items), generatedAt:new Date().toISOString() };
 }
 
 export async function createGeneratedPlaylist(config, dependencies, input) {
   if (input?.confirmed !== true) throw new Error('Confirm playlist creation before continuing.');
   const items = await catalog(config, dependencies);
-  const generator = buildPlaylistGenerators(items).find(entry => entry.id === input.generatorId);
+  const custom = input.generatorId === 'custom';
+  const generator = custom ? { id:'custom', name:'Custom Signal', items:composePlaylist(items, input.criteria).items } : buildPlaylistGenerators(items).find(entry => entry.id === input.generatorId);
   if (!generator) throw new Error('Unknown playlist generator.');
   const limit = Math.min(100, Math.max(1, Number(input.limit || 30)));
   const selected = generator.items.slice(0, limit);

@@ -11,7 +11,7 @@ A futuristic, local-first command centre for Plex. It combines live playback tel
 
 - Live Plex server, stream and household telemetry
 - Explainable Discovery Radar and library-based recommendations
-- Playlist Studio with criteria-driven, previewable generators
+- Playlist Studio with 22 live generators and an eight-control custom signal composer
 - Metadata integrity scanning and guided repair
 - Duplicate/edition review with copy-level evidence
 - Persistent, verified HEVC, AV1 and VP9 conversion queues

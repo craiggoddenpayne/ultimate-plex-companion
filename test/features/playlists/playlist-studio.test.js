@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { buildPlaylistGenerators, createGeneratedPlaylist, playlistCreatePath } from '../../../src/server/features/playlists/playlist-studio-server.js';
+import { buildPlaylistGenerators, composePlaylist, createGeneratedPlaylist, normalizeComposerCriteria, playlistComposerFacets, playlistCreatePath } from '../../../src/server/features/playlists/playlist-studio-server.js';
 
 const movie=(id,title,extra={})=>({ratingKey:String(id),type:'movie',title,duration:100*60_000,audienceRating:8,viewCount:0,Genre:[],Media:[{videoResolution:'1080'}],...extra});
 
@@ -50,4 +50,33 @@ test('playlist creation builds a confirmed Plex video playlist', async () => {
   assert.equal(calls[0][2],'POST');
   assert.match(decodeURIComponent(calls[0][1]),/server:\/\/machine\/com\.plexapp\.plugins\.library\/library\/metadata\/8/);
   assert.throws(()=>playlistCreatePath('machine','',[]),/name/);
+});
+
+test('custom composer combines filters and ranks matching Plex items', () => {
+  const items=[
+    movie(30,'Best Short Sci-Fi',{year:2018,duration:80*60_000,audienceRating:9,Genre:[{tag:'Science Fiction'}],Media:[{videoResolution:'4k'}]}),
+    movie(31,'Long Sci-Fi',{year:2015,duration:160*60_000,audienceRating:8.5,Genre:[{tag:'Science Fiction'}],Media:[{videoResolution:'4k'}]}),
+    movie(32,'Wrong Genre',{year:2019,duration:75*60_000,audienceRating:9.5,Genre:[{tag:'Drama'}],Media:[{videoResolution:'4k'}]}),
+  ];
+  const result=composePlaylist(items,{type:'movie',watchState:'unwatched',genre:'Science Fiction',decade:2010,minRating:8,maxMinutes:120,resolution:'4k',sort:'rating'});
+  assert.deepEqual(result.items.map(item=>item.ratingKey),['30']);
+  assert.deepEqual(result.criteria,{type:'movie',watchState:'unwatched',genre:'Science Fiction',decade:2010,minRating:8,maxMinutes:120,resolution:'4k',sort:'rating'});
+  const normalized=normalizeComposerCriteria({type:'music',watchState:'maybe',minRating:99,maxMinutes:900,resolution:'16k',sort:'random'});
+  assert.equal(normalized.type,'all');
+  assert.equal(normalized.minRating,10);
+  assert.equal(normalized.maxMinutes,600);
+  assert.equal(normalized.sort,'rating');
+});
+
+test('custom composer exposes useful facets and creates only confirmed matches', async () => {
+  const items=[movie(40,'Drama',{year:1995,Genre:[{tag:'Drama'}]}),movie(41,'Comedy',{year:2004,Genre:[{tag:'Comedy'}]})];
+  const facets=playlistComposerFacets(items);
+  assert.deepEqual(facets.decades,[2000,1990]);
+  assert.deepEqual(facets.genres.map(item=>item.value),['Comedy','Drama']);
+  const calls=[];
+  const dependencies={plexFetch:async()=>({MediaContainer:{Directory:[{key:'1',type:'movie'}]}}),libraryItems:async()=>items,inspectPlex:async()=>({machineIdentifier:'machine'}),plexCommand:async(...args)=>calls.push(args)};
+  const created=await createGeneratedPlaylist({},dependencies,{generatorId:'custom',criteria:{genre:'Drama'},title:'Custom Drama',limit:10,confirmed:true});
+  assert.equal(created.generatorId,'custom');
+  assert.equal(created.itemCount,1);
+  assert.match(decodeURIComponent(calls[0][1]),/metadata\/40/);
 });
