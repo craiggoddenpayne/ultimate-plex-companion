@@ -19,6 +19,7 @@ import './features/command-deck/command-deck.css';
 import './features/command-deck/command-deck-intelligence.css';
 import './features/utility-suite/utility-suite.css';
 import './features/telemetry/telemetry.css';
+import './features/telemetry/stream-session-details.css';
 import './features/profile/profile.css';
 import './features/future-lab/future-lab.css';
 import './features/recommendations/recommendations.css';

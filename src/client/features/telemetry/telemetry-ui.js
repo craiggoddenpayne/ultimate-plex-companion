@@ -1,3 +1,5 @@
+import { sessionMarkup } from './stream-session-view.js';
+
 const telemetryEscape = value => String(value == null ? '' : value).replace(/[&<>'"]/g, char => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', "'":'&#39;', '"':'&quot;' })[char]);
 const streamIcon = '<svg class="icon" viewBox="0 0 24 24"><path d="m8 5 11 7-11 7z"/></svg>';
 const usersIcon = '<svg class="icon" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM22 21v-2a4 4 0 0 0-3-3.87"/></svg>';
@@ -27,7 +29,7 @@ function renderStreams(data) {
   document.querySelector('#live-bandwidth').textContent=data.summary.totalBandwidth ? (data.summary.totalBandwidth/1000).toFixed(1)+' Mbps' : '0 Mbps';
   document.querySelector('#live-latency').textContent=data.summary.latencyMs+' ms';
   const list=document.querySelector('#live-session-list');
-  list.innerHTML=data.sessions.length?data.sessions.map(item=>'<article class="observed-session '+item.tone+'"><div class="session-art">'+(item.poster?'<img src="'+telemetryEscape(item.poster)+'" alt="">':streamIcon)+'<span>'+telemetryEscape(item.state)+'</span></div><div class="session-info"><div class="session-title"><div><h3>'+telemetryEscape(item.title)+'</h3><p>'+telemetryEscape([item.subtitle,item.resolution,item.container.toUpperCase()].filter(Boolean).join(' · '))+'</p></div><b class="decision '+(item.mode==='Transcoding'?'transcoding':'direct')+'">'+telemetryEscape(item.mode)+'</b></div><div class="session-route"><span><b>'+telemetryEscape(item.user)+'</b>'+telemetryEscape(item.device)+'</span><i></i><span><b>'+telemetryEscape(item.location)+'</b>'+(item.secure?'Secure connection':'Unsecured route')+'</span><i></i><span><b>'+item.remainingMinutes+' min</b>remaining</span></div><div class="session-progress"><i style="width:'+item.progress+'%"></i><span>'+item.progress+'%</span></div>'+(item.mode==='Transcoding'?'<div class="transcode-facts"><span>VIDEO <b>'+telemetryEscape(item.videoDecision)+'</b></span><span>AUDIO <b>'+telemetryEscape(item.audioDecision)+'</b></span><span>SPEED <b>'+item.transcodeSpeed.toFixed(1)+'×</b></span><span>ENGINE <b>'+(item.hardware?'Hardware':'Software')+'</b></span></div>':'')+'</div></article>').join(''):'<div class="observatory-empty"><span>'+streamIcon+'</span><h3>The observatory is quiet</h3><p>Plex is connected and healthy. Active sessions will appear here automatically.</p><i></i></div>';
+  list.innerHTML=data.sessions.length?data.sessions.map(sessionMarkup).join(''):'<div class="observatory-empty"><span>'+streamIcon+'</span><h3>The observatory is quiet</h3><p>Plex is connected and healthy. Active sessions will appear here automatically.</p><i></i></div>';
   const history=document.querySelector('#playback-history-list');
   history.innerHTML=data.recent.length?data.recent.map(item=>{
     const meta=[item.detail,item.subtitle,item.year,item.durationMinutes?item.durationMinutes+" min":null].filter(Boolean).join(" · ");
