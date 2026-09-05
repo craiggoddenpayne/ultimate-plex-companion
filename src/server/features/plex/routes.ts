@@ -1,5 +1,5 @@
-import { requirePlex } from '../../core/router.js';
-import { plexItemUrl } from './plex-link-server.js';
+import { requirePlex } from '../../core/router.ts';
+import { plexItemUrl } from './plex-link-server.ts';
 
 export function createPlexRoutes() {
   return async context => {

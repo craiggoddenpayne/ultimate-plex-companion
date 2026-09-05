@@ -1,4 +1,4 @@
-import { sessionMarkup } from './stream-session-view.js';
+import { sessionMarkup } from './stream-session-view.ts';
 
 const telemetryEscape = value => String(value == null ? '' : value).replace(/[&<>'"]/g, char => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', "'":'&#39;', '"':'&quot;' })[char]);
 const streamIcon = '<svg class="icon" viewBox="0 0 24 24"><path d="m8 5 11 7-11 7z"/></svg>';

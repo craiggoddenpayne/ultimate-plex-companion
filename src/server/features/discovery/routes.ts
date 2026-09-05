@@ -1,4 +1,4 @@
-import { requestOptions, refreshRequested, requirePlex } from '../../core/router.js';
+import { requestOptions, refreshRequested, requirePlex } from '../../core/router.ts';
 
 export function createDiscoveryRoutes() {
   return async context => {

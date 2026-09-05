@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { features, navigation, validateFeatureRegistry } from '../../src/shared/feature-registry.js';
+import { features, navigation, validateFeatureRegistry } from '../../src/shared/feature-registry.ts';
 
 test('feature registry is unique and drives navigation metadata', () => {
   assert.equal(validateFeatureRegistry(), true);

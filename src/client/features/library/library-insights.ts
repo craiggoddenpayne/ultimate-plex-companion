@@ -1,4 +1,4 @@
-import { bindOverlapActions, renderOverlapList } from './library-overlaps-ui.js';
+import { bindOverlapActions, renderOverlapList } from './library-overlaps-ui.ts';
 const atlasState={data:null,tab:'quality'};
 const atlasEscape=value=>String(value??'').replace(/[&<>'"]/g,char=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[char]));
 const atlasBytes=bytes=>{let value=Number(bytes)||0,unit=0;const units=['B','KB','MB','GB','TB'];while(value>=1024&&unit<4){value/=1024;unit++}return value.toFixed(unit>2?1:0)+' '+units[unit]};

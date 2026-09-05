@@ -1,4 +1,4 @@
-import { buildEditionInsights } from './library-overlap-server.js';
+import { buildEditionInsights } from './library-overlap-server.ts';
 let insightsCache;
 
 function mediaFacts(item) {

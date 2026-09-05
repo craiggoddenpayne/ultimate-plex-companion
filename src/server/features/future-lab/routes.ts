@@ -1,5 +1,5 @@
-import { refreshRequested, requirePlex } from '../../core/router.js';
-import { futureLab } from './future-lab-server.js';
+import { refreshRequested, requirePlex } from '../../core/router.ts';
+import { futureLab } from './future-lab-server.ts';
 
 export function createFutureLabRoutes() {
   return async context => {

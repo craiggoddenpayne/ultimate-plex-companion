@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { normalizeSidebarState } from '../../src/client/core/sidebar-collapse.js';
+import { normalizeSidebarState } from '../../src/client/core/sidebar-collapse.ts';
 
 test('sidebar state accepts only the persisted collapsed value', () => {
   assert.equal(normalizeSidebarState('collapsed'), 'collapsed');

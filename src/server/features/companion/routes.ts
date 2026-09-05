@@ -1,6 +1,6 @@
-import { requirePlex } from '../../core/router.js';
-import { answerCompanion, companionNotifications, universalSearch } from './companion-server.js';
-import { streamTelemetry } from '../telemetry/telemetry-server.js';
+import { requirePlex } from '../../core/router.ts';
+import { answerCompanion, companionNotifications, universalSearch } from './companion-server.ts';
+import { streamTelemetry } from '../telemetry/telemetry-server.ts';
 
 export function createCompanionRoutes(automationEngine) {
   return async context => {

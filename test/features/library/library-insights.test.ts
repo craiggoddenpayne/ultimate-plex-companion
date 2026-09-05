@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { libraryInsights } from '../../../src/server/features/library/library-insights-server.js';
+import { libraryInsights } from '../../../src/server/features/library/library-insights-server.ts';
 
 test('Library Atlas maps quality, editions, metadata and growth', async () => {
   const now=Math.floor(Date.now()/1000);

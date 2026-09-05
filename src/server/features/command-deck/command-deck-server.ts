@@ -1,4 +1,4 @@
-import { buildDeckIntelligence } from './command-deck-intelligence-server.js';
+import { buildDeckIntelligence } from './command-deck-intelligence-server.ts';
 let catalogCache;
 
 function historyIdentity(item) {

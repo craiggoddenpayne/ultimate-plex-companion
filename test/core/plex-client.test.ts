@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { createPlexClient } from '../../src/server/core/plex-client.js';
-import { normalizePlexConfig } from '../../src/server/core/validation.js';
+import { createPlexClient } from '../../src/server/core/plex-client.ts';
+import { normalizePlexConfig } from '../../src/server/core/validation.ts';
 
 test('Plex configuration validation strips trailing slashes and rejects embedded credentials', () => {
   assert.deepEqual(normalizePlexConfig({ plexUrl:'http://plex.local:32400/', token:' token ' }), { plexUrl:'http://plex.local:32400', token:'token' });

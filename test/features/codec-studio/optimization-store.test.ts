@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { mkdtemp, rm } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { createOptimizationStore } from '../../../src/server/features/codec-studio/optimization-store-server.js';
+import { createOptimizationStore } from '../../../src/server/features/codec-studio/optimization-store-server.ts';
 
 test('optimization jobs persist and interrupted work is safely re-queued', async t => {
   const directory = await mkdtemp(join(tmpdir(), 'plex-jobs-'));

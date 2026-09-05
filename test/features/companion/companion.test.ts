@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { universalSearch, answerCompanion, companionNotifications } from '../../../src/server/features/companion/companion-server.js';
+import { universalSearch, answerCompanion, companionNotifications } from '../../../src/server/features/companion/companion-server.ts';
 
 test('universal search normalizes Plex hubs and removes duplicates', async () => {
   const plexFetch=async()=>({ MediaContainer:{ Hub:[

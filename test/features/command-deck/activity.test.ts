@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { activityVisual } from '../../../src/client/features/command-deck/activity-view.js';
-import { commandDeck } from '../../../src/server/features/command-deck/command-deck-server.js';
+import { activityVisual } from '../../../src/client/features/command-deck/activity-view.ts';
+import { commandDeck } from '../../../src/server/features/command-deck/command-deck-server.ts';
 
 test('activity visuals prefer Plex artwork and retain typed fallbacks', () => {
   const artwork = activityVisual({ type:'watched', poster:'/api/art/42' });

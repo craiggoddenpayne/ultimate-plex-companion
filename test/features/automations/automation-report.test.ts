@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { arrivalReport } from '../../../src/server/features/automations/automation-report-server.js';
-import { renderAutomationReports } from '../../../src/client/features/automations/automation-report-ui.js';
+import { arrivalReport } from '../../../src/server/features/automations/automation-report-server.ts';
+import { renderAutomationReports } from '../../../src/client/features/automations/automation-report-ui.ts';
 
 const escape = value => String(value ?? '').replace(/[&<>'"]/g, character => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', "'":'&#39;', '"':'&quot;' }[character]));
 

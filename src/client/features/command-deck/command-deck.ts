@@ -1,6 +1,6 @@
-import { bindCommandDeckDetails, renderTasteIntelligence } from './command-deck-intelligence-ui.js';
-import { activityVisual } from './activity-view.js';
-import { compactStreamList } from './live-activity-view.js';
+import { bindCommandDeckDetails, renderTasteIntelligence } from './command-deck-intelligence-ui.ts';
+import { activityVisual } from './activity-view.ts';
+import { compactStreamList } from './live-activity-view.ts';
 const deckEscape = value => String(value == null ? '' : value).replace(/[&<>'"]/g, char => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', "'":'&#39;', '"':'&quot;' })[char]);
 
 function timeAgo(timestamp) {

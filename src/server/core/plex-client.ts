@@ -1,4 +1,4 @@
-import { friendlyConnectionError } from './errors.js';
+import { friendlyConnectionError } from './errors.ts';
 
 const defaultHeaders = {
   'X-Plex-Product':'Ultimate Plex Companion',

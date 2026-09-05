@@ -1,4 +1,4 @@
-import { futureLabExperiments } from './future-lab-experiments.js';
+import { futureLabExperiments } from './future-lab-experiments.ts';
 
 const labState={data:null,tab:'constellation'};
 const labEscape=value=>String(value==null?'':value).replace(/[&<>'"]/g,char=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'})[char]);
