@@ -15,7 +15,7 @@
     "ci": "npm run check && npm test && npm run build"
   },
   "devDependencies": {
-    "vite": "^7.1.4"
+    "vite": "^8.2.2"
   },
   "engines": {
     "node": ">=22"

@@ -1,5 +1,7 @@
 # Ultimate Plex Companion
 
+[![CI](https://github.com/craiggoddenpayne/ultimate-plex-companion/actions/workflows/ci.yml/badge.svg)](https://github.com/craiggoddenpayne/ultimate-plex-companion/actions/workflows/ci.yml) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE) [![Node.js 22+](https://img.shields.io/badge/Node.js-22%2B-5FA04E.svg)](package.json)
+
 A futuristic, local-first command centre for Plex. It combines live playback telemetry, explainable discovery, library health, metadata repair, playlist generation, automations and guarded codec optimization in one Docker-ready application.
 
 > [!WARNING]
@@ -9,7 +11,7 @@ A futuristic, local-first command centre for Plex. It combines live playback tel
 
 - Live Plex server, stream and household telemetry
 - Explainable Discovery Radar and library-based recommendations
-- Playlist Studio with criteria-driven, previewable generators
+- Playlist Studio with 22 live generators and an eight-control custom signal composer
 - Metadata integrity scanning and guided repair
 - Duplicate/edition review with copy-level evidence
 - Persistent, verified HEVC, AV1 and VP9 conversion queues
@@ -73,9 +75,15 @@ Codec conversions create a separate MKV, preserve audio/subtitles/chapters/metad
 
 ## Extending the project
 
-Feature navigation is defined centrally in `feature-registry.js`. Domain logic lives in dependency-injected `*-server.js` modules, browser behavior in focused feature modules and tests in `test/`.
+Feature navigation is defined centrally in `src/shared/feature-registry.js`. Browser and server capabilities are grouped into matching folders under `src`, with mirrored tests under `test`.
 
 Start with [architecture](docs/ARCHITECTURE.md), [extension patterns](docs/EXTENDING.md) and [contribution guidance](CONTRIBUTING.md).
+
+## Contributing
+
+Contributions are welcome. Start with [CONTRIBUTING.md](CONTRIBUTING.md), which covers local setup, tests, feature structure and safety expectations. Use the issue templates for bugs and proposals, read [SUPPORT.md](SUPPORT.md) for help, and report vulnerabilities through the private process in [SECURITY.md](SECURITY.md).
+
+Run `npm run ci` before opening a pull request. New Plex mutations must provide a read-only preview, server-side validation and explicit confirmation.
 
 ## Project status
 
@@ -83,4 +91,4 @@ This is pre-1.0 software. Interfaces and stored data may change between releases
 
 ## License
 
-A public open-source license must be selected before the first GitHub release.
+Released under the [MIT License](LICENSE). Plex is a trademark of Plex, Inc. This independent project is not affiliated with or endorsed by Plex.
