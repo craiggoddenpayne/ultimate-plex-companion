@@ -127,7 +127,7 @@
   position: absolute;
   bottom: 1px;
   color: #61dcd5;
-  font: 6px 'DM Mono';
+  font: calc(6px + var(--text-increase, 1px)) 'DM Mono';
   font-style: normal;
   letter-spacing: 1.6px;
 }
@@ -162,7 +162,7 @@
   color: #8197a1;
   border-radius: 5px;
   padding: 6px 8px;
-  font: 7px 'DM Mono';
+  font: calc(7px + var(--text-increase, 1px)) 'DM Mono';
   cursor: pointer;
   transition: 0.2s;
 }
@@ -277,7 +277,7 @@
 }
 @media (max-width: 520px) {
   .auto-toolbar button {
-    font-size: 6px;
+    font-size: calc(6px + var(--text-increase, 1px));
     padding: 5px;
   }
   .auto-toolbar #export-automations {

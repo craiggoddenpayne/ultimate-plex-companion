@@ -19,7 +19,7 @@
   border-radius: 5px;
   background: #181421;
   color: #bda7dc;
-  font: 6px 'DM Mono';
+  font: calc(6px + var(--text-increase, 1px)) 'DM Mono';
   cursor: pointer;
 }
 .studio-queue-tools button {
@@ -58,12 +58,12 @@
 }
 .studio-queue-summary b {
   color: #d6c4ef;
-  font-size: 9px;
+  font-size: calc(9px + var(--text-increase, 1px));
 }
 .studio-queue-summary small {
   margin-top: 2px;
   color: #65727c;
-  font: 5px 'DM Mono';
+  font: calc(5px + var(--text-increase, 1px)) 'DM Mono';
 }
 .studio-queue-summary button {
   border-color: #343d44;

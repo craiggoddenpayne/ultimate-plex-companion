@@ -57,18 +57,18 @@
 .session-tech-fact small {
   margin-bottom: 5px;
   color: var(--muted);
-  font: 6px 'DM Mono';
+  font: calc(6px + var(--text-increase, 1px)) 'DM Mono';
   letter-spacing: 0.8px;
   text-transform: uppercase;
 }
 .session-tech-fact b {
   color: var(--text);
-  font-size: 8px;
+  font-size: calc(8px + var(--text-increase, 1px));
 }
 .session-tech-fact em {
   margin-top: 3px;
   color: var(--muted);
-  font-size: 7px;
+  font-size: calc(7px + var(--text-increase, 1px));
   font-style: normal;
 }
 .session-tech-fact.healthy {
@@ -93,13 +93,13 @@
 }
 .transcode-pipeline > span small {
   color: var(--muted);
-  font: 6px 'DM Mono';
+  font: calc(6px + var(--text-increase, 1px)) 'DM Mono';
   letter-spacing: 0.8px;
 }
 .transcode-pipeline > span b {
   margin-top: 3px;
   color: var(--text);
-  font-size: 8px;
+  font-size: calc(8px + var(--text-increase, 1px));
 }
 .transcode-pipeline > i {
   color: var(--amber);
@@ -117,7 +117,7 @@
   border-radius: 3px;
   background: color-mix(in srgb, var(--amber) 10%, var(--panel));
   color: color-mix(in srgb, var(--amber) 78%, var(--text));
-  font: 6px 'DM Mono';
+  font: calc(6px + var(--text-increase, 1px)) 'DM Mono';
   font-style: normal;
 }
 .observed-session:has(.transcode-pipeline) .session-progress > i {
@@ -159,7 +159,7 @@
     gap: 7px;
   }
   .session-title h3 {
-    font-size: 11px;
+    font-size: calc(11px + var(--text-increase, 1px));
   }
   .decision {
     flex: 0 0 auto;

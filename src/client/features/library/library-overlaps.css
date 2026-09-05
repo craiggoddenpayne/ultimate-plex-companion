@@ -16,7 +16,7 @@
 .overlap-identity > span {
   display: block;
   color: #56dcd6;
-  font: 6px 'DM Mono';
+  font: calc(6px + var(--text-increase, 1px)) 'DM Mono';
   letter-spacing: 1px;
   text-transform: uppercase;
 }
@@ -29,12 +29,12 @@
 }
 .overlap-identity > b {
   margin-top: 4px;
-  font-size: 10px;
+  font-size: calc(10px + var(--text-increase, 1px));
 }
 .overlap-identity > small {
   margin-top: 3px;
   color: #69737d;
-  font-size: 7px;
+  font-size: calc(7px + var(--text-increase, 1px));
 }
 .overlap-glance {
   display: flex;
@@ -46,13 +46,13 @@
   border: 1px solid #28333b;
   border-radius: 5px;
   color: #63717c;
-  font: 6px 'DM Mono';
+  font: calc(6px + var(--text-increase, 1px)) 'DM Mono';
 }
 .overlap-glance b {
   display: block;
   margin-bottom: 2px;
   color: #c4ced2;
-  font: 10px Manrope;
+  font: calc(10px + var(--text-increase, 1px)) Manrope;
 }
 .overlap-review {
   padding: 9px 11px;
@@ -60,7 +60,7 @@
   border-radius: 5px;
   background: #142629;
   color: #89eae5;
-  font-size: 7px;
+  font-size: calc(7px + var(--text-increase, 1px));
   cursor: pointer;
 }
 .overlap-review:hover {
@@ -114,17 +114,17 @@
   border: 0;
   background: none;
   color: #71808d;
-  font-size: 24px;
+  font-size: calc(24px + var(--text-increase, 1px));
   cursor: pointer;
 }
 .overlap-modal > header h2 {
   margin: 8px 0 5px;
-  font-size: 27px;
+  font-size: calc(27px + var(--text-increase, 1px));
 }
 .overlap-modal > header p {
   margin: 0;
   color: #82909d;
-  font-size: 10px;
+  font-size: calc(10px + var(--text-increase, 1px));
 }
 .overlap-modal > header p b {
   color: #dce5e7;
@@ -152,13 +152,13 @@
 }
 .overlap-warning p {
   margin: 0;
-  font-size: 8px;
+  font-size: calc(8px + var(--text-increase, 1px));
   line-height: 1.5;
 }
 .overlap-warning b {
   display: block;
   color: #e3b487;
-  font-size: 9px;
+  font-size: calc(9px + var(--text-increase, 1px));
 }
 .overlap-copy-grid {
   display: grid;
@@ -190,20 +190,20 @@
 }
 .overlap-copy header span {
   color: #657580;
-  font: 7px 'DM Mono';
+  font: calc(7px + var(--text-increase, 1px)) 'DM Mono';
 }
 .overlap-copy header em {
   padding: 3px 5px;
   border-radius: 3px;
   background: #18342d;
   color: #61d9a6;
-  font: 6px 'DM Mono';
+  font: calc(6px + var(--text-increase, 1px)) 'DM Mono';
   font-style: normal;
 }
 .overlap-copy header strong {
   margin-left: auto;
   color: #9cf4ef;
-  font-size: 15px;
+  font-size: calc(15px + var(--text-increase, 1px));
 }
 .copy-format {
   padding: 12px 0;
@@ -216,12 +216,12 @@
   white-space: nowrap;
 }
 .copy-format b {
-  font-size: 10px;
+  font-size: calc(10px + var(--text-increase, 1px));
 }
 .copy-format small {
   margin-top: 4px;
   color: #67747e;
-  font-size: 7px;
+  font-size: calc(7px + var(--text-increase, 1px));
 }
 .overlap-copy dl {
   display: grid;
@@ -236,20 +236,20 @@
 }
 .overlap-copy dt {
   color: #5e6b76;
-  font: 6px 'DM Mono';
+  font: calc(6px + var(--text-increase, 1px)) 'DM Mono';
   text-transform: uppercase;
 }
 .overlap-copy dd {
   margin: 4px 0 0;
   color: #b7c3c9;
-  font-size: 8px;
+  font-size: calc(8px + var(--text-increase, 1px));
 }
 .copy-locations {
   margin: 10px 0;
 }
 .copy-locations > span {
   color: #66747e;
-  font: 6px 'DM Mono';
+  font: calc(6px + var(--text-increase, 1px)) 'DM Mono';
 }
 .copy-locations code {
   display: block;
@@ -259,7 +259,7 @@
   border-radius: 4px;
   background: #090d11;
   color: #8094a1;
-  font: 7px 'DM Mono';
+  font: calc(7px + var(--text-increase, 1px)) 'DM Mono';
   text-overflow: ellipsis;
   white-space: nowrap;
 }
@@ -270,7 +270,7 @@
   border-radius: 5px;
   background: #29151a;
   color: #ec929b;
-  font-size: 7px;
+  font-size: calc(7px + var(--text-increase, 1px));
   cursor: pointer;
 }
 .overlap-copy > [data-select-copy]:hover {
@@ -299,7 +299,7 @@
 .delete-console label {
   display: block;
   color: #8c6971;
-  font: 6px 'DM Mono';
+  font: calc(6px + var(--text-increase, 1px)) 'DM Mono';
   letter-spacing: 1px;
 }
 .delete-console > div b,
@@ -313,12 +313,12 @@
 .delete-console > div b {
   margin-top: 5px;
   color: #f0c4c7;
-  font-size: 11px;
+  font-size: calc(11px + var(--text-increase, 1px));
 }
 .delete-console > div small {
   margin-top: 4px;
   color: #765c62;
-  font-size: 7px;
+  font-size: calc(7px + var(--text-increase, 1px));
 }
 .delete-console input {
   box-sizing: border-box;
@@ -330,7 +330,7 @@
   outline: 0;
   background: #0c0c10;
   color: #f1d9da;
-  font: 8px 'DM Mono';
+  font: calc(8px + var(--text-increase, 1px)) 'DM Mono';
 }
 .delete-console input:focus {
   border-color: #df6874;
@@ -342,7 +342,7 @@
   border-radius: 5px;
   background: #7a2630;
   color: #fff;
-  font-size: 8px;
+  font-size: calc(8px + var(--text-increase, 1px));
   cursor: pointer;
 }
 .delete-console > button:disabled {
@@ -362,7 +362,7 @@
   border-radius: 7px;
   background: #10251f;
   color: #a4eddb;
-  font-size: 9px;
+  font-size: calc(9px + var(--text-increase, 1px));
   box-shadow: 0 12px 35px #000;
 }
 .overlap-toast.failed {

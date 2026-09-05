@@ -10,7 +10,7 @@
 }
 .suite-hero h1 {
   margin: 10px 0 8px;
-  font-size: 46px;
+  font-size: calc(46px + var(--text-increase, 1px));
   line-height: 1.08;
   letter-spacing: -2px;
 }
@@ -21,7 +21,7 @@
 .suite-hero p {
   max-width: 600px;
   color: #74808b;
-  font-size: 11px;
+  font-size: calc(11px + var(--text-increase, 1px));
   line-height: 1.7;
 }
 .suite-core {
@@ -56,14 +56,14 @@
   border-radius: 50%;
   background: color-mix(in srgb, var(--theme-primary, var(--amber)) 9%, #0a0e14);
   color: #fff;
-  font-size: 27px;
+  font-size: calc(27px + var(--text-increase, 1px));
   box-shadow: 0 0 35px color-mix(in srgb, var(--theme-primary, var(--amber)) 18%, transparent);
 }
 .suite-core b {
   position: absolute;
   bottom: -2px;
   color: #687783;
-  font: 6px 'DM Mono';
+  font: calc(6px + var(--text-increase, 1px)) 'DM Mono';
   letter-spacing: 1.2px;
 }
 .suite-stats {
@@ -80,17 +80,17 @@
 }
 .suite-stats span {
   color: #66727e;
-  font: 6px 'DM Mono';
+  font: calc(6px + var(--text-increase, 1px)) 'DM Mono';
   letter-spacing: 1px;
 }
 .suite-stats b {
   display: block;
   margin: 7px 0 2px;
-  font-size: 18px;
+  font-size: calc(18px + var(--text-increase, 1px));
 }
 .suite-stats small {
   color: #626f7b;
-  font-size: 7px;
+  font-size: calc(7px + var(--text-increase, 1px));
 }
 .suite-toolbar {
   display: flex;
@@ -119,7 +119,7 @@
   outline: 0;
   background: none;
   color: #dce5eb;
-  font-size: 9px;
+  font-size: calc(9px + var(--text-increase, 1px));
 }
 .suite-toolbar button {
   padding: 8px 11px;
@@ -127,7 +127,7 @@
   border-radius: 5px;
   background: #151b22;
   color: #8695a0;
-  font-size: 7px;
+  font-size: calc(7px + var(--text-increase, 1px));
   cursor: pointer;
 }
 .suite-toolbar button:hover {
@@ -174,7 +174,7 @@
   display: flex;
   align-items: center;
   color: #62707c;
-  font: 6px 'DM Mono';
+  font: calc(6px + var(--text-increase, 1px)) 'DM Mono';
   letter-spacing: 0.8px;
 }
 .suite-module > header i {
@@ -203,13 +203,13 @@
 }
 .suite-module h2 {
   margin: 0 0 6px;
-  font-size: 14px;
+  font-size: calc(14px + var(--text-increase, 1px));
 }
 .suite-module > p {
   max-width: 260px;
   margin: 0;
   color: #74818c;
-  font-size: 8px;
+  font-size: calc(8px + var(--text-increase, 1px));
   line-height: 1.55;
 }
 .suite-metric {
@@ -221,12 +221,12 @@
 .suite-metric b {
   display: block;
   color: var(--module);
-  font-size: 25px;
+  font-size: calc(25px + var(--text-increase, 1px));
   text-shadow: 0 0 16px color-mix(in srgb, var(--module) 30%, transparent);
 }
 .suite-metric span {
   color: #5f6d78;
-  font: 6px 'DM Mono';
+  font: calc(6px + var(--text-increase, 1px)) 'DM Mono';
   text-transform: uppercase;
 }
 .suite-module > footer {
@@ -239,14 +239,14 @@
   padding-top: 11px;
   border-top: 1px solid #252e36;
   color: #5f6c77;
-  font: 6px 'DM Mono';
+  font: calc(6px + var(--text-increase, 1px)) 'DM Mono';
 }
 .suite-module > footer button {
   margin-left: auto;
   border: 0;
   background: none;
   color: #96a4ae;
-  font-size: 7px;
+  font-size: calc(7px + var(--text-increase, 1px));
   cursor: pointer;
 }
 .suite-module > footer button b {
@@ -274,11 +274,11 @@
 }
 .suite-none h3 {
   margin: 0 0 4px;
-  font-size: 12px;
+  font-size: calc(12px + var(--text-increase, 1px));
 }
 .suite-none p {
   margin: 0;
-  font-size: 8px;
+  font-size: calc(8px + var(--text-increase, 1px));
 }
 .suite-none.error h3 {
   color: #e9848d;
@@ -311,23 +311,23 @@
   border: 0;
   background: none;
   color: #727f8a;
-  font-size: 25px;
+  font-size: calc(25px + var(--text-increase, 1px));
   cursor: pointer;
 }
 .suite-modal > header > span,
 .suite-decision > span {
   color: var(--theme-primary, var(--amber));
-  font: 6px 'DM Mono';
+  font: calc(6px + var(--text-increase, 1px)) 'DM Mono';
   letter-spacing: 1px;
 }
 .suite-modal > header h2 {
   margin: 7px 0 4px;
-  font-size: 28px;
+  font-size: calc(28px + var(--text-increase, 1px));
 }
 .suite-modal > header p {
   margin: 0;
   color: #788591;
-  font-size: 9px;
+  font-size: calc(9px + var(--text-increase, 1px));
 }
 .suite-modal-signal {
   display: grid;
@@ -341,19 +341,19 @@
   background: #0b1016;
 }
 .suite-modal-signal strong {
-  font-size: 27px;
+  font-size: calc(27px + var(--text-increase, 1px));
   color: var(--theme-primary, var(--amber));
 }
 .suite-modal-signal span {
   padding-bottom: 4px;
   color: #687681;
-  font: 7px 'DM Mono';
+  font: calc(7px + var(--text-increase, 1px)) 'DM Mono';
   text-transform: uppercase;
 }
 .suite-modal-signal p {
   margin: 0 0 3px;
   color: #7d8994;
-  font-size: 8px;
+  font-size: calc(8px + var(--text-increase, 1px));
   text-align: right;
 }
 .suite-decision {
@@ -369,12 +369,12 @@
 }
 .suite-decision b {
   margin-top: 5px;
-  font-size: 13px;
+  font-size: calc(13px + var(--text-increase, 1px));
 }
 .suite-decision small {
   margin-top: 3px;
   color: #7a8792;
-  font-size: 7px;
+  font-size: calc(7px + var(--text-increase, 1px));
 }
 .suite-results {
   border: 1px solid var(--theme-line, #29313a);
@@ -395,7 +395,7 @@
 }
 .suite-result-index {
   color: #4f5e69;
-  font: 6px 'DM Mono';
+  font: calc(6px + var(--text-increase, 1px)) 'DM Mono';
 }
 .suite-result img,
 .suite-result-glyph {
@@ -421,23 +421,23 @@
   white-space: nowrap;
 }
 .suite-result > div b {
-  font-size: 9px;
+  font-size: calc(9px + var(--text-increase, 1px));
 }
 .suite-result > div small {
   margin-top: 3px;
   color: #65737f;
-  font-size: 7px;
+  font-size: calc(7px + var(--text-increase, 1px));
 }
 .suite-result em {
   color: var(--theme-primary, var(--amber));
-  font: 7px 'DM Mono';
+  font: calc(7px + var(--text-increase, 1px)) 'DM Mono';
   font-style: normal;
 }
 .suite-empty {
   padding: 35px;
   text-align: center;
   color: #687681;
-  font-size: 9px;
+  font-size: calc(9px + var(--text-increase, 1px));
 }
 .suite-modal > footer {
   display: flex;
@@ -451,7 +451,7 @@
   border-radius: 5px;
   background: #151b22;
   color: #95a2ac;
-  font-size: 8px;
+  font-size: calc(8px + var(--text-increase, 1px));
   cursor: pointer;
 }
 .suite-modal > footer .suite-done {
@@ -481,7 +481,7 @@
 }
 @media (max-width: 600px) {
   .suite-hero h1 {
-    font-size: 34px;
+    font-size: calc(34px + var(--text-increase, 1px));
   }
   .suite-core {
     display: none;

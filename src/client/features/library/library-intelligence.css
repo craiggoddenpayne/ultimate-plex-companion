@@ -37,13 +37,13 @@
 
 .scan-metrics span {
   color: #6f7681;
-  font: 8px 'DM Mono';
+  font: calc(8px + var(--text-increase, 1px)) 'DM Mono';
   letter-spacing: 1.3px;
 }
 .scan-metrics strong {
   display: block;
   margin: 12px 0 4px;
-  font-size: 27px;
+  font-size: calc(27px + var(--text-increase, 1px));
   letter-spacing: -1px;
 }
 .scan-metrics .saving strong {
@@ -51,7 +51,7 @@
 }
 .scan-metrics small {
   color: #6c7480;
-  font-size: 8px;
+  font-size: calc(8px + var(--text-increase, 1px));
 }
 .candidate-panel {
   min-height: 310px;
@@ -65,7 +65,7 @@
   border-radius: 14px;
   padding: 5px 9px;
   background: #10251a;
-  font: 8px 'DM Mono';
+  font: calc(8px + var(--text-increase, 1px)) 'DM Mono';
 }
 .readonly-pill .icon {
   width: 11px;
@@ -94,13 +94,13 @@
 }
 .scan-empty h3 {
   margin: 14px 0 5px;
-  font-size: 13px;
+  font-size: calc(13px + var(--text-increase, 1px));
 }
 .scan-empty p {
   max-width: 460px;
   margin: 0;
   color: #69717d;
-  font-size: 9px;
+  font-size: calc(9px + var(--text-increase, 1px));
   line-height: 1.6;
 }
 .scan-empty .test-button {
@@ -147,7 +147,7 @@
 .candidate-head {
   min-height: 34px;
   color: #626a75;
-  font: 8px 'DM Mono';
+  font: calc(8px + var(--text-increase, 1px)) 'DM Mono';
   letter-spacing: 1px;
   text-transform: uppercase;
 }
@@ -157,22 +157,22 @@
   display: block;
 }
 .candidate-row div b {
-  font-size: 10px;
+  font-size: calc(10px + var(--text-increase, 1px));
 }
 .candidate-row div small {
   margin-top: 3px;
   color: #6e7681;
-  font-size: 8px;
+  font-size: calc(8px + var(--text-increase, 1px));
 }
 .candidate-row div em {
   margin-top: 6px;
   color: #8c939d;
-  font-size: 8px;
+  font-size: calc(8px + var(--text-increase, 1px));
   font-style: normal;
 }
 .candidate-row > span {
   color: #8b929c;
-  font: 9px 'DM Mono';
+  font: calc(9px + var(--text-increase, 1px)) 'DM Mono';
 }
 .candidate-row > span > i {
   display: inline-block;
@@ -182,7 +182,7 @@
   color: #c99a4d;
   background: #2b2114;
   font-style: normal;
-  font-size: 7px;
+  font-size: calc(7px + var(--text-increase, 1px));
 }
 .candidate-row .candidate-saving {
   color: #64dba3;
@@ -190,7 +190,7 @@
 .candidate-row > span strong {
   display: block;
   color: #c4c8ce;
-  font-size: 9px;
+  font-size: calc(9px + var(--text-increase, 1px));
 }
 .candidate-row u {
   display: block;
@@ -215,7 +215,7 @@
   padding: 7px 9px;
   color: #e0ab51;
   background: #251d13;
-  font-size: 8px;
+  font-size: calc(8px + var(--text-increase, 1px));
   cursor: pointer;
 }
 .encode-button:hover,
@@ -245,7 +245,7 @@
   border-radius: 12px;
   padding: 4px 8px;
   color: #858d98;
-  font: 8px 'DM Mono';
+  font: calc(8px + var(--text-increase, 1px)) 'DM Mono';
 }
 .optimization-jobs {
   display: flex;
@@ -259,7 +259,7 @@
   border: 1px dashed #292e37;
   border-radius: 7px;
   color: #68717c;
-  font-size: 9px;
+  font-size: calc(9px + var(--text-increase, 1px));
 }
 .job-card {
   display: grid;
@@ -276,18 +276,18 @@
   display: inline-block;
   margin-right: 8px;
   color: #d6a249;
-  font: 7px 'DM Mono';
+  font: calc(7px + var(--text-increase, 1px)) 'DM Mono';
   letter-spacing: 0.7px;
   text-transform: uppercase;
 }
 .job-status b {
-  font-size: 10px;
+  font-size: calc(10px + var(--text-increase, 1px));
 }
 .job-status small {
   display: block;
   margin-top: 5px;
   color: #6f7782;
-  font-size: 8px;
+  font-size: calc(8px + var(--text-increase, 1px));
 }
 .job-progress {
   height: 3px;
@@ -347,12 +347,12 @@
   width: 18px;
 }
 .safety-strip b {
-  font-size: 10px;
+  font-size: calc(10px + var(--text-increase, 1px));
 }
 .safety-strip p {
   margin: 4px 0 0;
   color: #717985;
-  font-size: 8px;
+  font-size: calc(8px + var(--text-increase, 1px));
   line-height: 1.6;
 }
 
@@ -390,14 +390,14 @@
   max-width: 450px;
   margin: 0 auto 22px;
   color: #89919c;
-  font-size: 10px;
+  font-size: calc(10px + var(--text-increase, 1px));
   line-height: 1.7;
 }
 .replacement-modal > label {
   display: block;
   text-align: left;
   color: #9ba2ac;
-  font-size: 9px;
+  font-size: calc(9px + var(--text-increase, 1px));
 }
 .replacement-modal > label input {
   display: block;
@@ -410,7 +410,7 @@
   outline: 0;
   color: #fff;
   background: #0c0d11;
-  font: 10px 'DM Mono';
+  font: calc(10px + var(--text-increase, 1px)) 'DM Mono';
 }
 .danger-button {
   height: 39px;
@@ -419,7 +419,7 @@
   border-radius: 7px;
   color: #fff;
   background: #9c3440;
-  font-size: 9px;
+  font-size: calc(9px + var(--text-increase, 1px));
   cursor: pointer;
 }
 .danger-button:disabled {

@@ -32,7 +32,7 @@
   border-bottom: 1px solid #252c34;
   background: #0d1117ed;
   color: #687480;
-  font: 7px 'DM Mono';
+  font: calc(7px + var(--text-increase, 1px)) 'DM Mono';
   letter-spacing: 1px;
 }
 .search-top b {
@@ -42,7 +42,7 @@
   display: block;
   padding: 9px 12px 4px;
   color: #646d78;
-  font: 6px 'DM Mono';
+  font: calc(6px + var(--text-increase, 1px)) 'DM Mono';
   letter-spacing: 1.2px;
 }
 .search-result {
@@ -94,12 +94,12 @@
   white-space: nowrap;
 }
 .search-result b {
-  font-size: 9px;
+  font-size: calc(9px + var(--text-increase, 1px));
 }
 .search-result small {
   margin-top: 3px;
   color: #68717c;
-  font-size: 7px;
+  font-size: calc(7px + var(--text-increase, 1px));
 }
 .search-result em {
   color: #53616b;
@@ -123,10 +123,10 @@
 }
 .search-idle span,
 .search-scanning span {
-  font-size: 8px;
+  font-size: calc(8px + var(--text-increase, 1px));
 }
 .search-idle small {
-  font: 6px 'DM Mono';
+  font: calc(6px + var(--text-increase, 1px)) 'DM Mono';
   letter-spacing: 1px;
   color: #4e5761;
 }
@@ -162,7 +162,7 @@
   border: 0;
   background: none;
   color: #76808a;
-  font-size: 22px;
+  font-size: calc(22px + var(--text-increase, 1px));
   cursor: pointer;
   z-index: 2;
 }
@@ -198,11 +198,11 @@
   gap: 15px;
 }
 .real-assistant header h2 {
-  font-size: 25px;
+  font-size: calc(25px + var(--text-increase, 1px));
   margin: 5px 0;
 }
 .real-assistant header p {
-  font-size: 9px;
+  font-size: calc(9px + var(--text-increase, 1px));
   color: #737d86;
   margin: 0;
 }
@@ -246,7 +246,7 @@
   outline: 0;
   background: none;
   color: #f1f2f0;
-  font-size: 11px;
+  font-size: calc(11px + var(--text-increase, 1px));
 }
 .real-assistant form button {
   display: flex;
@@ -257,7 +257,7 @@
   background: var(--amber);
   color: #17120a;
   padding: 0 13px;
-  font-size: 9px;
+  font-size: calc(9px + var(--text-increase, 1px));
   font-weight: 800;
   cursor: pointer;
 }
@@ -277,7 +277,7 @@
   background: #151a20;
   color: #858f99;
   padding: 6px 8px;
-  font-size: 7px;
+  font-size: calc(7px + var(--text-increase, 1px));
   cursor: pointer;
 }
 .assistant-prompts button:hover {
@@ -311,7 +311,7 @@
 }
 .answer-idle p,
 .answer-error p {
-  font-size: 8px;
+  font-size: calc(8px + var(--text-increase, 1px));
   max-width: 380px;
 }
 .answer-thinking span {
@@ -324,28 +324,28 @@
 }
 .answer-thinking b {
   margin-top: 10px;
-  font-size: 9px;
+  font-size: calc(9px + var(--text-increase, 1px));
 }
 .answer-thinking small {
   margin-top: 3px;
   color: #557074;
-  font: 6px 'DM Mono';
+  font: calc(6px + var(--text-increase, 1px)) 'DM Mono';
 }
 .answer-head {
   padding: 19px 20px 15px;
 }
 .answer-head > span {
   color: #56dcd6;
-  font: 7px 'DM Mono';
+  font: calc(7px + var(--text-increase, 1px)) 'DM Mono';
   letter-spacing: 1px;
 }
 .answer-head h3 {
-  font-size: 18px;
+  font-size: calc(18px + var(--text-increase, 1px));
   margin: 6px 0;
 }
 .answer-head p {
   color: #89919b;
-  font-size: 9px;
+  font-size: calc(9px + var(--text-increase, 1px));
   line-height: 1.7;
   margin: 0;
 }
@@ -358,7 +358,7 @@
 .answer-stats span {
   padding: 11px 17px;
   color: #616b75;
-  font: 6px 'DM Mono';
+  font: calc(6px + var(--text-increase, 1px)) 'DM Mono';
   letter-spacing: 0.7px;
 }
 .answer-stats span + span {
@@ -367,7 +367,7 @@
 .answer-stats b {
   display: block;
   color: #e2e5e4;
-  font: 15px Manrope;
+  font: calc(15px + var(--text-increase, 1px)) Manrope;
   margin-bottom: 2px;
 }
 .answer-cards {
@@ -414,19 +414,19 @@
 }
 .answer-cards b {
   margin-top: 6px;
-  font-size: 8px;
+  font-size: calc(8px + var(--text-increase, 1px));
 }
 .answer-cards small {
   margin-top: 2px;
   color: #66707a;
-  font-size: 6px;
+  font-size: calc(6px + var(--text-increase, 1px));
 }
 .answer-route {
   margin: 0 20px 17px;
   border: 0;
   background: none;
   color: #dfaa4e;
-  font-size: 8px;
+  font-size: calc(8px + var(--text-increase, 1px));
   cursor: pointer;
   padding: 0;
 }
@@ -435,7 +435,7 @@
 }
 .answer-error b {
   color: #ed7e88;
-  font-size: 18px;
+  font-size: calc(18px + var(--text-increase, 1px));
 }
 .media-peek {
   position: relative;
@@ -472,21 +472,21 @@
   align-self: center;
 }
 .media-peek h2 {
-  font-size: 24px;
+  font-size: calc(24px + var(--text-increase, 1px));
   margin: 8px 0;
 }
 .media-peek p {
   color: #838c96;
-  font-size: 9px;
+  font-size: calc(9px + var(--text-increase, 1px));
   line-height: 1.7;
 }
 .media-peek .media-meta {
   color: #bdc3c9;
-  font: 8px 'DM Mono';
+  font: calc(8px + var(--text-increase, 1px)) 'DM Mono';
 }
 .media-peek small {
   color: #52cfc9;
-  font: 7px 'DM Mono';
+  font: calc(7px + var(--text-increase, 1px)) 'DM Mono';
 }
 .notification-overlay {
   place-items: stretch end;
@@ -507,7 +507,7 @@
   border-bottom: 1px solid #252c33;
 }
 .notification-drawer h2 {
-  font-size: 21px;
+  font-size: calc(21px + var(--text-increase, 1px));
   margin: 6px 0 0;
 }
 .notification-drawer #notification-list {
@@ -554,23 +554,23 @@
   display: block;
 }
 .notification-item b {
-  font-size: 9px;
+  font-size: calc(9px + var(--text-increase, 1px));
 }
 .notification-item small {
   margin-top: 4px;
   color: #737c86;
-  font-size: 8px;
+  font-size: calc(8px + var(--text-increase, 1px));
   line-height: 1.4;
 }
 .notification-item time {
   color: #606974;
-  font: 7px 'DM Mono';
+  font: calc(7px + var(--text-increase, 1px)) 'DM Mono';
 }
 .notification-drawer > footer {
   padding: 14px 20px;
   border-top: 1px solid #252c33;
   color: #5d6771;
-  font: 7px 'DM Mono';
+  font: calc(7px + var(--text-increase, 1px)) 'DM Mono';
 }
 .notification-drawer > footer i {
   display: inline-block;
@@ -590,7 +590,7 @@
   gap: 8px;
   text-align: center;
   color: #707a84;
-  font-size: 8px;
+  font-size: calc(8px + var(--text-increase, 1px));
 }
 .notification-empty svg {
   width: 23px;
@@ -598,7 +598,7 @@
   stroke: #50d6d1;
 }
 .notification-empty h3 {
-  font-size: 11px;
+  font-size: calc(11px + var(--text-increase, 1px));
   margin: 4px 0 0;
 }
 .notification-empty p {
@@ -608,7 +608,7 @@
 }
 .notification-empty > b {
   color: #ec7b86;
-  font-size: 20px;
+  font-size: calc(20px + var(--text-increase, 1px));
 }
 @keyframes companion-spin {
   to {

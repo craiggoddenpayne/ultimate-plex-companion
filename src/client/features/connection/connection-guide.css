@@ -13,7 +13,7 @@
 .connection-presets > span {
   width: 100%;
   color: #687580;
-  font: 7px 'DM Mono';
+  font: calc(7px + var(--text-increase, 1px)) 'DM Mono';
   letter-spacing: 1px;
 }
 .connection-presets button,
@@ -25,7 +25,7 @@
   border-radius: 5px;
   background: #151b21;
   color: #a5b1ba;
-  font-size: 8px;
+  font-size: calc(8px + var(--text-increase, 1px));
   text-decoration: none;
   cursor: pointer;
 }
@@ -40,7 +40,7 @@
 .token-tools span {
   margin-left: auto;
   color: #606c77;
-  font-size: 7px;
+  font-size: calc(7px + var(--text-increase, 1px));
   line-height: 1.4;
 }
 .token-tools button:disabled {
@@ -58,17 +58,17 @@
 }
 .connection-guide header > span {
   color: var(--theme-primary, var(--amber));
-  font: 7px 'DM Mono';
+  font: calc(7px + var(--text-increase, 1px)) 'DM Mono';
   letter-spacing: 1px;
 }
 .connection-guide h3 {
   margin: 5px 0 3px;
-  font-size: 14px;
+  font-size: calc(14px + var(--text-increase, 1px));
 }
 .connection-guide header p {
   margin: 0;
   color: #77838e;
-  font-size: 8px;
+  font-size: calc(8px + var(--text-increase, 1px));
   line-height: 1.5;
 }
 .connection-guide ol {
@@ -101,7 +101,7 @@
   border: 1px solid #564324;
   border-radius: 50%;
   color: #e6ae50;
-  font: 7px 'DM Mono';
+  font: calc(7px + var(--text-increase, 1px)) 'DM Mono';
 }
 .connection-guide li b,
 .connection-guide li small {
@@ -109,12 +109,12 @@
 }
 .connection-guide li b {
   color: #bdc5cb;
-  font-size: 8px;
+  font-size: calc(8px + var(--text-increase, 1px));
 }
 .connection-guide li small {
   margin-top: 4px;
   color: #66737e;
-  font-size: 7px;
+  font-size: calc(7px + var(--text-increase, 1px));
   line-height: 1.45;
 }
 .connection-guide-actions {
@@ -132,7 +132,7 @@
   border-left: 2px solid #a17a3d;
   background: #18150f;
   color: #8f8676;
-  font-size: 7px;
+  font-size: calc(7px + var(--text-increase, 1px));
   line-height: 1.5;
 }
 .connection-diagnosis {
@@ -144,13 +144,13 @@
 }
 .connection-diagnosis b {
   color: #efb65c;
-  font: 7px 'DM Mono';
+  font: calc(7px + var(--text-increase, 1px)) 'DM Mono';
   letter-spacing: 1px;
 }
 .connection-diagnosis p {
   margin: 4px 0 0;
   color: #b4a58e;
-  font-size: 8px;
+  font-size: calc(8px + var(--text-increase, 1px));
   line-height: 1.5;
 }
 @media (max-width: 600px) {

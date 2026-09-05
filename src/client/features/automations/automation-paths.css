@@ -18,12 +18,12 @@
 .run-finding-path span {
   flex: 0 0 auto;
   color: var(--run-tone);
-  font-size: 7px;
+  font-size: calc(7px + var(--text-increase, 1px));
   letter-spacing: 1px;
 }
 @media (max-width: 800px) {
   .run-finding-path {
-    font-size: 8px;
+    font-size: calc(8px + var(--text-increase, 1px));
   }
   .run-finding:has(.run-finding-path) > em {
     align-self: start;

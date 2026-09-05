@@ -95,7 +95,7 @@
     top: 4px;
     min-width: 15px;
     padding: 1px 4px;
-    font-size: 7px;
+    font-size: calc(7px + var(--text-increase, 1px));
     text-align: center;
   }
   html[data-sidebar='collapsed'] .sidebar-foot {

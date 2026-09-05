@@ -9,7 +9,7 @@
 }
 .playlist-hero h1 {
   margin: 10px 0 8px;
-  font-size: 46px;
+  font-size: calc(46px + var(--text-increase, 1px));
   line-height: 1.08;
   letter-spacing: -2px;
 }
@@ -20,7 +20,7 @@
 .playlist-hero p {
   max-width: 650px;
   color: #74808b;
-  font-size: 10px;
+  font-size: calc(10px + var(--text-increase, 1px));
   line-height: 1.7;
 }
 .playlist-orbit {
@@ -68,7 +68,7 @@
   position: absolute;
   bottom: -2px;
   color: #68747f;
-  font: 6px 'DM Mono';
+  font: calc(6px + var(--text-increase, 1px)) 'DM Mono';
   letter-spacing: 1px;
 }
 .playlist-stats {
@@ -87,17 +87,17 @@
 .playlist-section > header span,
 .playlist-generator header span {
   color: #687680;
-  font: 6px 'DM Mono';
+  font: calc(6px + var(--text-increase, 1px)) 'DM Mono';
   letter-spacing: 1px;
 }
 .playlist-stats b {
   display: block;
   margin: 7px 0 2px;
-  font-size: 19px;
+  font-size: calc(19px + var(--text-increase, 1px));
 }
 .playlist-stats small {
   color: #5f6c76;
-  font-size: 7px;
+  font-size: calc(7px + var(--text-increase, 1px));
 }
 .playlist-section {
   margin-bottom: 24px;
@@ -110,12 +110,12 @@
 }
 .playlist-section > header h2 {
   margin: 5px 0 2px;
-  font-size: 16px;
+  font-size: calc(16px + var(--text-increase, 1px));
 }
 .playlist-section > header p {
   margin: 0;
   color: #687680;
-  font-size: 8px;
+  font-size: calc(8px + var(--text-increase, 1px));
 }
 .playlist-section > header button {
   padding: 9px 12px;
@@ -123,7 +123,7 @@
   border-radius: 5px;
   background: #151b22;
   color: #8f9da7;
-  font-size: 8px;
+  font-size: calc(8px + var(--text-increase, 1px));
   cursor: pointer;
 }
 .playlist-generators {
@@ -156,7 +156,7 @@
 }
 .playlist-generator header b {
   color: var(--playlist);
-  font: 6px 'DM Mono';
+  font: calc(6px + var(--text-increase, 1px)) 'DM Mono';
 }
 .playlist-generator-icon {
   width: 36px;
@@ -171,13 +171,13 @@
 }
 .playlist-generator h3 {
   margin: 0 0 5px;
-  font-size: 13px;
+  font-size: calc(13px + var(--text-increase, 1px));
 }
 .playlist-generator > p {
   min-height: 25px;
   margin: 0;
   color: #6f7d87;
-  font-size: 8px;
+  font-size: calc(8px + var(--text-increase, 1px));
   line-height: 1.5;
 }
 .playlist-samples {
@@ -214,7 +214,7 @@
 }
 .playlist-generator footer small {
   color: #65737e;
-  font: 6px 'DM Mono';
+  font: calc(6px + var(--text-increase, 1px)) 'DM Mono';
 }
 .playlist-generator footer button {
   margin-left: auto;
@@ -223,7 +223,7 @@
   border-radius: 5px;
   background: color-mix(in srgb, var(--playlist) 8%, #11171d);
   color: var(--playlist);
-  font-size: 7px;
+  font-size: calc(7px + var(--text-increase, 1px));
   cursor: pointer;
 }
 .playlist-generator.unavailable {
@@ -260,12 +260,12 @@
   display: block;
 }
 .playlist-existing b {
-  font-size: 9px;
+  font-size: calc(9px + var(--text-increase, 1px));
 }
 .playlist-existing small {
   margin-top: 3px;
   color: #66747e;
-  font-size: 7px;
+  font-size: calc(7px + var(--text-increase, 1px));
 }
 .playlist-loading,
 .playlist-empty {
@@ -276,7 +276,7 @@
   justify-content: center;
   gap: 9px;
   color: #687680;
-  font-size: 8px;
+  font-size: calc(8px + var(--text-increase, 1px));
   text-align: center;
 }
 .playlist-loading i {
@@ -323,23 +323,23 @@
   border: 0;
   background: none;
   color: #71808a;
-  font-size: 25px;
+  font-size: calc(25px + var(--text-increase, 1px));
   cursor: pointer;
 }
 .playlist-modal > header > span,
 .playlist-preview-label > span {
   color: #50d6d1;
-  font: 7px 'DM Mono';
+  font: calc(7px + var(--text-increase, 1px)) 'DM Mono';
   letter-spacing: 1px;
 }
 .playlist-modal h2 {
   margin: 7px 0 4px;
-  font-size: 25px;
+  font-size: calc(25px + var(--text-increase, 1px));
 }
 .playlist-modal header p {
   margin: 0;
   color: #71808a;
-  font-size: 9px;
+  font-size: calc(9px + var(--text-increase, 1px));
 }
 .playlist-create-fields {
   display: grid;
@@ -349,7 +349,7 @@
 }
 .playlist-create-fields label {
   color: #7e8b95;
-  font-size: 8px;
+  font-size: calc(8px + var(--text-increase, 1px));
 }
 .playlist-create-fields input,
 .playlist-create-fields select {
@@ -370,7 +370,7 @@
 }
 .playlist-preview-label small {
   color: #62717b;
-  font-size: 7px;
+  font-size: calc(7px + var(--text-increase, 1px));
 }
 .playlist-preview {
   border: 1px solid #29343c;
@@ -390,7 +390,7 @@
 }
 .playlist-preview > article > span {
   color: #54636e;
-  font: 6px 'DM Mono';
+  font: calc(6px + var(--text-increase, 1px)) 'DM Mono';
 }
 .playlist-preview img {
   width: 34px;
@@ -403,16 +403,16 @@
   display: block;
 }
 .playlist-preview b {
-  font-size: 8px;
+  font-size: calc(8px + var(--text-increase, 1px));
 }
 .playlist-preview small {
   margin-top: 2px;
   color: #64727d;
-  font-size: 7px;
+  font-size: calc(7px + var(--text-increase, 1px));
 }
 .playlist-preview a {
   color: #50d6d1;
-  font-size: 7px;
+  font-size: calc(7px + var(--text-increase, 1px));
   text-decoration: none;
 }
 .playlist-modal > footer {
@@ -427,7 +427,7 @@
   border-radius: 5px;
   background: #151b21;
   color: #929fa8;
-  font-size: 8px;
+  font-size: calc(8px + var(--text-increase, 1px));
   cursor: pointer;
 }
 .playlist-modal > footer .playlist-create {
@@ -448,7 +448,7 @@
     padding: 20px 0 25px;
   }
   .playlist-hero h1 {
-    font-size: 33px;
+    font-size: calc(33px + var(--text-increase, 1px));
   }
   .playlist-orbit {
     display: none;

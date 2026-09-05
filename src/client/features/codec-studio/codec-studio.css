@@ -9,7 +9,7 @@
 }
 .codec-studio-hero h1 {
   margin: 10px 0 8px;
-  font-size: 45px;
+  font-size: calc(45px + var(--text-increase, 1px));
   line-height: 1.08;
   letter-spacing: -2px;
 }
@@ -20,7 +20,7 @@
 .codec-studio-hero p {
   max-width: 650px;
   color: #74808b;
-  font-size: 10px;
+  font-size: calc(10px + var(--text-increase, 1px));
   line-height: 1.7;
 }
 .codec-reactor {
@@ -55,14 +55,14 @@
   border-radius: 50%;
   background: #211a30;
   color: #dccbff;
-  font: 18px 'DM Mono';
+  font: calc(18px + var(--text-increase, 1px)) 'DM Mono';
   box-shadow: 0 0 30px #a77aff28;
 }
 .codec-reactor b {
   position: absolute;
   bottom: -2px;
   color: #68747f;
-  font: 6px 'DM Mono';
+  font: calc(6px + var(--text-increase, 1px)) 'DM Mono';
   letter-spacing: 1px;
 }
 .codec-stats {
@@ -81,17 +81,17 @@
 .studio-candidates > header span,
 .studio-queue > header span {
   color: #687680;
-  font: 6px 'DM Mono';
+  font: calc(6px + var(--text-increase, 1px)) 'DM Mono';
   letter-spacing: 1px;
 }
 .codec-stats b {
   display: block;
   margin: 7px 0 2px;
-  font-size: 19px;
+  font-size: calc(19px + var(--text-increase, 1px));
 }
 .codec-stats small {
   color: #5f6c76;
-  font-size: 7px;
+  font-size: calc(7px + var(--text-increase, 1px));
 }
 .studio-targets {
   display: grid;
@@ -121,16 +121,16 @@
   display: block;
 }
 .studio-target b {
-  font-size: 11px;
+  font-size: calc(11px + var(--text-increase, 1px));
 }
 .studio-target small {
   margin-top: 3px;
   color: #697781;
-  font-size: 7px;
+  font-size: calc(7px + var(--text-increase, 1px));
 }
 .studio-target em {
   color: #82709f;
-  font: 6px 'DM Mono';
+  font: calc(6px + var(--text-increase, 1px)) 'DM Mono';
   font-style: normal;
 }
 .studio-target:has(input:checked) {
@@ -147,7 +147,7 @@
   padding: 16px;
   text-align: center;
   color: #64727c;
-  font-size: 8px;
+  font-size: calc(8px + var(--text-increase, 1px));
 }
 .studio-controls {
   display: flex;
@@ -171,7 +171,7 @@
   border-radius: 5px;
   background: #141a20;
   color: #84939d;
-  font-size: 8px;
+  font-size: calc(8px + var(--text-increase, 1px));
 }
 .studio-controls input {
   width: 100%;
@@ -203,11 +203,11 @@
 .studio-candidates > header h2,
 .studio-queue > header h2 {
   margin: 5px 0 0;
-  font-size: 13px;
+  font-size: calc(13px + var(--text-increase, 1px));
 }
 .studio-candidates > header em {
   color: #65747e;
-  font: 6px 'DM Mono';
+  font: calc(6px + var(--text-increase, 1px)) 'DM Mono';
   font-style: normal;
 }
 .studio-candidate {
@@ -227,14 +227,14 @@
   border-radius: 5px;
   background: #21192e;
   color: #c0a1ef;
-  font: 8px 'DM Mono';
+  font: calc(8px + var(--text-increase, 1px)) 'DM Mono';
   text-align: center;
 }
 .studio-codec small {
   display: block;
   margin-top: 3px;
   color: #74698a;
-  font-size: 6px;
+  font-size: calc(6px + var(--text-increase, 1px));
 }
 .studio-candidate > div {
   min-width: 0;
@@ -247,12 +247,12 @@
   white-space: nowrap;
 }
 .studio-candidate > div b {
-  font-size: 9px;
+  font-size: calc(9px + var(--text-increase, 1px));
 }
 .studio-candidate > div small,
 .studio-candidate > div p {
   color: #66747e;
-  font-size: 7px;
+  font-size: calc(7px + var(--text-increase, 1px));
 }
 .studio-candidate > div p {
   margin: 5px 0 0;
@@ -267,12 +267,12 @@
 }
 .studio-candidate dt {
   color: #5f6d77;
-  font: 6px 'DM Mono';
+  font: calc(6px + var(--text-increase, 1px)) 'DM Mono';
 }
 .studio-candidate dd {
   margin: 3px 0 0;
   color: #aeb8bd;
-  font-size: 8px;
+  font-size: calc(8px + var(--text-increase, 1px));
 }
 .studio-candidate > button,
 .studio-job > button {
@@ -281,7 +281,7 @@
   border-radius: 5px;
   background: #251b35;
   color: #c8abef;
-  font-size: 7px;
+  font-size: calc(7px + var(--text-increase, 1px));
   cursor: pointer;
 }
 .studio-job {
@@ -293,7 +293,7 @@
   display: flex;
   justify-content: space-between;
   color: #67747f;
-  font: 6px 'DM Mono';
+  font: calc(6px + var(--text-increase, 1px)) 'DM Mono';
   text-transform: uppercase;
 }
 .studio-job header em {
@@ -306,12 +306,12 @@
 }
 .studio-job > b {
   margin-top: 7px;
-  font-size: 9px;
+  font-size: calc(9px + var(--text-increase, 1px));
 }
 .studio-job > small {
   margin-top: 3px;
   color: #6f7c86;
-  font-size: 7px;
+  font-size: calc(7px + var(--text-increase, 1px));
 }
 .studio-job > i {
   display: block;
@@ -335,7 +335,7 @@
   align-items: center;
   justify-content: center;
   color: #687680;
-  font-size: 8px;
+  font-size: calc(8px + var(--text-increase, 1px));
   text-align: center;
 }
 .studio-loading {
@@ -365,13 +365,13 @@
 }
 .studio-safety b {
   color: #75d6a7;
-  font-size: 9px;
+  font-size: calc(9px + var(--text-increase, 1px));
   white-space: nowrap;
 }
 .studio-safety p {
   margin: 0;
   color: #718078;
-  font-size: 8px;
+  font-size: calc(8px + var(--text-increase, 1px));
   line-height: 1.5;
 }
 .sidebar nav {
@@ -413,7 +413,7 @@
     display: none;
   }
   .codec-studio-hero h1 {
-    font-size: 34px;
+    font-size: calc(34px + var(--text-increase, 1px));
   }
   .studio-candidate {
     grid-template-columns: 48px 1fr;

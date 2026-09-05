@@ -16,7 +16,7 @@
   border-radius: 15px;
   background: var(--theme-panel, #10151a);
   color: var(--theme-muted, #74818b);
-  font: 7px 'DM Mono';
+  font: calc(7px + var(--text-increase, 1px)) 'DM Mono';
   cursor: pointer;
 }
 .playlist-signal-filters button b {
@@ -28,7 +28,7 @@
   border-radius: 8px;
   background: var(--theme-panel2, #1b2228);
   color: inherit;
-  font-size: 6px;
+  font-size: calc(6px + var(--text-increase, 1px));
 }
 .playlist-signal-filters button.active {
   border-color: color-mix(in srgb, var(--theme-secondary, var(--cyan)) 55%, var(--theme-line));

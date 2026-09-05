@@ -10,7 +10,7 @@
 .experiment-view > header h2,
 .mood-signals h2 {
   margin: 8px 0 5px;
-  font-size: 23px;
+  font-size: calc(23px + var(--text-increase, 1px));
   line-height: 1.25;
 }
 .experiment-view > header p,
@@ -18,7 +18,7 @@
   max-width: 520px;
   margin: 0;
   color: var(--muted, #747c87);
-  font-size: 9px;
+  font-size: calc(9px + var(--text-increase, 1px));
   line-height: 1.7;
 }
 .experiment-metric {
@@ -27,11 +27,11 @@
 .experiment-metric b {
   display: block;
   color: #f2b653;
-  font: 26px 'DM Mono';
+  font: calc(26px + var(--text-increase, 1px)) 'DM Mono';
 }
 .experiment-metric span {
   color: var(--muted, #737b86);
-  font: 6px 'DM Mono';
+  font: calc(6px + var(--text-increase, 1px)) 'DM Mono';
   letter-spacing: 0.7px;
   text-transform: uppercase;
 }
@@ -51,11 +51,11 @@
   display: block;
   margin-bottom: 4px;
   color: var(--text, #d9dcd8);
-  font: 16px 'DM Mono';
+  font: calc(16px + var(--text-increase, 1px)) 'DM Mono';
 }
 .experiment-stats span {
   color: var(--muted, #68727c);
-  font: 6px 'DM Mono';
+  font: calc(6px + var(--text-increase, 1px)) 'DM Mono';
   letter-spacing: 0.7px;
 }
 .experiment-section {
@@ -68,7 +68,7 @@
 .experiment-empty {
   grid-column: 1/-1;
   color: var(--muted, #737b86);
-  font-size: 8px;
+  font-size: calc(8px + var(--text-increase, 1px));
 }
 .lab-version-warning {
   min-height: 525px;
@@ -82,12 +82,12 @@
 .lab-version-warning h2 {
   max-width: 520px;
   margin: 12px 0 8px;
-  font-size: 22px;
+  font-size: calc(22px + var(--text-increase, 1px));
 }
 .lab-version-warning p {
   max-width: 540px;
   color: var(--muted, #747c87);
-  font-size: 9px;
+  font-size: calc(9px + var(--text-increase, 1px));
   line-height: 1.7;
 }
 .lab-media-grid {
@@ -125,17 +125,17 @@
   white-space: nowrap;
 }
 .lab-media-card b {
-  font-size: 8px;
+  font-size: calc(8px + var(--text-increase, 1px));
 }
 .lab-media-card span {
   margin-top: 4px;
   color: var(--muted, #707985);
-  font: 6px 'DM Mono';
+  font: calc(6px + var(--text-increase, 1px)) 'DM Mono';
 }
 .lab-media-card small {
   margin-top: 4px;
   color: #c99545;
-  font: 6px 'DM Mono';
+  font: calc(6px + var(--text-increase, 1px)) 'DM Mono';
 }
 
 .memory-chart {
@@ -172,13 +172,13 @@
   width: 100%;
   color: var(--muted, #777f89);
   text-align: center;
-  font: 6px 'DM Mono';
+  font: calc(6px + var(--text-increase, 1px)) 'DM Mono';
   font-style: normal;
 }
 .memory-chart b {
   padding-bottom: 7px;
   color: var(--muted, #69717c);
-  font: 6px 'DM Mono';
+  font: calc(6px + var(--text-increase, 1px)) 'DM Mono';
   font-weight: 400;
 }
 
@@ -247,7 +247,7 @@
   position: absolute;
   top: 64%;
   color: #d6e6e5;
-  font: 7px 'DM Mono';
+  font: calc(7px + var(--text-increase, 1px)) 'DM Mono';
   letter-spacing: 0.8px;
   text-transform: uppercase;
 }
@@ -265,11 +265,11 @@
 }
 .mood-forecast h2 {
   margin: 8px 0 5px;
-  font-size: 24px;
+  font-size: calc(24px + var(--text-increase, 1px));
 }
 .mood-forecast > p {
   color: var(--muted, #747c87);
-  font-size: 9px;
+  font-size: calc(9px + var(--text-increase, 1px));
   line-height: 1.7;
 }
 .mood-facts {
@@ -288,12 +288,12 @@
   display: block;
 }
 .mood-facts b {
-  font: 13px 'DM Mono';
+  font: calc(13px + var(--text-increase, 1px)) 'DM Mono';
 }
 .mood-facts span {
   margin-top: 3px;
   color: var(--muted, #69717c);
-  font: 5px 'DM Mono';
+  font: calc(5px + var(--text-increase, 1px)) 'DM Mono';
   text-transform: uppercase;
 }
 .mood-signals {
@@ -305,7 +305,7 @@
   gap: 13px;
   margin: 19px 0 4px;
   color: var(--muted, #69717c);
-  font: 5px 'DM Mono';
+  font: calc(5px + var(--text-increase, 1px)) 'DM Mono';
 }
 .signal-key span:before {
   content: '';
@@ -328,11 +328,11 @@
   justify-content: space-between;
 }
 .mood-signals article b {
-  font-size: 8px;
+  font-size: calc(8px + var(--text-increase, 1px));
 }
 .mood-signals article span {
   color: var(--muted, #747c87);
-  font: 6px 'DM Mono';
+  font: calc(6px + var(--text-increase, 1px)) 'DM Mono';
 }
 .mood-signals article span.rising {
   color: #67dba5;
@@ -356,7 +356,7 @@
 }
 .mood-signals small {
   color: var(--muted, #646d78);
-  font: 5px 'DM Mono';
+  font: calc(5px + var(--text-increase, 1px)) 'DM Mono';
 }
 
 .runtime-clock {
@@ -378,14 +378,14 @@
   animation: labOrbit 25s linear infinite;
 }
 .runtime-clock b {
-  font: 20px 'DM Mono';
+  font: calc(20px + var(--text-increase, 1px)) 'DM Mono';
   color: #f2b653;
 }
 .runtime-clock span {
   position: absolute;
   top: 65%;
   color: #8b7554;
-  font: 5px 'DM Mono';
+  font: calc(5px + var(--text-increase, 1px)) 'DM Mono';
   letter-spacing: 0.7px;
 }
 .runtime-body {
@@ -415,11 +415,11 @@
   margin-bottom: 5px;
 }
 .runtime-distribution b {
-  font-size: 7px;
+  font-size: calc(7px + var(--text-increase, 1px));
 }
 .runtime-distribution span {
   color: var(--muted, #747c87);
-  font: 6px 'DM Mono';
+  font: calc(6px + var(--text-increase, 1px)) 'DM Mono';
 }
 .runtime-distribution article > i {
   display: block;
@@ -456,16 +456,16 @@
 }
 .time-portals b {
   color: #64d9d4;
-  font: 16px 'DM Mono';
+  font: calc(16px + var(--text-increase, 1px)) 'DM Mono';
 }
 .time-portals b small {
   margin-left: 2px;
-  font-size: 5px;
+  font-size: calc(5px + var(--text-increase, 1px));
 }
 .time-portals span {
   margin-top: 5px;
   color: var(--muted, #69717c);
-  font: 5px 'DM Mono';
+  font: calc(5px + var(--text-increase, 1px)) 'DM Mono';
 }
 
 .anomaly-beacon {
@@ -499,13 +499,13 @@
 }
 .anomaly-beacon b {
   color: #f2b653;
-  font: 21px 'DM Mono';
+  font: calc(21px + var(--text-increase, 1px)) 'DM Mono';
 }
 .anomaly-beacon span {
   position: absolute;
   top: 65%;
   color: #93734d;
-  font: 5px 'DM Mono';
+  font: calc(5px + var(--text-increase, 1px)) 'DM Mono';
 }
 .anomaly-columns {
   display: grid;
@@ -536,7 +536,7 @@
   border: 1px solid #39414a;
   border-radius: 20px;
   color: var(--muted, #89919b);
-  font: 6px 'DM Mono';
+  font: calc(6px + var(--text-increase, 1px)) 'DM Mono';
 }
 .anomaly-tags span b {
   margin-left: 3px;
@@ -544,7 +544,7 @@
 }
 .anomaly-columns small {
   color: var(--muted, #737b86);
-  font-size: 7px;
+  font-size: calc(7px + var(--text-increase, 1px));
 }
 .anomaly-list > div {
   display: flex;
@@ -555,14 +555,14 @@
 }
 .anomaly-list b {
   overflow: hidden;
-  font-size: 8px;
+  font-size: calc(8px + var(--text-increase, 1px));
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 .anomaly-list span {
   flex: none;
   color: var(--muted, #69717c);
-  font: 6px 'DM Mono';
+  font: calc(6px + var(--text-increase, 1px)) 'DM Mono';
 }
 
 @media (max-width: 950px) {
@@ -597,7 +597,7 @@
   }
   .experiment-view > header h2,
   .mood-signals h2 {
-    font-size: 19px;
+    font-size: calc(19px + var(--text-increase, 1px));
   }
   .experiment-metric {
     display: none;
@@ -609,7 +609,7 @@
     padding: 10px 8px;
   }
   .experiment-stats b {
-    font-size: 12px;
+    font-size: calc(12px + var(--text-increase, 1px));
   }
   .lab-media-grid {
     grid-template-columns: 1fr;
@@ -623,7 +623,7 @@
     width: 70%;
   }
   .memory-chart b {
-    font-size: 5px;
+    font-size: calc(5px + var(--text-increase, 1px));
   }
   .mood-view {
     display: block;
@@ -647,7 +647,7 @@
   }
   .runtime-clock b,
   .anomaly-beacon b {
-    font-size: 15px;
+    font-size: calc(15px + var(--text-increase, 1px));
   }
   .time-portals {
     padding: 11px;
@@ -664,7 +664,7 @@
   }
   .lab-tabs button {
     padding: 0 8px;
-    font-size: 8px;
+    font-size: calc(8px + var(--text-increase, 1px));
   }
 }
 @media (prefers-reduced-motion: reduce) {

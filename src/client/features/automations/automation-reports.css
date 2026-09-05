@@ -48,7 +48,7 @@
 .auto-run-report .history-status {
   color: var(--run-tone);
   text-transform: uppercase;
-  font-size: 10px;
+  font-size: calc(10px + var(--text-increase, 1px));
   letter-spacing: 1.6px;
   font-weight: 700;
 }
@@ -66,7 +66,7 @@
   gap: 3px;
 }
 .run-summary-title b {
-  font-size: 14px;
+  font-size: calc(14px + var(--text-increase, 1px));
   color: #edf7ff;
 }
 .run-summary-title small {
@@ -74,19 +74,19 @@
   text-overflow: ellipsis;
   white-space: nowrap;
   color: #7f91a9;
-  font-size: 12px;
+  font-size: calc(12px + var(--text-increase, 1px));
 }
 .run-trigger {
   padding: 5px 8px;
   border: 1px solid rgba(119, 229, 255, 0.14);
   border-radius: 5px;
   color: #7ea0b8;
-  font-size: 9px;
+  font-size: calc(9px + var(--text-increase, 1px));
   letter-spacing: 1.2px;
 }
 .auto-run-report summary time {
   color: #71839b;
-  font-size: 11px;
+  font-size: calc(11px + var(--text-increase, 1px));
   text-align: right;
 }
 .run-chevron {
@@ -118,20 +118,20 @@
 }
 .run-report-label {
   color: var(--run-tone);
-  font-size: 9px;
+  font-size: calc(9px + var(--text-increase, 1px));
   font-weight: 700;
   letter-spacing: 1.8px;
 }
 .run-outcome h3 {
   margin: 7px 0 5px;
   color: #f4f9ff;
-  font-size: 21px;
+  font-size: calc(21px + var(--text-increase, 1px));
 }
 .run-outcome p {
   max-width: 760px;
   margin: 0;
   color: #93a5bb;
-  font-size: 13px;
+  font-size: calc(13px + var(--text-increase, 1px));
   line-height: 1.55;
 }
 .run-metric-grid {
@@ -150,7 +150,7 @@
 .run-facts span {
   display: block;
   color: #60738c;
-  font-size: 9px;
+  font-size: calc(9px + var(--text-increase, 1px));
   letter-spacing: 1px;
   text-transform: uppercase;
 }
@@ -158,7 +158,7 @@
   display: block;
   margin-top: 6px;
   color: #eafaff;
-  font: 600 18px/1.1 var(--font-display, inherit);
+  font: 600 calc(18px + var(--text-increase, 1px))/1.1 var(--font-display, inherit);
   text-shadow: 0 0 18px color-mix(in srgb, var(--run-tone) 25%, transparent);
 }
 .run-facts {
@@ -177,7 +177,7 @@
   display: block;
   margin-top: 4px;
   color: #c8d5e3;
-  font-size: 12px;
+  font-size: calc(12px + var(--text-increase, 1px));
   font-weight: 500;
 }
 .run-findings {
@@ -193,7 +193,7 @@
 }
 .run-finding > span {
   color: #456078;
-  font: 10px/1 monospace;
+  font: calc(10px + var(--text-increase, 1px))/1 monospace;
 }
 .run-finding div {
   display: grid;
@@ -204,15 +204,15 @@
   text-overflow: ellipsis;
   white-space: nowrap;
   color: #dbe8f5;
-  font-size: 12px;
+  font-size: calc(12px + var(--text-increase, 1px));
 }
 .run-finding small {
   color: #71849c;
-  font-size: 10px;
+  font-size: calc(10px + var(--text-increase, 1px));
 }
 .run-finding em {
   color: var(--run-tone);
-  font-size: 11px;
+  font-size: calc(11px + var(--text-increase, 1px));
   font-style: normal;
 }
 .run-recommendation {
@@ -227,13 +227,13 @@
 }
 .run-recommendation span {
   color: var(--run-tone);
-  font-size: 9px;
+  font-size: calc(9px + var(--text-increase, 1px));
   letter-spacing: 1.5px;
 }
 .run-recommendation p {
   margin: 0;
   color: #aebed0;
-  font-size: 12px;
+  font-size: calc(12px + var(--text-increase, 1px));
   line-height: 1.5;
 }
 .run-report-body footer {
@@ -243,7 +243,7 @@
   padding-top: 14px;
   border-top: 1px solid rgba(255, 255, 255, 0.06);
   color: #53677f;
-  font-size: 9px;
+  font-size: calc(9px + var(--text-increase, 1px));
   letter-spacing: 0.5px;
   text-transform: uppercase;
 }

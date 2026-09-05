@@ -20,7 +20,7 @@
   background: radial-gradient(ellipse, #4ce0da14, transparent 66%);
 }
 .atlas-head h2 {
-  font-size: 35px;
+  font-size: calc(35px + var(--text-increase, 1px));
   line-height: 1.12;
   letter-spacing: -1.5px;
   margin: 10px 0;
@@ -30,7 +30,7 @@
   color: #939da7;
 }
 .atlas-head p {
-  font-size: 10px;
+  font-size: calc(10px + var(--text-increase, 1px));
   color: #717b85;
 }
 .atlas-orbit {
@@ -69,7 +69,7 @@
   background: #123031;
   border: 1px solid #427979;
   box-shadow: 0 0 25px #50d6d136;
-  font: 6px 'DM Mono';
+  font: calc(6px + var(--text-increase, 1px)) 'DM Mono';
   letter-spacing: 1px;
 }
 .atlas-summary {
@@ -102,21 +102,21 @@
 .growth-cards span,
 .atlas-callouts article > span {
   color: #69737e;
-  font: 7px 'DM Mono';
+  font: calc(7px + var(--text-increase, 1px)) 'DM Mono';
   letter-spacing: 1px;
 }
 .atlas-summary b,
 .growth-cards b,
 .atlas-callouts article > b {
   display: block;
-  font-size: 20px;
+  font-size: calc(20px + var(--text-increase, 1px));
   margin: 8px 0 2px;
 }
 .atlas-summary small,
 .growth-cards small,
 .atlas-callouts article > small {
   color: #626c76;
-  font-size: 7px;
+  font-size: calc(7px + var(--text-increase, 1px));
 }
 .atlas-tabs {
   display: flex;
@@ -133,7 +133,7 @@
   background: none;
   color: #707b85;
   padding: 9px 13px;
-  font-size: 8px;
+  font-size: calc(8px + var(--text-increase, 1px));
   cursor: pointer;
 }
 .atlas-tabs button:hover {
@@ -148,7 +148,7 @@
 }
 .atlas-tabs #refresh-atlas {
   margin-left: auto;
-  font-size: 14px;
+  font-size: calc(14px + var(--text-increase, 1px));
   padding: 5px 11px;
 }
 .atlas-stage {
@@ -163,11 +163,11 @@
 }
 .atlas-panel-title span {
   color: #65727c;
-  font: 7px 'DM Mono';
+  font: calc(7px + var(--text-increase, 1px)) 'DM Mono';
   letter-spacing: 1px;
 }
 .atlas-panel-title h3 {
-  font-size: 14px;
+  font-size: calc(14px + var(--text-increase, 1px));
   margin: 6px 0 17px;
 }
 .quality-layout {
@@ -205,12 +205,12 @@
   z-index: 1;
   text-align: center;
   color: #66727c;
-  font: 6px 'DM Mono';
+  font: calc(6px + var(--text-increase, 1px)) 'DM Mono';
 }
 .quality-donut span b {
   display: block;
   color: #f0f2ef;
-  font: 18px Manrope;
+  font: calc(18px + var(--text-increase, 1px)) Manrope;
   margin-bottom: 2px;
 }
 .quality-legend {
@@ -224,7 +224,7 @@
   align-items: center;
   gap: 7px;
   color: #838d97;
-  font-size: 8px;
+  font-size: calc(8px + var(--text-increase, 1px));
 }
 .quality-legend i {
   width: 6px;
@@ -234,12 +234,12 @@
 }
 .quality-legend b {
   color: #c7ccd0;
-  font-size: 9px;
+  font-size: calc(9px + var(--text-increase, 1px));
 }
 .quality-legend small {
   text-align: right;
   color: #5e6872;
-  font: 7px 'DM Mono';
+  font: calc(7px + var(--text-increase, 1px)) 'DM Mono';
 }
 .atlas-bars {
   display: flex;
@@ -255,7 +255,7 @@
   gap: 9px;
 }
 .atlas-bars span {
-  font: 7px 'DM Mono';
+  font: calc(7px + var(--text-increase, 1px)) 'DM Mono';
   color: #818b95;
 }
 .atlas-bars i,
@@ -274,7 +274,7 @@
 }
 .atlas-bars em,
 .library-mass em {
-  font: 7px 'DM Mono';
+  font: calc(7px + var(--text-increase, 1px)) 'DM Mono';
   font-style: normal;
   color: #6c7680;
   text-align: right;
@@ -287,12 +287,12 @@
 }
 .codec-panel footer span {
   color: #616c75;
-  font: 6px 'DM Mono';
+  font: calc(6px + var(--text-increase, 1px)) 'DM Mono';
 }
 .codec-panel footer b {
   display: block;
   color: #d9ddde;
-  font: 13px Manrope;
+  font: calc(13px + var(--text-increase, 1px)) Manrope;
 }
 .atlas-callouts {
   display: grid;
@@ -318,14 +318,14 @@
 }
 .atlas-callouts p {
   color: #7c776e;
-  font-size: 8px;
+  font-size: calc(8px + var(--text-increase, 1px));
   margin: 0;
   line-height: 1.5;
 }
 .atlas-callouts p b {
   display: block;
   color: #c5b796;
-  font-size: 9px;
+  font-size: calc(9px + var(--text-increase, 1px));
 }
 .atlas-list {
   padding-bottom: 5px;
@@ -364,11 +364,11 @@
   white-space: nowrap;
 }
 .atlas-media-row > div:nth-child(2) > b {
-  font-size: 9px;
+  font-size: calc(9px + var(--text-increase, 1px));
 }
 .atlas-media-row > div:nth-child(2) > small {
   color: #69737d;
-  font-size: 7px;
+  font-size: calc(7px + var(--text-increase, 1px));
   margin-top: 3px;
 }
 .edition-facts,
@@ -382,7 +382,7 @@
   border-radius: 3px;
   background: #1c242a;
   color: #71838a;
-  font: 6px 'DM Mono';
+  font: calc(6px + var(--text-increase, 1px)) 'DM Mono';
   text-transform: uppercase;
 }
 .missing-tags span {
@@ -423,20 +423,20 @@
   position: relative;
   z-index: 1;
   color: #69757e;
-  font: 6px 'DM Mono';
+  font: calc(6px + var(--text-increase, 1px)) 'DM Mono';
 }
 .score-ring b {
   display: block;
   color: #eff2ef;
-  font: 22px Manrope;
+  font: calc(22px + var(--text-increase, 1px)) Manrope;
 }
 .metadata-score h3 {
-  font-size: 12px;
+  font-size: calc(12px + var(--text-increase, 1px));
   margin: 17px 0 4px;
 }
 .metadata-score p {
   color: #69737d;
-  font-size: 8px;
+  font-size: calc(8px + var(--text-increase, 1px));
 }
 .growth-cards {
   display: grid;
@@ -464,10 +464,10 @@
   display: block;
 }
 .library-mass span b {
-  font-size: 9px;
+  font-size: calc(9px + var(--text-increase, 1px));
 }
 .library-mass span small {
-  font-size: 7px;
+  font-size: calc(7px + var(--text-increase, 1px));
   color: #65707a;
   margin-top: 2px;
 }
@@ -486,12 +486,12 @@
 }
 .atlas-none h3,
 .atlas-loading h3 {
-  font-size: 11px;
+  font-size: calc(11px + var(--text-increase, 1px));
   margin: 10px 0 2px;
 }
 .atlas-none p,
 .atlas-loading p {
-  font-size: 8px;
+  font-size: calc(8px + var(--text-increase, 1px));
 }
 .atlas-loading i {
   width: 28px;
@@ -503,7 +503,7 @@
 }
 .atlas-none.error > b {
   color: #e77f89;
-  font-size: 18px;
+  font-size: calc(18px + var(--text-increase, 1px));
 }
 @keyframes atlas-spin {
   to {
@@ -545,7 +545,7 @@
     display: none;
   }
   .atlas-head h2 {
-    font-size: 29px;
+    font-size: calc(29px + var(--text-increase, 1px));
   }
   .quality-core {
     grid-template-columns: 1fr;

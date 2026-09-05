@@ -18,13 +18,13 @@
 }
 .taste-empty {
   color: #68717c !important;
-  font-size: 8px !important;
+  font-size: calc(8px + var(--text-increase, 1px)) !important;
 }
 .deck-empty {
   width: 100%;
   justify-content: center !important;
   color: #69717d;
-  font-size: 9px;
+  font-size: calc(9px + var(--text-increase, 1px));
 }
 .activity-list {
   max-height: 210px;

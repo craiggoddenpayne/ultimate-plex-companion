@@ -41,18 +41,18 @@
   place-items: center;
 }
 .taste-core b {
-  font-size: 15px;
+  font-size: calc(15px + var(--text-increase, 1px));
 }
 .taste-core span {
   color: var(--theme-muted, #818895);
-  font: 5px 'DM Mono';
+  font: calc(5px + var(--text-increase, 1px)) 'DM Mono';
   letter-spacing: 0.7px;
 }
 .taste-radar > small {
   position: absolute;
   bottom: 5px;
   color: var(--theme-primary, var(--amber));
-  font: 7px 'DM Mono';
+  font: calc(7px + var(--text-increase, 1px)) 'DM Mono';
   letter-spacing: 0.8px;
   text-transform: uppercase;
 }
@@ -63,7 +63,7 @@
   display: block;
   margin-bottom: 13px;
   color: var(--theme-muted, #818895);
-  font-size: 8px;
+  font-size: calc(8px + var(--text-increase, 1px));
   line-height: 1.5;
 }
 .taste-profile footer {
@@ -73,13 +73,13 @@
   padding-top: 10px;
   border-top: 1px solid var(--theme-line, #242832);
   color: #66717c;
-  font: 6px 'DM Mono';
+  font: calc(6px + var(--text-increase, 1px)) 'DM Mono';
 }
 .taste-profile footer b {
   display: block;
   margin-bottom: 2px;
   color: #b8c5cc;
-  font-size: 9px;
+  font-size: calc(9px + var(--text-increase, 1px));
 }
 .watch-bars {
   position: absolute;
@@ -130,18 +130,18 @@
   border: 0;
   background: none;
   color: #747f8b;
-  font-size: 24px;
+  font-size: calc(24px + var(--text-increase, 1px));
   cursor: pointer;
 }
 .deck-detail-modal > header h2 {
   margin: 7px 0 5px;
-  font-size: 27px;
+  font-size: calc(27px + var(--text-increase, 1px));
 }
 .deck-detail-modal > header p {
   max-width: 650px;
   margin: 0 0 22px;
   color: #7c8996;
-  font-size: 9px;
+  font-size: calc(9px + var(--text-increase, 1px));
   line-height: 1.65;
 }
 .deck-detail-stats {
@@ -158,17 +158,17 @@
 .deck-detail-stats span,
 .deck-detail-section > span {
   color: var(--theme-primary, var(--amber));
-  font: 6px 'DM Mono';
+  font: calc(6px + var(--text-increase, 1px)) 'DM Mono';
   letter-spacing: 1px;
 }
 .deck-detail-stats b {
   display: block;
   margin: 7px 0 2px;
-  font-size: 19px;
+  font-size: calc(19px + var(--text-increase, 1px));
 }
 .deck-detail-stats small {
   color: #687581;
-  font-size: 7px;
+  font-size: calc(7px + var(--text-increase, 1px));
 }
 .deck-detail-section {
   margin-top: 12px;
@@ -193,12 +193,12 @@
   display: block;
 }
 .taste-detail-bars label b {
-  font-size: 9px;
+  font-size: calc(9px + var(--text-increase, 1px));
 }
 .taste-detail-bars label small {
   margin-top: 2px;
   color: #64717c;
-  font-size: 6px;
+  font-size: calc(6px + var(--text-increase, 1px));
 }
 .taste-detail-bars > div > i {
   height: 3px;
@@ -214,7 +214,7 @@
 }
 .taste-detail-bars em {
   color: #8997a3;
-  font: 7px 'DM Mono';
+  font: calc(7px + var(--text-increase, 1px)) 'DM Mono';
   font-style: normal;
   text-align: right;
 }
@@ -251,17 +251,17 @@
   white-space: nowrap;
 }
 .influence-list b {
-  font-size: 8px;
+  font-size: calc(8px + var(--text-increase, 1px));
 }
 .influence-list small {
   margin-top: 2px;
   color: #65727f;
-  font-size: 6px;
+  font-size: calc(6px + var(--text-increase, 1px));
 }
 .influence-list time,
 .deck-timeline time {
   color: #64717d;
-  font: 6px 'DM Mono';
+  font: calc(6px + var(--text-increase, 1px)) 'DM Mono';
 }
 .deck-timeline article {
   display: grid;
@@ -289,12 +289,12 @@
   display: block;
 }
 .deck-timeline b {
-  font-size: 9px;
+  font-size: calc(9px + var(--text-increase, 1px));
 }
 .deck-timeline small {
   margin-top: 3px;
   color: #697682;
-  font-size: 7px;
+  font-size: calc(7px + var(--text-increase, 1px));
 }
 .health-facts {
   display: grid;
@@ -312,11 +312,11 @@
 }
 .health-facts small {
   color: #61707c;
-  font: 6px 'DM Mono';
+  font: calc(6px + var(--text-increase, 1px)) 'DM Mono';
 }
 .health-facts b {
   margin-top: 4px;
-  font-size: 9px;
+  font-size: calc(9px + var(--text-increase, 1px));
 }
 .deck-detail-modal > footer {
   display: flex;
@@ -326,7 +326,7 @@
 }
 .deck-detail-modal > footer span {
   color: #596773;
-  font: 6px 'DM Mono';
+  font: calc(6px + var(--text-increase, 1px)) 'DM Mono';
   text-transform: uppercase;
 }
 .deck-detail-modal > footer button {
@@ -335,7 +335,7 @@
   border-radius: 5px;
   background: var(--theme-primary, var(--amber));
   color: var(--theme-bg, #080a0f);
-  font-size: 8px;
+  font-size: calc(8px + var(--text-increase, 1px));
   font-weight: 700;
   cursor: pointer;
 }

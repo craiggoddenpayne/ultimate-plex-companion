@@ -13,7 +13,7 @@
   border-radius: 5px;
   background: #142025;
   color: #7faaa9;
-  font: 7px 'DM Mono';
+  font: calc(7px + var(--text-increase, 1px)) 'DM Mono';
   cursor: pointer;
   white-space: nowrap;
 }
@@ -50,18 +50,18 @@
   border: 0;
   background: none;
   color: #71808a;
-  font-size: 24px;
+  font-size: calc(24px + var(--text-increase, 1px));
   cursor: pointer;
 }
 .metadata-helper-modal header h2 {
   margin: 8px 0 4px;
-  font-size: 25px;
+  font-size: calc(25px + var(--text-increase, 1px));
 }
 .metadata-helper-modal header p {
   max-width: 620px;
   margin: 0;
   color: #73808a;
-  font-size: 8px;
+  font-size: calc(8px + var(--text-increase, 1px));
   line-height: 1.6;
 }
 .metadata-helper-missing {
@@ -71,7 +71,7 @@
   border-radius: 5px;
   background: #24141a;
   color: #df8e9b;
-  font: 7px 'DM Mono';
+  font: calc(7px + var(--text-increase, 1px)) 'DM Mono';
   letter-spacing: 0.5px;
 }
 .metadata-helper-grid {
@@ -83,7 +83,7 @@
   display: block;
   margin-bottom: 9px;
   color: #87939c;
-  font-size: 8px;
+  font-size: calc(8px + var(--text-increase, 1px));
 }
 .metadata-helper-modal input,
 .metadata-helper-modal textarea {
@@ -97,7 +97,7 @@
   outline: none;
   background: #0b1015;
   color: #dbe2e5;
-  font: 9px Manrope;
+  font: calc(9px + var(--text-increase, 1px)) Manrope;
   resize: vertical;
 }
 .metadata-helper-modal input:focus,
@@ -109,7 +109,7 @@
   display: block;
   margin-top: 4px;
   color: #596872;
-  font-size: 7px;
+  font-size: calc(7px + var(--text-increase, 1px));
 }
 .metadata-artwork {
   padding: 11px;
@@ -119,7 +119,7 @@
 }
 .metadata-helper-result {
   min-height: 17px;
-  font-size: 8px;
+  font-size: calc(8px + var(--text-increase, 1px));
 }
 .metadata-helper-result.success {
   color: #68dca2;
@@ -139,7 +139,7 @@
   border-radius: 5px;
   background: #151c22;
   color: #8d9aa3;
-  font-size: 8px;
+  font-size: calc(8px + var(--text-increase, 1px));
   cursor: pointer;
 }
 .metadata-helper-modal footer .metadata-helper-save {

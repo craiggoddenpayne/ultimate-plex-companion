@@ -10,7 +10,7 @@
   margin-bottom: 25px;
 }
 .personal-head h2 {
-  font-size: 27px;
+  font-size: calc(27px + var(--text-increase, 1px));
   line-height: 1.25;
   letter-spacing: -1.1px;
   margin: 8px 0 6px;
@@ -23,7 +23,7 @@
 .personal-head p {
   margin: 0;
   color: #737b86;
-  font-size: 9px;
+  font-size: calc(9px + var(--text-increase, 1px));
 }
 .personal-controls {
   display: flex;
@@ -35,7 +35,7 @@
   align-items: center;
   gap: 7px;
   color: #858d97;
-  font-size: 8px;
+  font-size: calc(8px + var(--text-increase, 1px));
   cursor: pointer;
 }
 .personal-controls input {
@@ -70,7 +70,7 @@
   padding: 7px 10px;
   color: #9299a3;
   background: #181c22;
-  font-size: 8px;
+  font-size: calc(8px + var(--text-increase, 1px));
   cursor: pointer;
 }
 .recommendation-shelves {
@@ -111,28 +111,28 @@
 }
 .recommendation-shelf header span {
   color: #b28a4c;
-  font: 6px 'DM Mono';
+  font: calc(6px + var(--text-increase, 1px)) 'DM Mono';
   letter-spacing: 0.7px;
 }
 .recommendation-shelf header h3 {
   max-width: 95px;
   overflow: hidden;
   margin: 5px 0 3px;
-  font-size: 9px;
+  font-size: calc(9px + var(--text-increase, 1px));
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 .recommendation-shelf header p {
   margin: 0;
   color: #676f7a;
-  font-size: 6px;
+  font-size: calc(6px + var(--text-increase, 1px));
 }
 .recommendation-shelf header > b {
   display: block;
   clear: both;
   padding-top: 14px;
   color: #5f6772;
-  font: 6px 'DM Mono';
+  font: calc(6px + var(--text-increase, 1px)) 'DM Mono';
   font-weight: 400;
 }
 .rec-track {
@@ -175,7 +175,7 @@
   border-radius: 2px;
   color: #ffc35d;
   background: #17130ddd;
-  font: 6px 'DM Mono';
+  font: calc(6px + var(--text-increase, 1px)) 'DM Mono';
 }
 .rec-poster i {
   position: absolute;
@@ -185,20 +185,20 @@
   border-radius: 2px;
   color: #68dca5;
   background: #0d2118dd;
-  font: 5px 'DM Mono';
+  font: calc(5px + var(--text-increase, 1px)) 'DM Mono';
   font-style: normal;
 }
 .rec-track h4 {
   overflow: hidden;
   margin: 7px 0 2px;
-  font-size: 8px;
+  font-size: calc(8px + var(--text-increase, 1px));
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 .rec-track p {
   margin: 0;
   color: #666e79;
-  font-size: 6px;
+  font-size: calc(6px + var(--text-increase, 1px));
 }
 .rec-track small {
   display: block;
@@ -206,7 +206,7 @@
   overflow: hidden;
   margin-top: 4px;
   color: #887552;
-  font-size: 6px;
+  font-size: calc(6px + var(--text-increase, 1px));
   line-height: 1.5;
 }
 .rec-method {
@@ -226,7 +226,7 @@
 .rec-method p {
   margin: 0;
   color: #747c87;
-  font-size: 7px;
+  font-size: calc(7px + var(--text-increase, 1px));
 }
 .rec-method b {
   display: block;
@@ -275,12 +275,12 @@
 }
 .rec-empty h3 {
   margin: 13px 0 4px;
-  font-size: 12px;
+  font-size: calc(12px + var(--text-increase, 1px));
 }
 .rec-empty p {
   margin: 0;
   color: #6f7782;
-  font-size: 8px;
+  font-size: calc(8px + var(--text-increase, 1px));
 }
 .rec-modal {
   width: min(740px, calc(100vw - 30px));
@@ -308,11 +308,11 @@
 }
 .rec-detail-copy h2 {
   margin: 8px 0;
-  font-size: 27px;
+  font-size: calc(27px + var(--text-increase, 1px));
 }
 .rec-detail-meta {
   color: #d4a149;
-  font: 8px 'DM Mono';
+  font: calc(8px + var(--text-increase, 1px)) 'DM Mono';
 }
 .rec-detail-tags {
   display: flex;
@@ -324,13 +324,13 @@
   border-radius: 3px;
   color: #939aa4;
   background: #20242b;
-  font-size: 6px;
+  font-size: calc(6px + var(--text-increase, 1px));
 }
 .rec-detail-copy > p {
   max-height: 145px;
   overflow: auto;
   color: #838b96;
-  font-size: 9px;
+  font-size: calc(9px + var(--text-increase, 1px));
   line-height: 1.8;
 }
 .rec-because {
@@ -341,7 +341,7 @@
   border-left: 2px solid #f5ad2e;
   background: #191713;
   color: #9da4ad;
-  font-size: 7px;
+  font-size: calc(7px + var(--text-increase, 1px));
 }
 .rec-because > .icon {
   width: 14px;
@@ -382,7 +382,7 @@
     padding: 28px 20px;
   }
   .rec-detail-copy h2 {
-    font-size: 21px;
+    font-size: calc(21px + var(--text-increase, 1px));
   }
 }
 @media (max-width: 430px) {

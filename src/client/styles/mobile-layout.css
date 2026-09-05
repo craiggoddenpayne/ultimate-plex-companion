@@ -38,7 +38,7 @@
   .nav-link {
     min-height: 48px;
     height: 48px;
-    font-size: 14px;
+    font-size: calc(14px + var(--text-increase, 1px));
   }
   .server-chip {
     width: 100%;
@@ -121,7 +121,7 @@
   }
   .search input {
     min-width: 0;
-    font-size: 16px;
+    font-size: calc(16px + var(--text-increase, 1px));
   }
   .search kbd,
   .top-actions .sync {
@@ -171,13 +171,13 @@
   .metadata-center-hero h1,
   .telemetry-hero h1,
   .lab-hero h1 {
-    font-size: 32px;
+    font-size: calc(32px + var(--text-increase, 1px));
     line-height: 1.08;
     letter-spacing: -1.4px;
   }
   .hero-row p,
   .feature-hero > p {
-    font-size: 11px;
+    font-size: calc(11px + var(--text-increase, 1px));
     line-height: 1.6;
   }
   .hero-row .primary-button,
@@ -219,13 +219,13 @@
     padding: 15px;
   }
   .panel-head h2 {
-    font-size: 15px;
+    font-size: calc(15px + var(--text-increase, 1px));
   }
 
   input,
   select,
   textarea {
-    font-size: 16px !important;
+    font-size: calc(16px + var(--text-increase, 1px)) !important;
   }
   button,
   a {
@@ -292,7 +292,7 @@
     padding: 22px 17px 25px;
   }
   .detail-copy h2 {
-    font-size: 25px;
+    font-size: calc(25px + var(--text-increase, 1px));
   }
   .open-in-plex {
     width: 100%;

@@ -11,6 +11,18 @@ html[data-theme] {
   --rose: var(--theme-rose);
   color-scheme: dark;
 }
+html[data-text-size='standard'] {
+  --text-increase: 0px;
+}
+html[data-text-size='comfortable'] {
+  --text-increase: 1px;
+}
+html[data-text-size='large'] {
+  --text-increase: 2px;
+}
+html[data-text-size='extra-large'] {
+  --text-increase: 3px;
+}
 html[data-theme='solaris'] {
   --theme-bg: #080a0f;
   --theme-panel: #101319;
@@ -198,12 +210,12 @@ html[data-theme] .theme-launcher .icon {
 }
 .theme-modal h2 {
   margin: 6px 0 4px;
-  font-size: 28px;
+  font-size: calc(28px + var(--text-increase, 1px));
 }
 .theme-modal header p {
   margin: 0;
   color: var(--theme-muted);
-  font-size: 10px;
+  font-size: calc(10px + var(--text-increase, 1px));
 }
 .theme-close {
   position: absolute;
@@ -212,7 +224,7 @@ html[data-theme] .theme-launcher .icon {
   border: 0;
   background: none;
   color: var(--theme-muted);
-  font-size: 25px;
+  font-size: calc(25px + var(--text-increase, 1px));
   cursor: pointer;
 }
 .theme-prism {
@@ -323,12 +335,12 @@ html[data-theme] .theme-launcher .icon {
   white-space: nowrap;
 }
 .theme-card > b {
-  font-size: 10px;
+  font-size: calc(10px + var(--text-increase, 1px));
 }
 .theme-card > small {
   margin-top: 3px;
   color: var(--theme-muted);
-  font-size: 7px;
+  font-size: calc(7px + var(--text-increase, 1px));
 }
 .theme-swatches {
   display: flex;
@@ -345,7 +357,7 @@ html[data-theme] .theme-launcher .icon {
   right: 9px;
   bottom: 10px;
   color: var(--preview);
-  font: 6px 'DM Mono';
+  font: calc(6px + var(--text-increase, 1px)) 'DM Mono';
   letter-spacing: 0.8px;
 }
 .effect-control {
@@ -359,19 +371,34 @@ html[data-theme] .theme-launcher .icon {
   border-radius: 9px;
   background: color-mix(in srgb, var(--theme-panel2) 72%, transparent);
 }
+.theme-preference-grid {
+  display: grid;
+  grid-template-columns: 0.85fr 1.15fr;
+  gap: 12px;
+}
+.theme-preference-grid .effect-control {
+  min-width: 0;
+}
+.typography-control {
+  align-items: flex-end;
+}
+.text-options {
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
 .effect-control > div > span {
   color: var(--theme-primary);
-  font: 7px 'DM Mono';
+  font: calc(7px + var(--text-increase, 1px)) 'DM Mono';
   letter-spacing: 1px;
 }
 .effect-control h3 {
   margin: 5px 0 3px;
-  font-size: 12px;
+  font-size: calc(12px + var(--text-increase, 1px));
 }
 .effect-control p {
   margin: 0;
   color: var(--theme-muted);
-  font-size: 7px;
+  font-size: calc(7px + var(--text-increase, 1px));
 }
 .effect-options {
   display: flex;
@@ -385,7 +412,7 @@ html[data-theme] .theme-launcher .icon {
   border-radius: 4px;
   background: none;
   color: var(--theme-muted);
-  font-size: 7px;
+  font-size: calc(7px + var(--text-increase, 1px));
   cursor: pointer;
 }
 .effect-options button.active {
@@ -411,7 +438,7 @@ html[data-theme] .theme-launcher .icon {
 .theme-modal footer > span {
   margin-right: auto;
   color: var(--theme-muted);
-  font-size: 7px;
+  font-size: calc(7px + var(--text-increase, 1px));
 }
 .theme-modal footer button {
   padding: 9px 13px;
@@ -419,7 +446,7 @@ html[data-theme] .theme-launcher .icon {
   border-radius: 5px;
   background: var(--theme-panel2);
   color: var(--theme-muted);
-  font-size: 8px;
+  font-size: calc(8px + var(--text-increase, 1px));
   cursor: pointer;
 }
 .theme-modal footer .theme-done {
@@ -451,6 +478,9 @@ html[data-effects='still'] *:after {
   transition-duration: 0.01ms !important;
 }
 @media (max-width: 850px) {
+  .theme-preference-grid {
+    grid-template-columns: 1fr;
+  }
   .theme-grid {
     grid-template-columns: repeat(2, 1fr);
   }

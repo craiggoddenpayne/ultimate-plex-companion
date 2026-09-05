@@ -20,24 +20,24 @@
 }
 .playlist-composer > header span {
   color: var(--theme-tertiary, var(--violet));
-  font: 6px 'DM Mono';
+  font: calc(6px + var(--text-increase, 1px)) 'DM Mono';
   letter-spacing: 1px;
 }
 .playlist-composer > header h2 {
   margin: 5px 0 3px;
-  font-size: 16px;
+  font-size: calc(16px + var(--text-increase, 1px));
 }
 .playlist-composer > header p {
   margin: 0;
   color: var(--theme-muted, #687680);
-  font-size: 8px;
+  font-size: calc(8px + var(--text-increase, 1px));
 }
 .playlist-composer > header > b {
   padding: 5px 7px;
   border: 1px solid color-mix(in srgb, var(--theme-tertiary, var(--violet)) 30%, var(--theme-line));
   border-radius: 4px;
   color: var(--theme-tertiary, var(--violet));
-  font: 6px 'DM Mono';
+  font: calc(6px + var(--text-increase, 1px)) 'DM Mono';
   white-space: nowrap;
 }
 .composer-controls {
@@ -48,7 +48,7 @@
 .composer-controls label,
 .composer-create-bar label {
   color: var(--theme-muted, #74808b);
-  font-size: 7px;
+  font-size: calc(7px + var(--text-increase, 1px));
 }
 .composer-controls select,
 .composer-create-bar :is(input, select) {
@@ -61,7 +61,7 @@
   border-radius: 5px;
   background: var(--theme-panel2, #11171d);
   color: var(--theme-text, #d9e2e7);
-  font-size: 8px;
+  font-size: calc(8px + var(--text-increase, 1px));
 }
 .composer-preview-button {
   margin-top: 10px;
@@ -70,7 +70,7 @@
   border-radius: 5px;
   background: color-mix(in srgb, var(--theme-tertiary, var(--violet)) 9%, var(--theme-panel));
   color: var(--theme-tertiary, var(--violet));
-  font-size: 8px;
+  font-size: calc(8px + var(--text-increase, 1px));
   cursor: pointer;
 }
 .composer-preview-button:disabled {
@@ -106,12 +106,12 @@
 .composer-idle b,
 .composer-empty b {
   color: var(--theme-text, #bbc4ca);
-  font-size: 9px;
+  font-size: calc(9px + var(--text-increase, 1px));
 }
 .composer-idle span,
 .composer-empty span {
   margin-top: 3px;
-  font-size: 7px;
+  font-size: calc(7px + var(--text-increase, 1px));
 }
 .composer-empty.error b {
   color: var(--theme-rose, var(--rose));
@@ -123,12 +123,12 @@
   padding: 10px 12px;
   border-bottom: 1px solid var(--theme-line, #28323a);
   color: var(--theme-muted, #6b7882);
-  font: 6px 'DM Mono';
+  font: calc(6px + var(--text-increase, 1px)) 'DM Mono';
 }
 .composer-preview-head span b {
   margin-right: 4px;
   color: var(--theme-secondary, var(--cyan));
-  font-size: 9px;
+  font-size: calc(9px + var(--text-increase, 1px));
 }
 .composer-preview-head small {
   margin-left: auto;
@@ -167,12 +167,12 @@
   white-space: nowrap;
 }
 .composer-preview-track b {
-  font-size: 8px;
+  font-size: calc(8px + var(--text-increase, 1px));
 }
 .composer-preview-track small {
   margin-top: 3px;
   color: var(--theme-muted, #66747e);
-  font-size: 6px;
+  font-size: calc(6px + var(--text-increase, 1px));
 }
 .composer-create-bar {
   display: grid;
@@ -188,7 +188,7 @@
   border-radius: 5px;
   background: var(--theme-secondary, var(--cyan));
   color: var(--theme-bg, #071112);
-  font-size: 8px;
+  font-size: calc(8px + var(--text-increase, 1px));
   font-weight: 700;
   cursor: pointer;
 }

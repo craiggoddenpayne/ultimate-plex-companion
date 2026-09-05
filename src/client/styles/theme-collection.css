@@ -268,14 +268,14 @@ html[data-theme-mode='light'] :is(.primary-button, .secondary-button, .auto-prim
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  font-size: 10px;
+  font-size: calc(10px + var(--text-increase, 1px));
 }
 .theme-card-heading mark {
   padding: 2px 4px;
   border-radius: 3px;
   background: color-mix(in srgb, var(--preview) 11%, transparent);
   color: var(--preview);
-  font: 5px 'DM Mono';
+  font: calc(5px + var(--text-increase, 1px)) 'DM Mono';
   letter-spacing: 0.7px;
   text-transform: uppercase;
 }

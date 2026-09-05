@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { COMPANION_THEMES, normalizeThemePreferences } from '../../src/shared/theme-model.ts';
+import { COMPANION_THEMES, TEXT_SIZES, normalizeThemePreferences } from '../../src/shared/theme-model.ts';
 
 test('theme collection has fifteen valid and unique palettes', () => {
   assert.equal(COMPANION_THEMES.length, 15);
@@ -16,18 +16,22 @@ test('theme collection has fifteen valid and unique palettes', () => {
   }
 });
 
-test('theme preferences validate palettes and visual energy', () => {
+test('theme preferences validate palettes, visual energy and text size', () => {
+  assert.deepEqual(TEXT_SIZES, ['standard', 'comfortable', 'large', 'extra-large']);
   assert.deepEqual(normalizeThemePreferences({ theme: 'nebula', effects: 'still' }), {
     theme: 'nebula',
     effects: 'still',
+    textSize: 'comfortable',
   });
-  assert.deepEqual(normalizeThemePreferences({ theme: 'daylight', effects: 'ambient' }), {
+  assert.deepEqual(normalizeThemePreferences({ theme: 'daylight', effects: 'ambient', textSize: 'large' }), {
     theme: 'daylight',
     effects: 'ambient',
+    textSize: 'large',
   });
-  assert.deepEqual(normalizeThemePreferences({ theme: 'unknown', effects: 'maximum' }), {
+  assert.deepEqual(normalizeThemePreferences({ theme: 'unknown', effects: 'maximum', textSize: 'enormous' }), {
     theme: 'solaris',
     effects: 'full',
+    textSize: 'comfortable',
   });
 });
 
@@ -35,5 +39,6 @@ test('theme preferences accept Darkula as an alias for Darcula', () => {
   assert.deepEqual(normalizeThemePreferences({ theme: 'darkula', effects: 'full' }), {
     theme: 'darcula',
     effects: 'full',
+    textSize: 'comfortable',
   });
 });

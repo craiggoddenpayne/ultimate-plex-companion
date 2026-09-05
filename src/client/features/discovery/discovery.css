@@ -6,7 +6,7 @@
   padding: 35px 4% 35px 0;
 }
 .radar-hero h1 {
-  font-size: 48px;
+  font-size: calc(48px + var(--text-increase, 1px));
   line-height: 1.08;
   letter-spacing: -2.3px;
   margin: 12px 0 10px;
@@ -18,7 +18,7 @@
 }
 .radar-hero p {
   color: #727a85;
-  font-size: 11px;
+  font-size: calc(11px + var(--text-increase, 1px));
 }
 .radar-scope {
   width: 225px;
@@ -82,7 +82,7 @@
   z-index: 2;
   color: #a48654;
   text-align: center;
-  font: 7px/1.6 'DM Mono';
+  font: calc(7px + var(--text-increase, 1px))/1.6 'DM Mono';
   letter-spacing: 1px;
 }
 @keyframes radarSweep {
@@ -111,7 +111,7 @@
   padding: 7px 12px;
   color: #858d98;
   background: #15181e;
-  font-size: 9px;
+  font-size: calc(9px + var(--text-increase, 1px));
   cursor: pointer;
   transition: 0.2s;
 }
@@ -152,7 +152,7 @@
 .time-control output {
   min-width: 49px;
   color: #d7a64e;
-  font: 9px 'DM Mono';
+  font: calc(9px + var(--text-increase, 1px)) 'DM Mono';
 }
 .unwatched-toggle {
   display: flex;
@@ -190,7 +190,7 @@
 .unwatched-toggle b {
   white-space: nowrap;
   color: #8b929c;
-  font-size: 9px;
+  font-size: calc(9px + var(--text-increase, 1px));
 }
 .discovery-heading {
   display: flex;
@@ -199,12 +199,12 @@
   margin: 34px 0 16px;
 }
 .discovery-heading h2 {
-  font-size: 17px;
+  font-size: calc(17px + var(--text-increase, 1px));
   margin: 6px 0 0;
 }
 .discovery-heading > span {
   color: #606873;
-  font: 8px 'DM Mono';
+  font: calc(8px + var(--text-increase, 1px)) 'DM Mono';
 }
 .discovery-results {
   display: grid;
@@ -257,7 +257,7 @@
   border-radius: 3px;
   color: #ffc25b;
   background: #18140edb;
-  font: 6px 'DM Mono';
+  font: calc(6px + var(--text-increase, 1px)) 'DM Mono';
   letter-spacing: 0.7px;
 }
 .discovery-poster > i {
@@ -265,7 +265,7 @@
   right: 8px;
   top: 8px;
   color: #ffffff80;
-  font: 8px 'DM Mono';
+  font: calc(8px + var(--text-increase, 1px)) 'DM Mono';
   font-style: normal;
   text-shadow: 0 1px 4px #000;
 }
@@ -281,7 +281,7 @@
 .discovery-card-copy h3 {
   overflow: hidden;
   margin: 0;
-  font-size: 10px;
+  font-size: calc(10px + var(--text-increase, 1px));
   white-space: nowrap;
   text-overflow: ellipsis;
 }
@@ -289,7 +289,7 @@
   display: block;
   margin-top: 3px;
   color: #6e7580;
-  font-size: 7px;
+  font-size: calc(7px + var(--text-increase, 1px));
 }
 .discovery-card-copy > b {
   position: absolute;
@@ -298,7 +298,7 @@
   min-height: 27px;
   margin: 9px 0;
   color: #8a919b;
-  font-size: 7px;
+  font-size: calc(7px + var(--text-increase, 1px));
   line-height: 1.5;
 }
 .discovery-card-copy > div:last-child {
@@ -311,7 +311,7 @@
   border-radius: 3px;
   color: #8d949e;
   background: #1d2128;
-  font-size: 6px;
+  font-size: calc(6px + var(--text-increase, 1px));
   font-style: normal;
   white-space: nowrap;
 }
@@ -349,11 +349,11 @@
 }
 .discovery-empty h3 {
   margin: 13px 0 5px;
-  font-size: 13px;
+  font-size: calc(13px + var(--text-increase, 1px));
 }
 .discovery-empty p {
   color: #707884;
-  font-size: 9px;
+  font-size: calc(9px + var(--text-increase, 1px));
 }
 .discovery-method {
   display: flex;
@@ -374,7 +374,7 @@
 .discovery-method p {
   margin: 0;
   color: #747c87;
-  font-size: 8px;
+  font-size: calc(8px + var(--text-increase, 1px));
 }
 .discovery-method b {
   display: block;
@@ -406,13 +406,13 @@
   padding: 40px 34px;
 }
 .detail-copy h2 {
-  font-size: 29px;
+  font-size: calc(29px + var(--text-increase, 1px));
   letter-spacing: -1px;
   margin: 9px 0 8px;
 }
 .detail-meta {
   color: #d1a14c;
-  font: 9px 'DM Mono';
+  font: calc(9px + var(--text-increase, 1px)) 'DM Mono';
 }
 .detail-genres {
   display: flex;
@@ -424,13 +424,13 @@
   border-radius: 4px;
   color: #959ca6;
   background: #20242b;
-  font-size: 7px;
+  font-size: calc(7px + var(--text-increase, 1px));
 }
 .detail-copy > p {
   max-height: 155px;
   overflow: auto;
   color: #858d98;
-  font-size: 10px;
+  font-size: calc(10px + var(--text-increase, 1px));
   line-height: 1.8;
 }
 .why-match {
@@ -441,7 +441,7 @@
   border-left: 2px solid #d39b3f;
   background: #191713;
   color: #aeb4bc;
-  font-size: 8px;
+  font-size: calc(8px + var(--text-increase, 1px));
 }
 .why-match .icon {
   width: 14px;
@@ -471,7 +471,7 @@
     min-height: 220px;
   }
   .radar-hero h1 {
-    font-size: 34px;
+    font-size: calc(34px + var(--text-increase, 1px));
   }
   .radar-scope {
     display: none;
@@ -492,7 +492,7 @@
     padding: 30px 20px;
   }
   .detail-copy h2 {
-    font-size: 22px;
+    font-size: calc(22px + var(--text-increase, 1px));
   }
 }
 @media (max-width: 420px) {
