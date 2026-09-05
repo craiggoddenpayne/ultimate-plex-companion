@@ -9,16 +9,19 @@
     "server": "node server.js",
     "start": "node server.js",
     "build": "vite build",
-    "test": "node --test",
+    "test": "tsx --test test/core/*.test.ts test/features/**/*.test.ts test/integration/*.test.ts",
     "preview": "vite preview --host 0.0.0.0",
-    "check": "node scripts/check-syntax.js",
+    "check": "tsc --noEmit",
     "ci": "npm run check && npm test && npm run build"
   },
   "devDependencies": {
-    "vite": "^7.1.4"
+    "@types/node": "^24.3.0",
+    "tsx": "^4.20.5",
+    "typescript": "^5.9.2",
+    "vite": "^8.2.2"
   },
   "engines": {
-    "node": ">=22"
+    "node": ">=22.18"
   },
   "keywords": [
     "plex",

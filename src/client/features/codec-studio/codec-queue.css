@@ -1,0 +1,25 @@
+.studio-queue [hidden]{display:none!important}
+.studio-queue>header{gap:10px}
+.studio-queue-tools{display:flex;align-items:center;gap:5px}
+.studio-queue-tools button,.studio-queue-tools select,.studio-queue-summary button,.studio-job-actions button{min-height:28px;padding:0 8px;border:1px solid #4a3b60;border-radius:5px;background:#181421;color:#bda7dc;font:6px 'DM Mono';cursor:pointer}
+.studio-queue-tools button{white-space:nowrap}
+.studio-queue-tools button.is-paused{border-color:#db9d4e;background:#2a2015;color:#f0bd76;box-shadow:0 0 14px #db9d4e24}
+.studio-queue-tools select{max-width:105px;background:#11171d;color:#81909a}
+.studio-queue-summary{display:grid;grid-template-columns:repeat(3,1fr) auto;gap:5px;align-items:center;padding:8px;border-bottom:1px solid #29343b;background:linear-gradient(90deg,#171123,#0f151a)}
+.studio-queue-summary span{padding:7px;border:1px solid #312b3d;border-radius:5px;background:#10151b;text-align:center}
+.studio-queue-summary b,.studio-queue-summary small{display:block}
+.studio-queue-summary b{color:#d6c4ef;font-size:9px}
+.studio-queue-summary small{margin-top:2px;color:#65727c;font:5px 'DM Mono'}
+.studio-queue-summary button{border-color:#343d44;background:#12181d;color:#788690}
+.studio-job{transition:background .2s,border-color .2s}
+.studio-job.encoding{background:linear-gradient(90deg,#21172f88,transparent)}
+.studio-job.ready{background:linear-gradient(90deg,#12271d88,transparent)}
+.studio-job.failed{background:linear-gradient(90deg,#2a151988,transparent)}
+.studio-job.cancelled{opacity:.62}
+.studio-job:has(button:disabled):not(.cancelled) { border-left: 1px solid #a84d59; background: linear-gradient(90deg,#35191f88,transparent); }
+.studio-job-actions{display:flex;gap:5px;margin-top:9px}
+.studio-job-actions button:first-child{margin-left:auto}
+.studio-job-actions button[data-studio-action="cancel"]{border-color:#59353b;color:#d78d97}
+.studio-job-actions button:hover,.studio-queue-tools button:hover,.studio-queue-summary button:hover{border-color:#a77aff;color:#eadcff;box-shadow:0 0 12px #a77aff20}
+.studio-job-actions button:disabled,.studio-queue-tools button:disabled{opacity:.45;cursor:wait}
+@media(max-width:650px){.studio-queue>header{align-items:flex-start;flex-direction:column}.studio-queue-tools{width:100%}.studio-queue-tools select{flex:1;max-width:none}.studio-queue-summary{grid-template-columns:repeat(3,1fr)}.studio-queue-summary button{grid-column:1/-1}}

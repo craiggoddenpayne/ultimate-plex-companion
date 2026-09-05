@@ -30,9 +30,9 @@ npm run build
 
 ## Adding a feature
 
-1. Register the surface in `feature-registry.js` when it needs navigation.
-2. Keep Plex/data logic in a focused `*-server.js` module with dependency injection.
-3. Keep browser behavior in a focused module and styles in a matching stylesheet.
+1. Register the surface in `src/shared/feature-registry.js` when it needs navigation.
+2. Keep Plex/data logic in a focused `src/server/features/<name>` module with dependency injection.
+3. Keep browser behavior and styles together in `src/client/features/<name>`.
 4. Expose the minimum JSON needed by the browser; never return the Plex token or raw private paths without a clear user-facing need.
 5. Add deterministic tests for filtering, validation and destructive-action guards.
 6. Document new environment variables and operational risks.
