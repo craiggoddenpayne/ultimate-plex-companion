@@ -9,6 +9,7 @@ import { normalizePlexConfig } from './core/validation.ts';
 import { readJsonFile, writeJsonAtomic } from './core/atomic-json-store.ts';
 import { applySecurityHeaders, errorResponse, readJsonBody, sendJson } from './core/http.ts';
 import { resolveWithin } from './core/safe-path.ts';
+import { contentTypeFor } from './core/static-files.ts';
 import { createAutomationRoutes } from './features/automations/routes.ts';
 import { createCodecRoutes } from './features/codec-studio/routes.ts';
 import { createCommandDeckRoutes } from './features/command-deck/routes.ts';
@@ -41,16 +42,6 @@ const envConfig =
   process.env.PLEX_URL && process.env.PLEX_TOKEN
     ? { plexUrl: process.env.PLEX_URL, token: process.env.PLEX_TOKEN }
     : null;
-
-const mime = {
-  '.html': 'text/html; charset=utf-8',
-  '.ts': 'text/javascript; charset=utf-8',
-  '.css': 'text/css; charset=utf-8',
-  '.svg': 'image/svg+xml',
-  '.png': 'image/png',
-  '.webp': 'image/webp',
-  '.woff2': 'font/woff2',
-};
 
 const json = sendJson;
 const body = readJsonBody;
@@ -799,7 +790,7 @@ async function serve(res, pathname) {
     if ((await stat(file)).isDirectory()) file = join(file, 'index.html');
     const contents = await readFile(file);
     res.writeHead(200, {
-      'Content-Type': mime[extname(file)] || 'application/octet-stream',
+      'Content-Type': contentTypeFor(file),
       'Cache-Control': file.endsWith('.html') ? 'no-cache' : 'public, max-age=604800',
     });
     res.end(contents);
