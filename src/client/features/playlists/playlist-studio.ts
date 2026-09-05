@@ -1,4 +1,5 @@
 import { renderPlaylistComposer } from './playlist-composer.ts';
+import { apiFetch } from '../../core/api-client.ts';
 
 const playlistState = { data: null, selected: null, filter: 'All' };
 const playlistEscape = (value) =>
@@ -196,7 +197,7 @@ async function createPlaylist(wrap, generator, close) {
   button.disabled = true;
   button.textContent = 'Creating…';
   try {
-    const response = await fetch('/api/playlists/generate', {
+    const response = await apiFetch('/api/playlists/generate', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ generatorId: generator.id, title, limit, confirmed: true }),
@@ -218,7 +219,7 @@ async function loadStudio(force = false) {
   if (!grid) return;
   grid.innerHTML = '<div class="playlist-loading"><i></i><span>Evaluating playlist criteria…</span></div>';
   try {
-    const response = await fetch(`/api/playlists/studio${force ? '?refresh=1' : ''}`);
+    const response = await apiFetch(`/api/playlists/studio${force ? '?refresh=1' : ''}`);
     const data = await response.json();
     if (!response.ok) throw new Error(data.error || 'Playlist Studio unavailable');
     playlistState.data = data;

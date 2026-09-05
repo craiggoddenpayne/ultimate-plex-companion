@@ -1,3 +1,5 @@
+import { apiFetch } from '../../core/api-client.ts';
+
 const metaEscape = (value) =>
   String(value ?? '').replace(
     /[&<>'"]/g,
@@ -75,7 +77,7 @@ async function openMetadataHelper(ratingKey) {
   wrap.querySelector('.metadata-helper-close').onclick = close;
   wrap.querySelector('.metadata-helper-backdrop').onclick = close;
   try {
-    const response = await fetch('/api/library/metadata/' + encodeURIComponent(ratingKey)),
+    const response = await apiFetch('/api/library/metadata/' + encodeURIComponent(ratingKey)),
       item = await response.json();
     if (!response.ok) throw new Error(item.error || 'Metadata unavailable');
     wrap.querySelector('#metadata-helper-body').innerHTML = form(item);
@@ -90,7 +92,7 @@ async function openMetadataHelper(ratingKey) {
       button.textContent = 'Saving to Plex…';
       result.textContent = '';
       try {
-        const savedResponse = await fetch('/api/library/metadata/' + encodeURIComponent(ratingKey), {
+        const savedResponse = await apiFetch('/api/library/metadata/' + encodeURIComponent(ratingKey), {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(payload),

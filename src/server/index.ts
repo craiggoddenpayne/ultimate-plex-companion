@@ -1,11 +1,14 @@
 import { createServer } from 'node:http';
-import { readFile, writeFile, mkdir, stat, access, rename, unlink } from 'node:fs/promises';
-import { extname, join, normalize, dirname, basename, relative, resolve, isAbsolute } from 'node:path';
+import { readFile, stat, access, rename, unlink } from 'node:fs/promises';
+import { extname, join, dirname, basename, relative, resolve, isAbsolute } from 'node:path';
 import { spawn } from 'node:child_process';
 import { randomUUID } from 'node:crypto';
 import { composeFeatureRouters } from './core/router.ts';
 import { createPlexClient } from './core/plex-client.ts';
 import { normalizePlexConfig } from './core/validation.ts';
+import { readJsonFile, writeJsonAtomic } from './core/atomic-json-store.ts';
+import { applySecurityHeaders, errorResponse, readJsonBody, sendJson } from './core/http.ts';
+import { resolveWithin } from './core/safe-path.ts';
 import { createAutomationRoutes } from './features/automations/routes.ts';
 import { createCodecRoutes } from './features/codec-studio/routes.ts';
 import { createCommandDeckRoutes } from './features/command-deck/routes.ts';
@@ -49,23 +52,8 @@ const mime = {
   '.woff2': 'font/woff2',
 };
 
-function json(res, status, body) {
-  res.writeHead(status, {
-    'Content-Type': 'application/json; charset=utf-8',
-    'Cache-Control': 'no-store',
-    'X-Content-Type-Options': 'nosniff',
-  });
-  res.end(JSON.stringify(body));
-}
-
-async function body(req) {
-  let raw = '';
-  for await (const chunk of req) {
-    raw += chunk;
-    if (raw.length > 16_384) throw new Error('Request is too large.');
-  }
-  return JSON.parse(raw || '{}');
-}
+const json = sendJson;
+const body = readJsonBody;
 
 const normalizeConfig = normalizePlexConfig;
 
@@ -85,12 +73,12 @@ async function savedConfig() {
   if (envConfig) {
     let stored = {};
     try {
-      stored = JSON.parse(await readFile(configFile, 'utf8'));
+      stored = await readJsonFile(configFile);
     } catch {}
     return { ...normalizeConfig(envConfig), optimization: optimizationSettings(stored) };
   }
   try {
-    const raw = JSON.parse(await readFile(configFile, 'utf8'));
+    const raw = await readJsonFile(configFile);
     return { ...normalizeConfig(raw), optimization: optimizationSettings(raw) };
   } catch (error) {
     if (error.code === 'ENOENT') return null;
@@ -781,27 +769,32 @@ function requestContext(req, res, pathname) {
       discoveryCache = null;
     },
     async saveConfig(config) {
-      await mkdir(configDir, { recursive: true });
-      await writeFile(configFile, `${JSON.stringify(config, null, 2)}\n`, { mode: 0o600 });
+      await writeJsonAtomic(configFile, config);
     },
   };
 }
 
 async function api(req, res, pathname) {
   try {
-    if (pathname === '/api/health') return json(res, 200, { ok: true });
+    if (pathname === '/api/health')
+      return json(res, 200, {
+        ok: true,
+        status: shuttingDown ? 'stopping' : 'ready',
+        uptimeSeconds: Math.floor(process.uptime()),
+        timestamp: new Date().toISOString(),
+      });
     if (await featureRouter(requestContext(req, res, pathname))) return;
     return json(res, 404, { error: 'Not found.' });
   } catch (error) {
-    const message = error.cause?.code === 'ECONNREFUSED' ? 'Could not reach Plex at that address.' : error.message;
-    return json(res, 400, { error: message || 'The request failed.' });
+    const response = errorResponse(error);
+    return json(res, response.status, response.body);
   }
 }
 
 async function serve(res, pathname) {
-  let requested = pathname === '/' ? 'index.html' : pathname.slice(1);
-  let file = normalize(join(staticRoot, requested));
-  if (!file.startsWith(staticRoot)) return json(res, 403, { error: 'Forbidden.' });
+  const requested = pathname === '/' ? 'index.html' : pathname.slice(1);
+  let file = resolveWithin(staticRoot, requested);
+  if (!file) return json(res, 403, { error: 'Forbidden.', code: 'PATH_OUTSIDE_STATIC_ROOT' });
   try {
     if ((await stat(file)).isDirectory()) file = join(file, 'index.html');
     const contents = await readFile(file);
@@ -822,13 +815,40 @@ async function serve(res, pathname) {
 
 await restoreOptimizationJobs();
 
-createServer(async (req, res) => {
-  const url = new URL(req.url, `http://${req.headers.host || 'localhost'}`);
-  const artMatch = url.pathname.match(/^\/api\/art\/(\d+)$/);
-  if (artMatch) return servePlexArt(res, artMatch[1]);
-  if (url.pathname.startsWith('/api/')) return api(req, res, url.pathname);
-  return serve(res, decodeURIComponent(url.pathname));
-}).listen(port, '0.0.0.0', () => {
+const server = createServer(async (req, res) => {
+  applySecurityHeaders(res);
+  res.setHeader('X-Request-ID', randomUUID());
+  try {
+    const url = new URL(req.url || '/', `http://${req.headers.host || 'localhost'}`);
+    const artMatch = url.pathname.match(/^\/api\/art\/(\d+)$/);
+    if (artMatch) return servePlexArt(res, artMatch[1]);
+    if (url.pathname.startsWith('/api/')) return api(req, res, url.pathname);
+    return serve(res, decodeURIComponent(url.pathname));
+  } catch (error) {
+    const response = errorResponse(error);
+    return json(res, response.status, response.body);
+  }
+});
+
+server.listen(port, '0.0.0.0', () => {
   console.log('Ultimate Plex Companion listening on http://0.0.0.0:' + port);
   runNextJob();
 });
+
+let shuttingDown = false;
+function shutdown(signal) {
+  if (shuttingDown) return;
+  shuttingDown = true;
+  console.log(`Received ${signal}; finishing in-flight requests.`);
+  if (activeOptimizationProcess?.exitCode === null) activeOptimizationProcess.kill('SIGTERM');
+  server.close(() => {
+    persistOptimizationJobs()
+      .catch((error) => console.error(`Could not persist the optimization queue during shutdown: ${error.message}`))
+      .finally(() => process.exit(0));
+  });
+  const forceExit = setTimeout(() => process.exit(1), 10_000);
+  forceExit.unref();
+}
+
+process.once('SIGTERM', () => shutdown('SIGTERM'));
+process.once('SIGINT', () => shutdown('SIGINT'));

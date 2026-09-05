@@ -1,4 +1,5 @@
 import { renderAutomationReports } from './automation-report-ui.ts';
+import { apiFetch } from '../../core/api-client.ts';
 const autoState = { data: null, loaded: false };
 const autoIcon = {
   bolt: '<svg viewBox="0 0 24 24"><path d="m13 2-9 12h8l-1 8 9-12h-8z"/></svg>',
@@ -62,7 +63,7 @@ const typeMeta = {
 };
 
 function autoRequest(path, options: any = {}) {
-  return fetch(path, { ...options, headers: { 'Content-Type': 'application/json', ...options.headers } }).then(
+  return apiFetch(path, { ...options, headers: { 'Content-Type': 'application/json', ...options.headers } }).then(
     async (response) => {
       const data = await response.json();
       if (!response.ok) throw new Error(data.error || data.run?.error || 'Automation request failed.');

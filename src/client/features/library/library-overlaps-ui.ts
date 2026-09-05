@@ -1,3 +1,5 @@
+import { apiFetch } from '../../core/api-client.ts';
+
 const esc = (value) =>
   String(value ?? '').replace(
     /[&<>'"]/g,
@@ -101,7 +103,7 @@ function openModal(group, onDeleted) {
     confirm.disabled = true;
     confirm.textContent = 'Deleting through Plex…';
     try {
-      const response = await fetch('/api/library/overlaps/delete', {
+      const response = await apiFetch('/api/library/overlaps/delete', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ ratingKey: selected.ratingKey, mediaId: selected.mediaId, confirmed: true }),

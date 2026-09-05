@@ -1,3 +1,5 @@
+import { apiFetch } from '../../core/api-client.ts';
+
 const studioState = {
   analysis: null,
   config: null,
@@ -149,7 +151,7 @@ async function stage(button) {
   button.disabled = true;
   button.textContent = 'Staging…';
   try {
-    const response = await fetch('/api/optimization/jobs', {
+    const response = await apiFetch('/api/optimization/jobs', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ ratingKey: button.dataset.studioConvert, targetCodec: target.key }),
@@ -270,7 +272,7 @@ function renderJobs() {
 }
 
 async function requestQueue(url, options) {
-  const response = await fetch(url, options),
+  const response = await apiFetch(url, options),
     data = await response.json();
   if (!response.ok) throw new Error(data.error || 'Queue operation failed');
   return data;
@@ -361,7 +363,7 @@ async function replaceJob(job) {
 }
 async function loadJobs() {
   try {
-    const response = await fetch('/api/optimization/jobs'),
+    const response = await apiFetch('/api/optimization/jobs'),
       data = await response.json();
     if (!response.ok) throw new Error(data.error);
     studioState.jobs = data.jobs || [];
@@ -378,8 +380,8 @@ async function loadAnalysis(force = false) {
   if (list) list.innerHTML = '<div class="studio-loading"><i></i><span>Mapping legacy codecs…</span></div>';
   try {
     const [analysisResponse, configResponse] = await Promise.all([
-        fetch('/api/analysis/storage' + (force ? '?refresh=1' : '')),
-        fetch('/api/optimization/config'),
+        apiFetch('/api/analysis/storage' + (force ? '?refresh=1' : '')),
+        apiFetch('/api/optimization/config'),
       ]),
       analysis = await analysisResponse.json(),
       config = await configResponse.json();

@@ -4,6 +4,7 @@ import { createServer } from 'node:http';
 import { spawn } from 'node:child_process';
 import { execFile } from 'node:child_process';
 import { promisify } from 'node:util';
+import { once } from 'node:events';
 import { mkdtemp, rm, access } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
@@ -112,7 +113,11 @@ test('saves Plex credentials securely and returns a live overview', async (t) =>
     stdio: 'ignore',
   });
   t.after(async () => {
-    app.kill();
+    if (app.exitCode === null) {
+      const exited = once(app, 'exit');
+      app.kill('SIGTERM');
+      await exited;
+    }
     await close(mock);
     await rm(configDir, { recursive: true, force: true });
   });
@@ -130,6 +135,27 @@ test('saves Plex credentials securely and returns a live overview', async (t) =>
   const publicConfig = await (await fetch(`http://127.0.0.1:${appPort}/api/config`)).json();
   assert.equal(publicConfig.configured, true);
   assert.equal('token' in publicConfig, false);
+
+  const health = await fetch(`http://127.0.0.1:${appPort}/api/health`);
+  assert.equal(health.status, 200);
+  assert.equal((await health.json()).status, 'ready');
+  assert.match(health.headers.get('content-security-policy'), /default-src 'self'/);
+  assert.match(health.headers.get('x-request-id'), /^[a-f0-9-]+$/);
+
+  const invalidJson = await fetch(`http://127.0.0.1:${appPort}/api/config/test`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: '{',
+  });
+  assert.equal(invalidJson.status, 400);
+  assert.equal((await invalidJson.json()).code, 'INVALID_JSON_BODY');
+
+  const unsupportedBody = await fetch(`http://127.0.0.1:${appPort}/api/config/test`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'text/plain' },
+    body: '{}',
+  });
+  assert.equal(unsupportedBody.status, 415);
 
   const overview = await (await fetch(`http://127.0.0.1:${appPort}/api/overview`)).json();
   assert.equal(overview.titleCount, 1);

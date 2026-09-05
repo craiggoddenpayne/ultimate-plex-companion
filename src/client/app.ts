@@ -1,6 +1,7 @@
 import { initStarfield } from './core/starfield-engine.ts';
 import { featureSets, navigation as nav, pageCopy } from '../shared/feature-registry.ts';
 import { compactStreamList } from './features/command-deck/live-activity-view.ts';
+import { apiFetch } from './core/api-client.ts';
 const icons = {
   grid: '<path d="M4 4h6v6H4zM14 4h6v6h-6zM4 14h6v6H4zM14 14h6v6h-6z"/>',
   library:
@@ -161,7 +162,7 @@ function settingsModal(config: any = {}) {
 }
 
 async function request(path, options: any = {}) {
-  const response = await fetch(path, {
+  const response = await apiFetch(path, {
     ...options,
     headers: { 'Content-Type': 'application/json', ...options?.headers },
   });

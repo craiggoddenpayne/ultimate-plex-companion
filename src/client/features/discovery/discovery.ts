@@ -1,3 +1,5 @@
+import { apiFetch } from '../../core/api-client.ts';
+
 const state = { mood: 'any', mode: 'tonight', maxMinutes: 150, unwatchedOnly: true, results: [], loaded: false };
 const escapeText = (value) =>
   String(value == null ? '' : value).replace(
@@ -79,7 +81,7 @@ function radarMarkup() {
 }
 
 async function api(path) {
-  const response = await fetch(path);
+  const response = await apiFetch(path);
   const result = await response.json().catch(() => ({}));
   if (!response.ok) throw new Error(result.error || 'Discovery request failed.');
   return result;

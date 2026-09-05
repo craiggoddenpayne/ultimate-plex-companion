@@ -1,5 +1,6 @@
-import { mkdir, readFile, rename, writeFile } from 'node:fs/promises';
+import { readFile } from 'node:fs/promises';
 import { join } from 'node:path';
+import { writeJsonAtomic } from '../../core/atomic-json-store.ts';
 
 const resumableStates = new Set(['preparing', 'encoding', 'verifying']);
 const validStates = new Set([
@@ -60,20 +61,13 @@ export function createOptimizationStore(configDir) {
   }
 
   function save(jobs, options: any = {}) {
-    const snapshot =
-      JSON.stringify(
-        { version: 2, savedAt: new Date().toISOString(), paused: options.paused === true, jobs: [...jobs.values()] },
-        null,
-        2,
-      ) + '\n';
-    pendingWrite = pendingWrite
-      .catch(() => {})
-      .then(async () => {
-        await mkdir(configDir, { recursive: true });
-        const temporary = `${file}.tmp`;
-        await writeFile(temporary, snapshot, { mode: 0o600 });
-        await rename(temporary, file);
-      });
+    const snapshot = {
+      version: 2,
+      savedAt: new Date().toISOString(),
+      paused: options.paused === true,
+      jobs: [...jobs.values()],
+    };
+    pendingWrite = pendingWrite.catch(() => {}).then(() => writeJsonAtomic(file, snapshot));
     return pendingWrite;
   }
 

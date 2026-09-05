@@ -1,3 +1,5 @@
+import { apiFetch } from '../../core/api-client.ts';
+
 const suiteState = { data: null, query: '' };
 const suiteEscape = (value) =>
   String(value ?? '').replace(
@@ -77,7 +79,7 @@ async function load(force = false) {
   if (!grid) return;
   grid.innerHTML = '<div class="suite-loading"><i></i><span>Reading library and history signals…</span></div>';
   try {
-    const response = await fetch(`/api/utility-suite${force ? '?refresh=1' : ''}`),
+    const response = await apiFetch(`/api/utility-suite${force ? '?refresh=1' : ''}`),
       data = await response.json();
     if (!response.ok) throw new Error(data.error || 'Utility Matrix unavailable');
     suiteState.data = data;

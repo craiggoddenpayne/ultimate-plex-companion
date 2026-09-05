@@ -1,4 +1,5 @@
 import { bindOverlapActions, renderOverlapList } from './library-overlaps-ui.ts';
+import { apiFetch } from '../../core/api-client.ts';
 const atlasState = { data: null, tab: 'quality' };
 const atlasEscape = (value) =>
   String(value ?? '').replace(
@@ -186,7 +187,7 @@ async function loadAtlas(force = false) {
   stage.innerHTML =
     '<div class="atlas-loading"><i></i><h3>Mapping media signatures</h3><p>Reading quality, editions, metadata and growth from Plex.</p></div>';
   try {
-    const response = await fetch('/api/library/insights' + (force ? '?refresh=1' : ''));
+    const response = await apiFetch('/api/library/insights' + (force ? '?refresh=1' : ''));
     const data = await response.json();
     if (!response.ok) throw new Error(data.error);
     atlasState.data = data;

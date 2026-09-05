@@ -1,3 +1,5 @@
+import { apiFetch } from '../../core/api-client.ts';
+
 const cEscape = (value) =>
   String(value ?? '').replace(
     /[&<>'"]/g,
@@ -11,7 +13,7 @@ let searchTimer,
   searchIndex = -1;
 
 async function cRequest(path, options: any = {}) {
-  const response = await fetch(path, {
+  const response = await apiFetch(path, {
     ...options,
     headers: { 'Content-Type': 'application/json', ...options.headers },
   });

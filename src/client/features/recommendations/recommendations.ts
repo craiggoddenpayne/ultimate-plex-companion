@@ -1,3 +1,5 @@
+import { apiFetch } from '../../core/api-client.ts';
+
 const recState = { loaded: false, includeWatched: false, data: null };
 const recEscape = (value) =>
   String(value == null ? '' : value).replace(
@@ -113,7 +115,7 @@ async function loadRecommendations(force = false) {
   try {
     const params = new URLSearchParams({ includeWatched: String(recState.includeWatched) });
     if (force) params.set('refresh', '1');
-    const response = await fetch('/api/recommendations?' + params);
+    const response = await apiFetch('/api/recommendations?' + params);
     const data = await response.json();
     if (!response.ok) throw new Error(data.error);
     recState.loaded = true;

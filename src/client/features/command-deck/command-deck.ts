@@ -1,6 +1,7 @@
 import { bindCommandDeckDetails, renderTasteIntelligence } from './command-deck-intelligence-ui.ts';
 import { activityVisual } from './activity-view.ts';
 import { compactStreamList } from './live-activity-view.ts';
+import { apiFetch } from '../../core/api-client.ts';
 const deckEscape = (value) =>
   String(value == null ? '' : value).replace(
     /[&<>'"]/g,
@@ -118,7 +119,7 @@ async function loadCommandDeck() {
   const sync = document.querySelector('#sync-state');
   if (sync) sync.classList.add('refreshing');
   try {
-    const response = await fetch('/api/command-deck');
+    const response = await apiFetch('/api/command-deck');
     const data = await response.json().catch(() => ({}));
     if (!response.ok) throw new Error(data.error || 'Command Deck unavailable');
     updateDeck(data);

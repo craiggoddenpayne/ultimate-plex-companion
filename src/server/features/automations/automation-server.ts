@@ -1,6 +1,7 @@
-import { readFile, writeFile, mkdir } from 'node:fs/promises';
+import { readFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import { randomUUID } from 'node:crypto';
+import { writeJsonAtomic } from '../../core/atomic-json-store.ts';
 import {
   arrivalReport,
   healthReport,
@@ -139,10 +140,7 @@ export function createAutomationEngine({ configDir, savedConfig, plexFetch, plex
   }
 
   function save() {
-    saving = saving.then(async () => {
-      await mkdir(configDir, { recursive: true });
-      await writeFile(file, `${JSON.stringify(state, null, 2)}\n`, { mode: 0o600 });
-    });
+    saving = saving.catch(() => {}).then(() => writeJsonAtomic(file, state));
     return saving;
   }
 

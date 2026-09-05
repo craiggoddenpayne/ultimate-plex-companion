@@ -1,3 +1,5 @@
+import { apiFetch } from '../../core/api-client.ts';
+
 const escape = (value) =>
   String(value == null ? '' : value).replace(
     /[&<>'"]/g,
@@ -55,7 +57,7 @@ export function renderPlaylistComposer(facets: any = {}, onCreated = () => {}) {
     button.disabled = true;
     button.textContent = 'Reading Plex…';
     try {
-      const response = await fetch('/api/playlists/preview', {
+      const response = await apiFetch('/api/playlists/preview', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(criteria(form)),
@@ -86,7 +88,7 @@ export function renderPlaylistComposer(facets: any = {}, onCreated = () => {}) {
     create.disabled = true;
     create.textContent = 'Creating…';
     try {
-      const response = await fetch('/api/playlists/generate', {
+      const response = await apiFetch('/api/playlists/generate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ generatorId: 'custom', criteria: preview.criteria, title, limit, confirmed: true }),

@@ -1,3 +1,5 @@
+import { apiFetch } from '../../core/api-client.ts';
+
 const profileEscape = (value) =>
   String(value == null ? '' : value).replace(
     /[&<>'"]/g,
@@ -17,10 +19,10 @@ let profileData;
 async function getProfileData() {
   if (profileData) return profileData;
   const [peopleResult, configResult, encoderResult, deckResult] = await Promise.allSettled([
-    fetch('/api/people?days=365').then((r) => r.json()),
-    fetch('/api/config').then((r) => r.json()),
-    fetch('/api/optimization/config').then((r) => r.json()),
-    fetch('/api/overview').then((r) => r.json()),
+    apiFetch('/api/people?days=365').then((r) => r.json()),
+    apiFetch('/api/config').then((r) => r.json()),
+    apiFetch('/api/optimization/config').then((r) => r.json()),
+    apiFetch('/api/overview').then((r) => r.json()),
   ]);
   const people = peopleResult.value || {};
   const config = configResult.value || {};

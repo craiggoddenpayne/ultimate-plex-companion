@@ -34,7 +34,17 @@ client/main.ts → feature UI → /api → feature router → domain service →
 - Route adapters translate HTTP to domain calls and receive runtime dependencies explicitly.
 - Domain modules remain independent of the HTTP server and are tested with fake Plex responses.
 - `src/server/core/plex-client.ts` is the only Plex HTTP transport boundary.
-- Persistent jobs and automations use atomic JSON writes in `/data`.
+- `src/client/core/api-client.ts` is the browser's same-origin API boundary, with consistent timeouts and headers.
+- Persistent configuration, jobs and automations use private, atomic JSON writes in `/data`.
+
+## Cross-cutting policies
+
+- Every response receives a restrictive Content Security Policy and anti-framing, MIME-sniffing and referrer headers.
+- API request bodies must be JSON objects and are capped at 16 KB before route handlers receive them.
+- HTTP errors retain meaningful status codes and stable machine-readable codes.
+- Static assets are resolved with path-segment containment checks rather than string-prefix checks.
+- SIGTERM and SIGINT stop accepting requests, terminate an active encoder safely and persist the queue before exit.
+- New compiler safety checks are enabled incrementally; full strict mode remains a tracked migration because legacy UI modules still require explicit DOM and Plex response models.
 
 ## Trust boundaries
 

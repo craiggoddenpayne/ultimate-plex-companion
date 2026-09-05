@@ -1,4 +1,5 @@
 import { renderFutureLabExperiment } from './future-lab-experiments.ts';
+import { apiFetch } from '../../core/api-client.ts';
 
 const labState = { data: null, tab: 'constellation' };
 const labEscape = (value) =>
@@ -278,7 +279,7 @@ async function loadLab(force = false) {
   if (!stage) return;
   stage.classList.add('loading');
   try {
-    const response = await fetch('/api/lab' + (force ? '?refresh=1' : ''));
+    const response = await apiFetch('/api/lab' + (force ? '?refresh=1' : ''));
     const data = await response.json();
     if (!response.ok) throw new Error(data.error);
     labState.data = data;

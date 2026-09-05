@@ -1,4 +1,5 @@
 import { sessionMarkup } from './stream-session-view.ts';
+import { apiFetch } from '../../core/api-client.ts';
 
 const telemetryEscape = (value) =>
   String(value == null ? '' : value).replace(
@@ -97,7 +98,7 @@ function renderStreams(data) {
 
 async function loadStreams() {
   try {
-    const response = await fetch('/api/streams');
+    const response = await apiFetch('/api/streams');
     const data = await response.json();
     if (!response.ok) throw new Error(data.error);
     renderStreams(data);
@@ -175,7 +176,7 @@ function renderPeople(data) {
 
 async function loadPeople() {
   try {
-    const response = await fetch('/api/people?days=' + peopleDays);
+    const response = await apiFetch('/api/people?days=' + peopleDays);
     const data = await response.json();
     if (!response.ok) throw new Error(data.error);
     renderPeople(data);

@@ -1,3 +1,5 @@
+import { apiFetch } from '../../core/api-client.ts';
+
 const centerState = { data: null, query: '', filter: 'all', category: 'all', resolved: new Set() };
 const centerEscape = (value) =>
   String(value ?? '').replace(
@@ -104,7 +106,7 @@ async function loadCenter(force = false) {
   if (!list) return;
   list.innerHTML = '<div class="center-loading"><i></i><span>Inspecting Plex metadata…</span></div>';
   try {
-    const response = await fetch('/api/metadata-center' + (force ? '?refresh=1' : '')),
+    const response = await apiFetch('/api/metadata-center' + (force ? '?refresh=1' : '')),
       data = await response.json();
     if (!response.ok) throw new Error(data.error || 'Metadata scan unavailable');
     centerState.data = data;
