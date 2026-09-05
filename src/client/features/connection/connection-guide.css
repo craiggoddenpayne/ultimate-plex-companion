@@ -1,23 +1,175 @@
-.connection-presets,.token-tools{display:flex;align-items:center;flex-wrap:wrap;gap:6px;margin-top:-9px;padding:9px 10px;border:1px solid #252c35;border-radius:7px;background:#0d1116}
-.connection-presets>span{width:100%;color:#687580;font:7px 'DM Mono';letter-spacing:1px}
-.connection-presets button,.token-tools button,.connection-guide-actions button,.connection-guide-actions a{padding:7px 9px;border:1px solid #353e48;border-radius:5px;background:#151b21;color:#a5b1ba;font-size:8px;text-decoration:none;cursor:pointer}
-.connection-presets button:hover,.token-tools button:hover,.connection-guide-actions button:hover,.connection-guide-actions a:hover{border-color:var(--theme-primary,var(--amber));color:var(--theme-primary,var(--amber))}
-.connection-presets small,.token-tools span{margin-left:auto;color:#606c77;font-size:7px;line-height:1.4}
-.token-tools button:disabled{opacity:.4;cursor:not-allowed}
-.settings-modal{max-height:calc(100dvh - 30px);overflow:auto}.connection-guide{margin-top:21px;padding-top:17px;border-top:1px solid #272e36}
-.connection-guide header>span{color:var(--theme-primary,var(--amber));font:7px 'DM Mono';letter-spacing:1px}
-.connection-guide h3{margin:5px 0 3px;font-size:14px}
-.connection-guide header p{margin:0;color:#77838e;font-size:8px;line-height:1.5}
-.connection-guide ol{display:grid;grid-template-columns:1fr 1fr;gap:7px;counter-reset:connection;margin:13px 0;padding:0;list-style:none}
-.connection-guide li{position:relative;min-height:70px;padding:11px 10px 9px 36px;border:1px solid #29313a;border-radius:7px;background:#0c1116;counter-increment:connection}
-.connection-guide li:before{content:counter(connection);position:absolute;left:10px;top:11px;width:18px;height:18px;display:grid;place-items:center;border:1px solid #564324;border-radius:50%;color:#e6ae50;font:7px 'DM Mono'}
-.connection-guide li b,.connection-guide li small{display:block}
-.connection-guide li b{color:#bdc5cb;font-size:8px}
-.connection-guide li small{margin-top:4px;color:#66737e;font-size:7px;line-height:1.45}
-.connection-guide-actions{display:flex;gap:7px}
-.connection-guide-actions button{border-color:color-mix(in srgb,var(--theme-primary,var(--amber)) 55%,#353e48);background:color-mix(in srgb,var(--theme-primary,var(--amber)) 10%,#151b21);color:var(--theme-primary,var(--amber))}
-.connection-guide aside{margin-top:10px;padding:9px 11px;border-left:2px solid #a17a3d;background:#18150f;color:#8f8676;font-size:7px;line-height:1.5}
-.connection-diagnosis{margin-top:10px;padding:10px 11px;border:1px solid #57402b;border-radius:6px;background:#21170e}
-.connection-diagnosis b{color:#efb65c;font:7px 'DM Mono';letter-spacing:1px}
-.connection-diagnosis p{margin:4px 0 0;color:#b4a58e;font-size:8px;line-height:1.5}
-@media(max-width:600px){.connection-guide ol{grid-template-columns:1fr}.connection-guide-actions{flex-direction:column}.connection-guide-actions button,.connection-guide-actions a{min-height:42px;display:flex;align-items:center;justify-content:center}.connection-presets small,.token-tools span{width:100%;margin-left:0}}
+.connection-presets,
+.token-tools {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: -9px;
+  padding: 9px 10px;
+  border: 1px solid #252c35;
+  border-radius: 7px;
+  background: #0d1116;
+}
+.connection-presets > span {
+  width: 100%;
+  color: #687580;
+  font: 7px 'DM Mono';
+  letter-spacing: 1px;
+}
+.connection-presets button,
+.token-tools button,
+.connection-guide-actions button,
+.connection-guide-actions a {
+  padding: 7px 9px;
+  border: 1px solid #353e48;
+  border-radius: 5px;
+  background: #151b21;
+  color: #a5b1ba;
+  font-size: 8px;
+  text-decoration: none;
+  cursor: pointer;
+}
+.connection-presets button:hover,
+.token-tools button:hover,
+.connection-guide-actions button:hover,
+.connection-guide-actions a:hover {
+  border-color: var(--theme-primary, var(--amber));
+  color: var(--theme-primary, var(--amber));
+}
+.connection-presets small,
+.token-tools span {
+  margin-left: auto;
+  color: #606c77;
+  font-size: 7px;
+  line-height: 1.4;
+}
+.token-tools button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+.settings-modal {
+  max-height: calc(100dvh - 30px);
+  overflow: auto;
+}
+.connection-guide {
+  margin-top: 21px;
+  padding-top: 17px;
+  border-top: 1px solid #272e36;
+}
+.connection-guide header > span {
+  color: var(--theme-primary, var(--amber));
+  font: 7px 'DM Mono';
+  letter-spacing: 1px;
+}
+.connection-guide h3 {
+  margin: 5px 0 3px;
+  font-size: 14px;
+}
+.connection-guide header p {
+  margin: 0;
+  color: #77838e;
+  font-size: 8px;
+  line-height: 1.5;
+}
+.connection-guide ol {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 7px;
+  counter-reset: connection;
+  margin: 13px 0;
+  padding: 0;
+  list-style: none;
+}
+.connection-guide li {
+  position: relative;
+  min-height: 70px;
+  padding: 11px 10px 9px 36px;
+  border: 1px solid #29313a;
+  border-radius: 7px;
+  background: #0c1116;
+  counter-increment: connection;
+}
+.connection-guide li:before {
+  content: counter(connection);
+  position: absolute;
+  left: 10px;
+  top: 11px;
+  width: 18px;
+  height: 18px;
+  display: grid;
+  place-items: center;
+  border: 1px solid #564324;
+  border-radius: 50%;
+  color: #e6ae50;
+  font: 7px 'DM Mono';
+}
+.connection-guide li b,
+.connection-guide li small {
+  display: block;
+}
+.connection-guide li b {
+  color: #bdc5cb;
+  font-size: 8px;
+}
+.connection-guide li small {
+  margin-top: 4px;
+  color: #66737e;
+  font-size: 7px;
+  line-height: 1.45;
+}
+.connection-guide-actions {
+  display: flex;
+  gap: 7px;
+}
+.connection-guide-actions button {
+  border-color: color-mix(in srgb, var(--theme-primary, var(--amber)) 55%, #353e48);
+  background: color-mix(in srgb, var(--theme-primary, var(--amber)) 10%, #151b21);
+  color: var(--theme-primary, var(--amber));
+}
+.connection-guide aside {
+  margin-top: 10px;
+  padding: 9px 11px;
+  border-left: 2px solid #a17a3d;
+  background: #18150f;
+  color: #8f8676;
+  font-size: 7px;
+  line-height: 1.5;
+}
+.connection-diagnosis {
+  margin-top: 10px;
+  padding: 10px 11px;
+  border: 1px solid #57402b;
+  border-radius: 6px;
+  background: #21170e;
+}
+.connection-diagnosis b {
+  color: #efb65c;
+  font: 7px 'DM Mono';
+  letter-spacing: 1px;
+}
+.connection-diagnosis p {
+  margin: 4px 0 0;
+  color: #b4a58e;
+  font-size: 8px;
+  line-height: 1.5;
+}
+@media (max-width: 600px) {
+  .connection-guide ol {
+    grid-template-columns: 1fr;
+  }
+  .connection-guide-actions {
+    flex-direction: column;
+  }
+  .connection-guide-actions button,
+  .connection-guide-actions a {
+    min-height: 42px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .connection-presets small,
+  .token-tools span {
+    width: 100%;
+    margin-left: 0;
+  }
+}

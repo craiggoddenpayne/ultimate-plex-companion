@@ -1,14 +1,24 @@
 import { renderPlaylistComposer } from './playlist-composer.ts';
 
-const playlistState = { data:null, selected:null, filter:'All' };
-const playlistEscape = value => String(value ?? '').replace(/[&<>'"]/g, character => ({
-  '&':'&amp;', '<':'&lt;', '>':'&gt;', "'":'&#39;', '"':'&quot;',
-}[character]));
-const playlistDuration = minutes => {
+const playlistState = { data: null, selected: null, filter: 'All' };
+const playlistEscape = (value) =>
+  String(value ?? '').replace(
+    /[&<>'"]/g,
+    (character) =>
+      ({
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        "'": '&#39;',
+        '"': '&quot;',
+      })[character],
+  );
+const playlistDuration = (minutes) => {
   const value = Number(minutes) || 0;
   return value >= 60 ? `${Math.floor(value / 60)}h ${value % 60}m` : `${value} min`;
 };
-const playlistIcon = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 6h10M5 11h10M5 16h6"/><path d="m16 14 4 3-4 3z"/></svg>';
+const playlistIcon =
+  '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 6h10M5 11h10M5 16h6"/><path d="m16 14 4 3-4 3z"/></svg>';
 
 function studioShell() {
   return `
@@ -68,10 +78,17 @@ function renderGeneratorGrid() {
   const data = playlistState.data;
   const grid = document.querySelector('#playlist-generators-grid');
   if (!data || !grid) return;
-  const visible = playlistState.filter === 'All' ? data.generators : data.generators.filter(item => item.category === playlistState.filter);
-  grid.innerHTML = visible.map(generatorCard).join('') || '<div class="playlist-empty">No signals are available in this category.</div>';
-  grid.querySelectorAll('[data-playlist-generate]').forEach(button => {
-    button.addEventListener('click', () => openGenerator(data.generators.find(item => item.id === button.dataset.playlistGenerate)));
+  const visible =
+    playlistState.filter === 'All'
+      ? data.generators
+      : data.generators.filter((item) => item.category === playlistState.filter);
+  grid.innerHTML =
+    visible.map(generatorCard).join('') ||
+    '<div class="playlist-empty">No signals are available in this category.</div>';
+  grid.querySelectorAll('[data-playlist-generate]').forEach((button) => {
+    button.addEventListener('click', () =>
+      openGenerator(data.generators.find((item) => item.id === button.dataset.playlistGenerate)),
+    );
   });
 }
 
@@ -79,27 +96,39 @@ function renderStudio() {
   const data = playlistState.data;
   if (!data) return;
   document.querySelector('#playlist-catalog').textContent = data.catalogSize.toLocaleString();
-  document.querySelector('#playlist-generators').textContent = data.generators.filter(item => item.available).length;
+  document.querySelector('#playlist-generators').textContent = data.generators.filter((item) => item.available).length;
   document.querySelector('#playlist-existing-count').textContent = data.existing.length;
   renderPlaylistComposer(data.composer, () => loadStudio(true));
 
-  const categories = ['All', ...new Set(data.generators.map(item => item.category).filter(Boolean))];
+  const categories = ['All', ...new Set(data.generators.map((item) => item.category).filter(Boolean))];
   if (!categories.includes(playlistState.filter)) playlistState.filter = 'All';
   const filters = document.querySelector('#playlist-signal-filters');
-  filters.innerHTML = categories.map(category => {
-    const count = category === 'All' ? data.generators.length : data.generators.filter(item => item.category === category).length;
-    return `<button type="button" data-playlist-filter="${playlistEscape(category)}" class="${playlistState.filter === category ? 'active' : ''}">${playlistEscape(category)} <b>${count}</b></button>`;
-  }).join('');
-  filters.querySelectorAll('[data-playlist-filter]').forEach(button => button.addEventListener('click', () => {
-    playlistState.filter = button.dataset.playlistFilter;
-    filters.querySelectorAll('button').forEach(item => item.classList.toggle('active', item === button));
-    renderGeneratorGrid();
-  }));
+  filters.innerHTML = categories
+    .map((category) => {
+      const count =
+        category === 'All'
+          ? data.generators.length
+          : data.generators.filter((item) => item.category === category).length;
+      return `<button type="button" data-playlist-filter="${playlistEscape(category)}" class="${playlistState.filter === category ? 'active' : ''}">${playlistEscape(category)} <b>${count}</b></button>`;
+    })
+    .join('');
+  filters.querySelectorAll('[data-playlist-filter]').forEach((button) =>
+    button.addEventListener('click', () => {
+      playlistState.filter = button.dataset.playlistFilter;
+      filters.querySelectorAll('button').forEach((item) => item.classList.toggle('active', item === button));
+      renderGeneratorGrid();
+    }),
+  );
   renderGeneratorGrid();
 
   const existing = document.querySelector('#playlist-existing');
   existing.innerHTML = data.existing.length
-    ? data.existing.map(item => `<article><span>${playlistIcon}</span><div><b>${playlistEscape(item.title)}</b><small>${item.itemCount} items${item.durationMinutes ? ` · ${playlistDuration(item.durationMinutes)}` : ''}</small></div></article>`).join('')
+    ? data.existing
+        .map(
+          (item) =>
+            `<article><span>${playlistIcon}</span><div><b>${playlistEscape(item.title)}</b><small>${item.itemCount} items${item.durationMinutes ? ` · ${playlistDuration(item.durationMinutes)}` : ''}</small></div></article>`,
+        )
+        .join('')
     : '<div class="playlist-empty">No video playlists returned by Plex yet. Create your first one above.</div>';
 }
 
@@ -111,7 +140,9 @@ function openGenerator(generator) {
   playlistState.selected = generator;
   document.querySelector('.playlist-modal-wrap')?.remove();
   const previousFocus = document.activeElement;
-  document.body.insertAdjacentHTML('beforeend', `
+  document.body.insertAdjacentHTML(
+    'beforeend',
+    `
     <div class="playlist-modal-wrap">
       <div class="playlist-modal-backdrop"></div>
       <section class="playlist-modal" role="dialog" aria-modal="true" aria-labelledby="playlist-dialog-title">
@@ -123,13 +154,14 @@ function openGenerator(generator) {
         </header>
         <div class="playlist-create-fields">
           <label>Playlist name<input id="playlist-name" maxlength="80" value="${playlistEscape(generator.name)}"></label>
-          <label>Maximum items<select id="playlist-limit">${[10,20,30,50,100].map(value => `<option value="${value}" ${value === 30 ? 'selected' : ''}>${Math.min(value, generator.count)} items</option>`).join('')}</select></label>
+          <label>Maximum items<select id="playlist-limit">${[10, 20, 30, 50, 100].map((value) => `<option value="${value}" ${value === 30 ? 'selected' : ''}>${Math.min(value, generator.count)} items</option>`).join('')}</select></label>
         </div>
         <div class="playlist-preview-label"><span>PREVIEW · FIRST ${Math.min(12, generator.sample.length)}</span><small>Final order follows the criterion ranking.</small></div>
         <div class="playlist-preview">${generator.sample.map(previewItem).join('')}</div>
         <footer><button class="playlist-cancel" type="button">Cancel</button><button class="playlist-create" type="button">Create in Plex</button></footer>
       </section>
-    </div>`);
+    </div>`,
+  );
 
   const wrap = document.querySelector('.playlist-modal-wrap');
   const close = () => {
@@ -137,7 +169,9 @@ function openGenerator(generator) {
     wrap.remove();
     previousFocus?.focus?.();
   };
-  const onKeydown = event => { if (event.key === 'Escape') close(); };
+  const onKeydown = (event) => {
+    if (event.key === 'Escape') close();
+  };
   wrap.querySelector('.playlist-modal-backdrop').addEventListener('click', close);
   wrap.querySelector('.playlist-modal-close').addEventListener('click', close);
   wrap.querySelector('.playlist-cancel').addEventListener('click', close);
@@ -151,16 +185,21 @@ async function createPlaylist(wrap, generator, close) {
   const title = nameField.value.trim();
   const limit = Number(wrap.querySelector('#playlist-limit').value);
   if (!title) return nameField.focus();
-  if (!window.confirm(`Are you sure you want to create “${title}” in Plex with up to ${Math.min(limit, generator.count)} items?`)) return;
+  if (
+    !window.confirm(
+      `Are you sure you want to create “${title}” in Plex with up to ${Math.min(limit, generator.count)} items?`,
+    )
+  )
+    return;
 
   const button = wrap.querySelector('.playlist-create');
   button.disabled = true;
   button.textContent = 'Creating…';
   try {
     const response = await fetch('/api/playlists/generate', {
-      method:'POST',
-      headers:{ 'Content-Type':'application/json' },
-      body:JSON.stringify({ generatorId:generator.id, title, limit, confirmed:true }),
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ generatorId: generator.id, title, limit, confirmed: true }),
     });
     const data = await response.json();
     if (!response.ok) throw new Error(data.error || 'Playlist creation failed');
@@ -194,7 +233,9 @@ function setupPlaylistStudio() {
   if (!page) return;
   page.classList.add('playlist-studio');
   page.innerHTML = studioShell();
-  page.querySelector('[data-playlist-back]').addEventListener('click', () => document.querySelector('[data-nav="dashboard"]').click());
+  page
+    .querySelector('[data-playlist-back]')
+    .addEventListener('click', () => document.querySelector('[data-nav="dashboard"]').click());
   page.querySelector('#playlist-refresh').addEventListener('click', () => loadStudio(true));
   document.querySelector('[data-nav="playlists"]')?.addEventListener('click', () => {
     if (!playlistState.data) setTimeout(() => loadStudio(), 80);

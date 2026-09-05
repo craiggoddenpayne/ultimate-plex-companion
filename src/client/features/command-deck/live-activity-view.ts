@@ -1,6 +1,15 @@
-const escape = (value) => String(value == null ? '' : value).replace(/[&<>'"]/g, (char) => ({
-  '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;',
-}[char]));
+const escape = (value) =>
+  String(value == null ? '' : value).replace(
+    /[&<>'"]/g,
+    (char) =>
+      ({
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        "'": '&#39;',
+        '"': '&quot;',
+      })[char],
+  );
 
 const playIcon = '<svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m8 5 11 7-11 7z"/></svg>';
 

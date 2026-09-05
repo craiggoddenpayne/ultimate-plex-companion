@@ -48,6 +48,8 @@ npm run dev
 Useful checks:
 
 ```bash
+npm run lint
+npm run format:check
 npm run check
 npm test
 npm run build

@@ -11,11 +11,17 @@
     "build": "vite build",
     "test": "tsx --test test/core/*.test.ts test/features/**/*.test.ts test/integration/*.test.ts",
     "preview": "vite preview --host 0.0.0.0",
+    "lint": "oxlint --deny-warnings src test vite.config.ts server.js",
+    "lint:fix": "oxlint --fix src test vite.config.ts server.js",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
     "check": "tsc --noEmit",
-    "ci": "npm run check && npm test && npm run build"
+    "ci": "npm run lint && npm run format:check && npm run check && npm test && npm run build"
   },
   "devDependencies": {
     "@types/node": "^24.13.3",
+    "oxlint": "^1.81.0",
+    "prettier": "^3.9.6",
     "tsx": "^4.23.13",
     "typescript": "^7.0.2",
     "vite": "^8.2.2"

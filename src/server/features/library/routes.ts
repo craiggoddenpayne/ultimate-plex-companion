@@ -3,7 +3,7 @@ import { invalidateLibraryInsights, libraryInsights } from './library-insights-s
 import { deleteOverlap } from './library-overlap-server.ts';
 
 export function createLibraryRoutes() {
-  return async context => {
+  return async (context) => {
     const { pathname, req, res, json } = context;
     if (pathname === '/api/library/insights' && req.method === 'GET') {
       const config = await requirePlex(context);
@@ -14,7 +14,12 @@ export function createLibraryRoutes() {
       const config = await requirePlex(context);
       if (!config) return true;
       const report = await libraryInsights(config, context, true);
-      const result = await deleteOverlap(config, { ...context, invalidate:invalidateLibraryInsights }, await context.body(req), report);
+      const result = await deleteOverlap(
+        config,
+        { ...context, invalidate: invalidateLibraryInsights },
+        await context.body(req),
+        report,
+      );
       json(res, 200, result);
       return true;
     }

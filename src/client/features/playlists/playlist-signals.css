@@ -1,1 +1,51 @@
-.playlist-signal-filters{display:flex;gap:6px;margin:-2px 0 12px;padding-bottom:3px;overflow-x:auto;scrollbar-width:thin}.playlist-signal-filters button{display:flex;align-items:center;gap:6px;flex:0 0 auto;padding:7px 9px;border:1px solid var(--theme-line,#303a43);border-radius:15px;background:var(--theme-panel,#10151a);color:var(--theme-muted,#74818b);font:7px 'DM Mono';cursor:pointer}.playlist-signal-filters button b{display:grid;min-width:15px;height:15px;padding:0 4px;place-items:center;border-radius:8px;background:var(--theme-panel2,#1b2228);color:inherit;font-size:6px}.playlist-signal-filters button.active{border-color:color-mix(in srgb,var(--theme-secondary,var(--cyan)) 55%,var(--theme-line));background:color-mix(in srgb,var(--theme-secondary,var(--cyan)) 9%,var(--theme-panel));color:var(--theme-secondary,var(--cyan));box-shadow:0 0 16px color-mix(in srgb,var(--theme-secondary,var(--cyan)) 10%,transparent)}.playlist-signal-filters button:focus-visible{outline:1px solid var(--theme-secondary,var(--cyan));outline-offset:2px}@media(max-width:600px){.playlist-signal-filters{margin-inline:-2px;padding-bottom:7px}.playlist-signal-filters button{min-height:34px}}
+.playlist-signal-filters {
+  display: flex;
+  gap: 6px;
+  margin: -2px 0 12px;
+  padding-bottom: 3px;
+  overflow-x: auto;
+  scrollbar-width: thin;
+}
+.playlist-signal-filters button {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex: 0 0 auto;
+  padding: 7px 9px;
+  border: 1px solid var(--theme-line, #303a43);
+  border-radius: 15px;
+  background: var(--theme-panel, #10151a);
+  color: var(--theme-muted, #74818b);
+  font: 7px 'DM Mono';
+  cursor: pointer;
+}
+.playlist-signal-filters button b {
+  display: grid;
+  min-width: 15px;
+  height: 15px;
+  padding: 0 4px;
+  place-items: center;
+  border-radius: 8px;
+  background: var(--theme-panel2, #1b2228);
+  color: inherit;
+  font-size: 6px;
+}
+.playlist-signal-filters button.active {
+  border-color: color-mix(in srgb, var(--theme-secondary, var(--cyan)) 55%, var(--theme-line));
+  background: color-mix(in srgb, var(--theme-secondary, var(--cyan)) 9%, var(--theme-panel));
+  color: var(--theme-secondary, var(--cyan));
+  box-shadow: 0 0 16px color-mix(in srgb, var(--theme-secondary, var(--cyan)) 10%, transparent);
+}
+.playlist-signal-filters button:focus-visible {
+  outline: 1px solid var(--theme-secondary, var(--cyan));
+  outline-offset: 2px;
+}
+@media (max-width: 600px) {
+  .playlist-signal-filters {
+    margin-inline: -2px;
+    padding-bottom: 7px;
+  }
+  .playlist-signal-filters button {
+    min-height: 34px;
+  }
+}

@@ -23,6 +23,8 @@ Run the API separately with `npm run server`. Vite proxies `/api` to port 8080.
 Before submitting a pull request:
 
 ```bash
+npm run lint
+npm run format:check
 npm run check
 npm test
 npm run build

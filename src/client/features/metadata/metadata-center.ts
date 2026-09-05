@@ -1,9 +1,148 @@
-const centerState={data:null,query:'',filter:'all',category:'all',resolved:new Set()};
-const centerEscape=value=>String(value??'').replace(/[&<>'"]/g,char=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[char]));
-function shell(){return '<button class="back-link" data-metadata-back>← Command deck</button><header class="metadata-center-hero"><div><span class="eyebrow">METADATA CENTER · PLEX RECORD REPAIR</span><h1>Clean signals.<br><em>Better libraries.</em></h1><p>Find missing, malformed and suspicious metadata, understand every flag, then repair records directly in Plex.</p></div><div class="metadata-radar" aria-hidden="true"><i></i><i></i><span>META</span><b>INTEGRITY SCAN</b></div></header><section class="metadata-center-stats"><article><span>HEALTH SCORE</span><b id="center-health">—</b><small>Valid scanned records</small></article><article><span>NEEDS ATTENTION</span><b id="center-issues">—</b><small>Unique records</small></article><article><span>MISSING DATA</span><b id="center-missing">—</b><small>Incomplete records</small></article><article><span>INVALID SIGNALS</span><b id="center-invalid">—</b><small>Suspicious values</small></article></section><section class="metadata-center-controls"><label><input id="center-search" placeholder="Search titles or libraries…"></label><select id="center-filter"><option value="all">All problems</option><option value="missing">Missing metadata</option><option value="invalid">Invalid metadata</option><option value="high">High priority</option></select><button id="center-next">Resolve next</button><button id="center-refresh">Refresh scan</button></section><div id="center-categories" class="metadata-categories"></div><section class="metadata-center-list" id="center-list"><div class="center-loading"><i></i><span>Inspecting Plex metadata…</span></div></section>'}
-function filtered(){if(!centerState.data)return[];const query=centerState.query.toLowerCase();return centerState.data.issues.filter(item=>{if(centerState.resolved.has(item.ratingKey))return false;if(query&&!`${item.title} ${item.library} ${item.problems.map(problem=>problem.label).join(' ')}`.toLowerCase().includes(query))return false;if(centerState.category!=='all'&&!item.problems.some(problem=>problem.code===centerState.category))return false;if(centerState.filter==='high'&&item.severity!=='high')return false;if(['missing','invalid'].includes(centerState.filter)&&!item.problems.some(problem=>problem.kind===centerState.filter))return false;return true})}
-function render(){const list=document.querySelector('#center-list');if(!list||!centerState.data)return;const items=filtered();document.querySelectorAll('[data-center-category]').forEach(button=>button.classList.toggle('active',button.dataset.centerCategory===centerState.category));list.innerHTML=items.length?items.map(item=>'<article class="metadata-record '+item.severity+'"><span class="metadata-record-art">'+(item.poster?'<img src="'+centerEscape(item.poster)+'" loading="lazy" alt="">':'<b>?</b>')+'</span><div class="metadata-record-main"><header><span>'+centerEscape(item.library)+' · '+centerEscape(item.type)+'</span><h2>'+centerEscape(item.title)+'</h2><small>'+centerEscape([item.year,item.genres.slice(0,3).join(' · ')].filter(Boolean).join(' · ')||'No supporting metadata')+'</small></header><div class="metadata-problems">'+item.problems.map(problem=>'<span class="'+problem.kind+'">'+centerEscape(problem.label)+'</span>').join('')+'</div><p>'+(item.summary?centerEscape(item.summary):'No summary is currently available for this record.')+'</p></div><div class="metadata-record-actions"><em>'+item.problems.length+' SIGNAL'+(item.problems.length===1?'':'S')+'</em><button class="metadata-edit-button" data-rating-key="'+centerEscape(item.ratingKey)+'">Resolve metadata</button></div></article>').join(''):'<div class="center-empty"><b>✓</b><h2>No matching issues</h2><p>Adjust the filters, or enjoy the clean corner of your library.</p></div>'}
-function categories(){const box=document.querySelector('#center-categories');box.innerHTML='<button class="active" data-center-category="all"><span>ALL SIGNALS</span><b>'+centerState.data.issueCount.toLocaleString()+'</b></button>'+centerState.data.categories.slice(0,8).map(item=>'<button data-center-category="'+centerEscape(item.code)+'"><span>'+centerEscape(item.label)+'</span><b>'+item.count.toLocaleString()+'</b></button>').join('');box.querySelectorAll('[data-center-category]').forEach(button=>button.onclick=()=>{centerState.category=button.dataset.centerCategory;render()})}
-async function loadCenter(force=false){const list=document.querySelector('#center-list');if(!list)return;list.innerHTML='<div class="center-loading"><i></i><span>Inspecting Plex metadata…</span></div>';try{const response=await fetch('/api/metadata-center'+(force?'?refresh=1':'')),data=await response.json();if(!response.ok)throw new Error(data.error||'Metadata scan unavailable');centerState.data=data;document.querySelector('#center-health').textContent=data.health+'%';document.querySelector('#center-issues').textContent=data.issueCount.toLocaleString();document.querySelector('#center-missing').textContent=data.missing.toLocaleString();document.querySelector('#center-invalid').textContent=data.invalid.toLocaleString();categories();render()}catch(error){list.innerHTML='<div class="center-empty error"><b>!</b><h2>Metadata scan unavailable</h2><p>'+centerEscape(error.message)+'</p></div>'}}
-function setupCenter(){const page=document.querySelector('#metadata-page');if(!page)return;page.classList.add('metadata-center');page.innerHTML=shell();page.querySelector('[data-metadata-back]').onclick=()=>document.querySelector('[data-nav="dashboard"]').click();page.querySelector('#center-search').oninput=event=>{centerState.query=event.target.value;render()};page.querySelector('#center-filter').onchange=event=>{centerState.filter=event.target.value;render()};page.querySelector('#center-refresh').onclick=()=>loadCenter(true);page.querySelector('#center-next').onclick=()=>document.querySelector('#center-list .metadata-edit-button')?.click();document.querySelector('[data-nav="metadata"]')?.addEventListener('click',()=>{if(!centerState.data)setTimeout(()=>loadCenter(),80)});document.addEventListener('metadata:saved',()=>loadCenter(true));if(location.hash==='#metadata')loadCenter()}
-if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',setupCenter);else setupCenter();
+const centerState = { data: null, query: '', filter: 'all', category: 'all', resolved: new Set() };
+const centerEscape = (value) =>
+  String(value ?? '').replace(
+    /[&<>'"]/g,
+    (char) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' })[char],
+  );
+function shell() {
+  return '<button class="back-link" data-metadata-back>← Command deck</button><header class="metadata-center-hero"><div><span class="eyebrow">METADATA CENTER · PLEX RECORD REPAIR</span><h1>Clean signals.<br><em>Better libraries.</em></h1><p>Find missing, malformed and suspicious metadata, understand every flag, then repair records directly in Plex.</p></div><div class="metadata-radar" aria-hidden="true"><i></i><i></i><span>META</span><b>INTEGRITY SCAN</b></div></header><section class="metadata-center-stats"><article><span>HEALTH SCORE</span><b id="center-health">—</b><small>Valid scanned records</small></article><article><span>NEEDS ATTENTION</span><b id="center-issues">—</b><small>Unique records</small></article><article><span>MISSING DATA</span><b id="center-missing">—</b><small>Incomplete records</small></article><article><span>INVALID SIGNALS</span><b id="center-invalid">—</b><small>Suspicious values</small></article></section><section class="metadata-center-controls"><label><input id="center-search" placeholder="Search titles or libraries…"></label><select id="center-filter"><option value="all">All problems</option><option value="missing">Missing metadata</option><option value="invalid">Invalid metadata</option><option value="high">High priority</option></select><button id="center-next">Resolve next</button><button id="center-refresh">Refresh scan</button></section><div id="center-categories" class="metadata-categories"></div><section class="metadata-center-list" id="center-list"><div class="center-loading"><i></i><span>Inspecting Plex metadata…</span></div></section>';
+}
+function filtered() {
+  if (!centerState.data) return [];
+  const query = centerState.query.toLowerCase();
+  return centerState.data.issues.filter((item) => {
+    if (centerState.resolved.has(item.ratingKey)) return false;
+    if (
+      query &&
+      !`${item.title} ${item.library} ${item.problems.map((problem) => problem.label).join(' ')}`
+        .toLowerCase()
+        .includes(query)
+    )
+      return false;
+    if (centerState.category !== 'all' && !item.problems.some((problem) => problem.code === centerState.category))
+      return false;
+    if (centerState.filter === 'high' && item.severity !== 'high') return false;
+    if (
+      ['missing', 'invalid'].includes(centerState.filter) &&
+      !item.problems.some((problem) => problem.kind === centerState.filter)
+    )
+      return false;
+    return true;
+  });
+}
+function render() {
+  const list = document.querySelector('#center-list');
+  if (!list || !centerState.data) return;
+  const items = filtered();
+  document
+    .querySelectorAll('[data-center-category]')
+    .forEach((button) => button.classList.toggle('active', button.dataset.centerCategory === centerState.category));
+  list.innerHTML = items.length
+    ? items
+        .map(
+          (item) =>
+            '<article class="metadata-record ' +
+            item.severity +
+            '"><span class="metadata-record-art">' +
+            (item.poster ? '<img src="' + centerEscape(item.poster) + '" loading="lazy" alt="">' : '<b>?</b>') +
+            '</span><div class="metadata-record-main"><header><span>' +
+            centerEscape(item.library) +
+            ' · ' +
+            centerEscape(item.type) +
+            '</span><h2>' +
+            centerEscape(item.title) +
+            '</h2><small>' +
+            centerEscape(
+              [item.year, item.genres.slice(0, 3).join(' · ')].filter(Boolean).join(' · ') || 'No supporting metadata',
+            ) +
+            '</small></header><div class="metadata-problems">' +
+            item.problems
+              .map((problem) => '<span class="' + problem.kind + '">' + centerEscape(problem.label) + '</span>')
+              .join('') +
+            '</div><p>' +
+            (item.summary ? centerEscape(item.summary) : 'No summary is currently available for this record.') +
+            '</p></div><div class="metadata-record-actions"><em>' +
+            item.problems.length +
+            ' SIGNAL' +
+            (item.problems.length === 1 ? '' : 'S') +
+            '</em><button class="metadata-edit-button" data-rating-key="' +
+            centerEscape(item.ratingKey) +
+            '">Resolve metadata</button></div></article>',
+        )
+        .join('')
+    : '<div class="center-empty"><b>✓</b><h2>No matching issues</h2><p>Adjust the filters, or enjoy the clean corner of your library.</p></div>';
+}
+function categories() {
+  const box = document.querySelector('#center-categories');
+  box.innerHTML =
+    '<button class="active" data-center-category="all"><span>ALL SIGNALS</span><b>' +
+    centerState.data.issueCount.toLocaleString() +
+    '</b></button>' +
+    centerState.data.categories
+      .slice(0, 8)
+      .map(
+        (item) =>
+          '<button data-center-category="' +
+          centerEscape(item.code) +
+          '"><span>' +
+          centerEscape(item.label) +
+          '</span><b>' +
+          item.count.toLocaleString() +
+          '</b></button>',
+      )
+      .join('');
+  box.querySelectorAll('[data-center-category]').forEach(
+    (button) =>
+      (button.onclick = () => {
+        centerState.category = button.dataset.centerCategory;
+        render();
+      }),
+  );
+}
+async function loadCenter(force = false) {
+  const list = document.querySelector('#center-list');
+  if (!list) return;
+  list.innerHTML = '<div class="center-loading"><i></i><span>Inspecting Plex metadata…</span></div>';
+  try {
+    const response = await fetch('/api/metadata-center' + (force ? '?refresh=1' : '')),
+      data = await response.json();
+    if (!response.ok) throw new Error(data.error || 'Metadata scan unavailable');
+    centerState.data = data;
+    document.querySelector('#center-health').textContent = data.health + '%';
+    document.querySelector('#center-issues').textContent = data.issueCount.toLocaleString();
+    document.querySelector('#center-missing').textContent = data.missing.toLocaleString();
+    document.querySelector('#center-invalid').textContent = data.invalid.toLocaleString();
+    categories();
+    render();
+  } catch (error) {
+    list.innerHTML =
+      '<div class="center-empty error"><b>!</b><h2>Metadata scan unavailable</h2><p>' +
+      centerEscape(error.message) +
+      '</p></div>';
+  }
+}
+function setupCenter() {
+  const page = document.querySelector('#metadata-page');
+  if (!page) return;
+  page.classList.add('metadata-center');
+  page.innerHTML = shell();
+  page.querySelector('[data-metadata-back]').onclick = () => document.querySelector('[data-nav="dashboard"]').click();
+  page.querySelector('#center-search').oninput = (event) => {
+    centerState.query = event.target.value;
+    render();
+  };
+  page.querySelector('#center-filter').onchange = (event) => {
+    centerState.filter = event.target.value;
+    render();
+  };
+  page.querySelector('#center-refresh').onclick = () => loadCenter(true);
+  page.querySelector('#center-next').onclick = () =>
+    document.querySelector('#center-list .metadata-edit-button')?.click();
+  document.querySelector('[data-nav="metadata"]')?.addEventListener('click', () => {
+    if (!centerState.data) setTimeout(() => loadCenter(), 80);
+  });
+  document.addEventListener('metadata:saved', () => loadCenter(true));
+  if (location.hash === '#metadata') loadCenter();
+}
+if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', setupCenter);
+else setupCenter();

@@ -1,1 +1,40 @@
-.stream-card .poster img{position:absolute;z-index:1;inset:0;width:100%;height:100%;object-fit:cover}.stream-card .poster:after{z-index:2;background:linear-gradient(135deg,transparent 30%,#0009)}.stream-card .poster span{z-index:3;transition:transform .2s,background .2s}.stream-card:hover .poster span{transform:scale(1.08);background:#121318e8}.stream-card .poster:has(img) span{width:21px;height:21px;background:#090b0dcc;box-shadow:0 2px 12px #0008}.stream-card .poster:has(img) .icon{width:9px}.stream-card{transition:border-color .2s,transform .2s}.stream-card:hover{border-color:color-mix(in srgb,var(--theme-primary) 34%,var(--theme-line));transform:translateX(2px)}
+.stream-card .poster img {
+  position: absolute;
+  z-index: 1;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.stream-card .poster:after {
+  z-index: 2;
+  background: linear-gradient(135deg, transparent 30%, #0009);
+}
+.stream-card .poster span {
+  z-index: 3;
+  transition:
+    transform 0.2s,
+    background 0.2s;
+}
+.stream-card:hover .poster span {
+  transform: scale(1.08);
+  background: #121318e8;
+}
+.stream-card .poster:has(img) span {
+  width: 21px;
+  height: 21px;
+  background: #090b0dcc;
+  box-shadow: 0 2px 12px #0008;
+}
+.stream-card .poster:has(img) .icon {
+  width: 9px;
+}
+.stream-card {
+  transition:
+    border-color 0.2s,
+    transform 0.2s;
+}
+.stream-card:hover {
+  border-color: color-mix(in srgb, var(--theme-primary) 34%, var(--theme-line));
+  transform: translateX(2px);
+}

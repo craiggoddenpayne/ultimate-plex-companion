@@ -6,7 +6,7 @@ export function normalizePlexConfig(input: Partial<PlexConfig> | null | undefine
   if (url.username || url.password) throw new Error('Do not include credentials in the Plex URL.');
   const token = String(input?.token || '').trim();
   if (!token) throw new Error('A Plex access token is required.');
-  return { plexUrl:url.toString().replace(/\/$/, ''), token };
+  return { plexUrl: url.toString().replace(/\/$/, ''), token };
 }
 
 export function isNumericId(value: unknown): boolean {

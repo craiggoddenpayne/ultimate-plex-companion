@@ -1,9 +1,18 @@
 import { COMPANION_THEMES, normalizeThemePreferences } from '../../shared/theme-model.ts';
 
 const storageKey = 'ultimate-plex-companion:appearance';
-const themeEscape = (value) => String(value ?? '').replace(/[&<>'"]/g, (char) => ({
-  '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;',
-}[char]));
+const themeEscape = (value) =>
+  String(value ?? '').replace(
+    /[&<>'"]/g,
+    (char) =>
+      ({
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        "'": '&#39;',
+        '"': '&quot;',
+      })[char],
+  );
 
 let preferences = loadPreferences();
 
@@ -38,8 +47,15 @@ function themeCard(item) {
 }
 
 function modalMarkup() {
-  const effectOptions = [['full', 'Full energy'], ['ambient', 'Ambient'], ['still', 'Still']]
-    .map(([value, label]) => `<button data-effect-choice="${value}" class="${preferences.effects === value ? 'active' : ''}"><i></i>${label}</button>`)
+  const effectOptions = [
+    ['full', 'Full energy'],
+    ['ambient', 'Ambient'],
+    ['still', 'Still'],
+  ]
+    .map(
+      ([value, label]) =>
+        `<button data-effect-choice="${value}" class="${preferences.effects === value ? 'active' : ''}"><i></i>${label}</button>`,
+    )
     .join('');
   return `<div class="theme-modal-wrap"><div class="theme-backdrop"></div><section class="theme-modal" role="dialog" aria-modal="true" aria-labelledby="theme-title"><button class="theme-close" aria-label="Close">×</button><header><div class="theme-prism"><i></i><i></i><i></i></div><div><span class="eyebrow">VISUAL SYSTEM · 15 ENVIRONMENTS</span><h2 id="theme-title">Choose your universe.</h2><p>Every command surface, signal and ambient light responds instantly.</p></div></header><div class="theme-grid">${COMPANION_THEMES.map(themeCard).join('')}</div><section class="effect-control"><div><span>VISUAL ENERGY</span><h3>Control ambient motion</h3><p>Still mode pauses decorative animation while preserving the complete interface.</p></div><div class="effect-options">${effectOptions}</div></section><footer><span>Saved on this browser · No account data leaves your network</span><button class="theme-reset">Restore Solaris</button><button class="theme-done">Done</button></footer></section></div>`;
 }
@@ -84,7 +100,9 @@ export function openThemeStudio() {
   wrap.querySelectorAll('[data-effect-choice]').forEach((button) => {
     button.onclick = () => {
       applyPreferences({ ...preferences, effects: button.dataset.effectChoice });
-      wrap.querySelectorAll('[data-effect-choice]').forEach((item) => item.classList.toggle('active', item.dataset.effectChoice === preferences.effects));
+      wrap
+        .querySelectorAll('[data-effect-choice]')
+        .forEach((item) => item.classList.toggle('active', item.dataset.effectChoice === preferences.effects));
     };
   });
   wrap.querySelector('.theme-reset').onclick = () => {

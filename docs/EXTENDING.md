@@ -26,7 +26,7 @@ Keep business logic independent from HTTP and inject its dependencies:
 ```ts
 export async function myFeature(config, { plexFetch, libraryItems }) {
   const data = await plexFetch(config, '/library/sections');
-  return { count:data.MediaContainer?.size || 0 };
+  return { count: data.MediaContainer?.size || 0 };
 }
 ```
 
@@ -36,7 +36,7 @@ Expose it through a feature router that returns `true` only when it handles the 
 import { requirePlex } from '../../core/router.ts';
 
 export function createMyFeatureRoutes() {
-  return async context => {
+  return async (context) => {
     if (context.pathname !== '/api/my-feature' || context.req.method !== 'GET') return false;
     const config = await requirePlex(context);
     if (config) context.json(context.res, 200, await myFeature(config, context));

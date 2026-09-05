@@ -11,7 +11,7 @@ test('connection guide extracts either a token or the token within an XML URL', 
 });
 
 test('connection failures are translated into actionable Plex advice', () => {
-  assert.match(friendlyConnectionError({ cause:{ code:'ECONNREFUSED' } }), /Docker/);
-  assert.match(friendlyConnectionError({ cause:{ code:'ENOTFOUND' } }), /LAN IP/);
-  assert.match(friendlyConnectionError({ name:'AbortError' }), /32400/);
+  assert.match(friendlyConnectionError({ cause: { code: 'ECONNREFUSED' } }), /Docker/);
+  assert.match(friendlyConnectionError({ cause: { code: 'ENOTFOUND' } }), /LAN IP/);
+  assert.match(friendlyConnectionError({ name: 'AbortError' }), /32400/);
 });

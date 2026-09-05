@@ -5,10 +5,19 @@ import { composeFeatureRouters } from '../../src/server/core/router.ts';
 test('feature routers stop at the first handler that owns a request', async () => {
   const visited = [];
   const router = composeFeatureRouters([
-    async () => { visited.push('first'); return false; },
-    async () => { visited.push('owner'); return true; },
-    async () => { visited.push('late'); return true; },
+    async () => {
+      visited.push('first');
+      return false;
+    },
+    async () => {
+      visited.push('owner');
+      return true;
+    },
+    async () => {
+      visited.push('late');
+      return true;
+    },
   ]);
-  assert.equal(await router({ pathname:'/api/example' }), true);
-  assert.deepEqual(visited, ['first','owner']);
+  assert.equal(await router({ pathname: '/api/example' }), true);
+  assert.deepEqual(visited, ['first', 'owner']);
 });

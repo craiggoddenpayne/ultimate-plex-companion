@@ -1,7 +1,59 @@
-html[data-theme]:not([data-theme=solaris]) :is(.panel,.metric-card,.feature-grid article,.blueprint,.atlas-panel,.atlas-summary article,.growth-cards article,.auto-template,.auto-rule,.auto-run-report,.profile-modal,.profile-popover,.settings-modal,.overlap-modal,.overlap-copy,.companion-panel,.stream-card,.search,.icon-button,.server-chip){background:linear-gradient(145deg,color-mix(in srgb,var(--theme-primary) 5%,var(--theme-panel2)),var(--theme-panel));border-color:var(--theme-line)}
-html[data-theme]:not([data-theme=solaris]) :is(.atlas-tabs,.auto-toolbar,.profile-connections,.privacy-list,.delete-console,.effect-control){background:color-mix(in srgb,var(--theme-panel) 90%,var(--theme-primary));border-color:var(--theme-line)}
-html[data-theme]:not([data-theme=solaris]) .nav-link.active{background:linear-gradient(90deg,color-mix(in srgb,var(--theme-primary) 13%,var(--theme-panel2)),var(--theme-panel))}
-html[data-theme]:not([data-theme=solaris]) :is(.feature-hero:after,.automation-hero:before,.atlas-head:before){background:radial-gradient(circle,color-mix(in srgb,var(--theme-primary) 14%,transparent),transparent 68%)}
-html[data-theme]:not([data-theme=solaris]) :is(.assistant-glyph,.feature-orb,.template-orb,.modal-symbol){color:var(--theme-primary);background:color-mix(in srgb,var(--theme-primary) 12%,var(--theme-panel));border-color:color-mix(in srgb,var(--theme-primary) 28%,var(--theme-line));box-shadow:0 0 30px rgba(var(--theme-glow),.12)}
-html[data-theme]:not([data-theme=solaris]) :is(.signal-panel,.metric-card.featured){background:radial-gradient(circle at 78% 100%,color-mix(in srgb,var(--theme-primary) 9%,transparent),transparent 52%),linear-gradient(145deg,var(--theme-panel2),var(--theme-panel))}
-html[data-theme]:not([data-theme=solaris]) :is(input,select,textarea){accent-color:var(--theme-primary)}
+html[data-theme]:not([data-theme='solaris'])
+  :is(
+    .panel,
+    .metric-card,
+    .feature-grid article,
+    .blueprint,
+    .atlas-panel,
+    .atlas-summary article,
+    .growth-cards article,
+    .auto-template,
+    .auto-rule,
+    .auto-run-report,
+    .profile-modal,
+    .profile-popover,
+    .settings-modal,
+    .overlap-modal,
+    .overlap-copy,
+    .companion-panel,
+    .stream-card,
+    .search,
+    .icon-button,
+    .server-chip
+  ) {
+  background: linear-gradient(
+    145deg,
+    color-mix(in srgb, var(--theme-primary) 5%, var(--theme-panel2)),
+    var(--theme-panel)
+  );
+  border-color: var(--theme-line);
+}
+html[data-theme]:not([data-theme='solaris'])
+  :is(.atlas-tabs, .auto-toolbar, .profile-connections, .privacy-list, .delete-console, .effect-control) {
+  background: color-mix(in srgb, var(--theme-panel) 90%, var(--theme-primary));
+  border-color: var(--theme-line);
+}
+html[data-theme]:not([data-theme='solaris']) .nav-link.active {
+  background: linear-gradient(
+    90deg,
+    color-mix(in srgb, var(--theme-primary) 13%, var(--theme-panel2)),
+    var(--theme-panel)
+  );
+}
+html[data-theme]:not([data-theme='solaris']) :is(.feature-hero:after, .automation-hero:before, .atlas-head:before) {
+  background: radial-gradient(circle, color-mix(in srgb, var(--theme-primary) 14%, transparent), transparent 68%);
+}
+html[data-theme]:not([data-theme='solaris']) :is(.assistant-glyph, .feature-orb, .template-orb, .modal-symbol) {
+  color: var(--theme-primary);
+  background: color-mix(in srgb, var(--theme-primary) 12%, var(--theme-panel));
+  border-color: color-mix(in srgb, var(--theme-primary) 28%, var(--theme-line));
+  box-shadow: 0 0 30px rgba(var(--theme-glow), 0.12);
+}
+html[data-theme]:not([data-theme='solaris']) :is(.signal-panel, .metric-card.featured) {
+  background:
+    radial-gradient(circle at 78% 100%, color-mix(in srgb, var(--theme-primary) 9%, transparent), transparent 52%),
+    linear-gradient(145deg, var(--theme-panel2), var(--theme-panel));
+}
+html[data-theme]:not([data-theme='solaris']) :is(input, select, textarea) {
+  accent-color: var(--theme-primary);
+}

@@ -1,6 +1,15 @@
-const escape = (value) => String(value == null ? '' : value).replace(/[&<>'"]/g, (char) => ({
-  '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;',
-}[char]));
+const escape = (value) =>
+  String(value == null ? '' : value).replace(
+    /[&<>'"]/g,
+    (char) =>
+      ({
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        "'": '&#39;',
+        '"': '&quot;',
+      })[char],
+  );
 
 const icons = {
   stream: '<svg class="icon" viewBox="0 0 24 24"><path d="m8 5 11 7-11 7z"/></svg>',
@@ -11,8 +20,6 @@ const icons = {
 export function activityVisual(item, variant = 'compact') {
   const type = Object.hasOwn(icons, item?.type) ? item.type : 'added';
   const className = variant === 'timeline' ? 'timeline-activity-icon' : 'activity-icon';
-  const content = item?.poster
-    ? `<img loading="lazy" src="${escape(item.poster)}" alt="">`
-    : icons[type];
+  const content = item?.poster ? `<img loading="lazy" src="${escape(item.poster)}" alt="">` : icons[type];
   return `<span class="${className} activity-visual ${type}" aria-hidden="true">${content}</span>`;
 }

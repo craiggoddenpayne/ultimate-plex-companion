@@ -1,1 +1,173 @@
-@property --neon-border-pulse{syntax:'<number>';inherits:true;initial-value:0}.neon-border-host{position:relative;isolation:isolate;--neon-border-speed:5.6s;--neon-border-light:var(--theme-primary,var(--amber,#f5ad2e))}.neon-border-host:has(>.neon-border-runner){border-color:color-mix(in srgb,var(--neon-border-light) 24%,var(--theme-line,#28303a));box-shadow:inset 0 0 14px color-mix(in srgb,var(--neon-border-light) 3%,transparent),0 0 0 1px color-mix(in srgb,var(--neon-border-light) 2%,transparent)}.neon-border-runner{position:absolute;z-index:8;inset:-1px;overflow:hidden;border-radius:inherit;pointer-events:none}.neon-border-runner span{position:absolute;display:block;opacity:0;will-change:transform,opacity;background:linear-gradient(90deg,transparent 0,color-mix(in srgb,var(--neon-border-light) 45%,white) 32%,#fff 50%,color-mix(in srgb,var(--neon-border-light) 76%,white) 66%,transparent 100%);filter:drop-shadow(0 0 3px var(--neon-border-light)) drop-shadow(0 0 8px color-mix(in srgb,var(--neon-border-light) 80%,transparent))}.neon-border-runner span:nth-child(1),.neon-border-runner span:nth-child(3){width:30%;height:2px}.neon-border-runner span:nth-child(2),.neon-border-runner span:nth-child(4){width:2px;height:30%;background:linear-gradient(180deg,transparent 0,color-mix(in srgb,var(--neon-border-light) 45%,white) 32%,#fff 50%,color-mix(in srgb,var(--neon-border-light) 76%,white) 66%,transparent 100%)}.neon-border-runner span:nth-child(1){left:0;top:0}.neon-border-runner span:nth-child(2){right:0;top:0}.neon-border-runner span:nth-child(3){right:0;bottom:0}.neon-border-runner span:nth-child(4){left:0;bottom:0}.neon-border-active>.neon-border-runner span:nth-child(1){animation:neon-border-east var(--neon-border-speed) linear infinite}.neon-border-active>.neon-border-runner span:nth-child(2){animation:neon-border-south var(--neon-border-speed) linear 1.4s infinite}.neon-border-active>.neon-border-runner span:nth-child(3){animation:neon-border-west var(--neon-border-speed) linear 2.8s infinite}.neon-border-active>.neon-border-runner span:nth-child(4){animation:neon-border-north var(--neon-border-speed) linear 4.2s infinite}@keyframes neon-border-east{0%{opacity:0;transform:translateX(-105%)}3%{opacity:1}22%{opacity:1}25%,100%{opacity:0;transform:translateX(438%)}}@keyframes neon-border-south{0%{opacity:0;transform:translateY(-105%)}3%{opacity:1}22%{opacity:1}25%,100%{opacity:0;transform:translateY(438%)}}@keyframes neon-border-west{0%{opacity:0;transform:translateX(105%)}3%{opacity:1}22%{opacity:1}25%,100%{opacity:0;transform:translateX(-438%)}}@keyframes neon-border-north{0%{opacity:0;transform:translateY(105%)}3%{opacity:1}22%{opacity:1}25%,100%{opacity:0;transform:translateY(-438%)}}html[data-effects=ambient] .neon-border-host{--neon-border-speed:7.2s}html[data-effects=ambient] .neon-border-runner{opacity:.62}html[data-effects=still] .neon-border-runner{display:none}@media(prefers-reduced-motion:reduce){.neon-border-runner{display:none}.neon-border-host:has(>.neon-border-runner){border-color:color-mix(in srgb,var(--neon-border-light) 28%,var(--theme-line,#28303a));box-shadow:0 0 10px color-mix(in srgb,var(--neon-border-light) 8%,transparent)}}
+@property --neon-border-pulse {
+  syntax: '<number>';
+  inherits: true;
+  initial-value: 0;
+}
+.neon-border-host {
+  position: relative;
+  isolation: isolate;
+  --neon-border-speed: 5.6s;
+  --neon-border-light: var(--theme-primary, var(--amber, #f5ad2e));
+}
+.neon-border-host:has(> .neon-border-runner) {
+  border-color: color-mix(in srgb, var(--neon-border-light) 24%, var(--theme-line, #28303a));
+  box-shadow:
+    inset 0 0 14px color-mix(in srgb, var(--neon-border-light) 3%, transparent),
+    0 0 0 1px color-mix(in srgb, var(--neon-border-light) 2%, transparent);
+}
+.neon-border-runner {
+  position: absolute;
+  z-index: 8;
+  inset: -1px;
+  overflow: hidden;
+  border-radius: inherit;
+  pointer-events: none;
+}
+.neon-border-runner span {
+  position: absolute;
+  display: block;
+  opacity: 0;
+  will-change: transform, opacity;
+  background: linear-gradient(
+    90deg,
+    transparent 0,
+    color-mix(in srgb, var(--neon-border-light) 45%, white) 32%,
+    #fff 50%,
+    color-mix(in srgb, var(--neon-border-light) 76%, white) 66%,
+    transparent 100%
+  );
+  filter: drop-shadow(0 0 3px var(--neon-border-light))
+    drop-shadow(0 0 8px color-mix(in srgb, var(--neon-border-light) 80%, transparent));
+}
+.neon-border-runner span:nth-child(1),
+.neon-border-runner span:nth-child(3) {
+  width: 30%;
+  height: 2px;
+}
+.neon-border-runner span:nth-child(2),
+.neon-border-runner span:nth-child(4) {
+  width: 2px;
+  height: 30%;
+  background: linear-gradient(
+    180deg,
+    transparent 0,
+    color-mix(in srgb, var(--neon-border-light) 45%, white) 32%,
+    #fff 50%,
+    color-mix(in srgb, var(--neon-border-light) 76%, white) 66%,
+    transparent 100%
+  );
+}
+.neon-border-runner span:nth-child(1) {
+  left: 0;
+  top: 0;
+}
+.neon-border-runner span:nth-child(2) {
+  right: 0;
+  top: 0;
+}
+.neon-border-runner span:nth-child(3) {
+  right: 0;
+  bottom: 0;
+}
+.neon-border-runner span:nth-child(4) {
+  left: 0;
+  bottom: 0;
+}
+.neon-border-active > .neon-border-runner span:nth-child(1) {
+  animation: neon-border-east var(--neon-border-speed) linear infinite;
+}
+.neon-border-active > .neon-border-runner span:nth-child(2) {
+  animation: neon-border-south var(--neon-border-speed) linear 1.4s infinite;
+}
+.neon-border-active > .neon-border-runner span:nth-child(3) {
+  animation: neon-border-west var(--neon-border-speed) linear 2.8s infinite;
+}
+.neon-border-active > .neon-border-runner span:nth-child(4) {
+  animation: neon-border-north var(--neon-border-speed) linear 4.2s infinite;
+}
+@keyframes neon-border-east {
+  0% {
+    opacity: 0;
+    transform: translateX(-105%);
+  }
+  3% {
+    opacity: 1;
+  }
+  22% {
+    opacity: 1;
+  }
+  25%,
+  100% {
+    opacity: 0;
+    transform: translateX(438%);
+  }
+}
+@keyframes neon-border-south {
+  0% {
+    opacity: 0;
+    transform: translateY(-105%);
+  }
+  3% {
+    opacity: 1;
+  }
+  22% {
+    opacity: 1;
+  }
+  25%,
+  100% {
+    opacity: 0;
+    transform: translateY(438%);
+  }
+}
+@keyframes neon-border-west {
+  0% {
+    opacity: 0;
+    transform: translateX(105%);
+  }
+  3% {
+    opacity: 1;
+  }
+  22% {
+    opacity: 1;
+  }
+  25%,
+  100% {
+    opacity: 0;
+    transform: translateX(-438%);
+  }
+}
+@keyframes neon-border-north {
+  0% {
+    opacity: 0;
+    transform: translateY(105%);
+  }
+  3% {
+    opacity: 1;
+  }
+  22% {
+    opacity: 1;
+  }
+  25%,
+  100% {
+    opacity: 0;
+    transform: translateY(-438%);
+  }
+}
+html[data-effects='ambient'] .neon-border-host {
+  --neon-border-speed: 7.2s;
+}
+html[data-effects='ambient'] .neon-border-runner {
+  opacity: 0.62;
+}
+html[data-effects='still'] .neon-border-runner {
+  display: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  .neon-border-runner {
+    display: none;
+  }
+  .neon-border-host:has(> .neon-border-runner) {
+    border-color: color-mix(in srgb, var(--neon-border-light) 28%, var(--theme-line, #28303a));
+    box-shadow: 0 0 10px color-mix(in srgb, var(--neon-border-light) 8%, transparent);
+  }
+}

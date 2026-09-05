@@ -5,15 +5,15 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { createOptimizationStore } from '../../../src/server/features/codec-studio/optimization-store-server.ts';
 
-test('optimization jobs persist and interrupted work is safely re-queued', async t => {
+test('optimization jobs persist and interrupted work is safely re-queued', async (t) => {
   const directory = await mkdtemp(join(tmpdir(), 'plex-jobs-'));
-  t.after(() => rm(directory, { recursive:true, force:true }));
+  t.after(() => rm(directory, { recursive: true, force: true }));
   const store = createOptimizationStore(directory);
   const jobs = new Map([
-    ['active', { id:'a1-b2', ratingKey:'42', title:'Active film', state:'encoding', progress:61 }],
-    ['ready', { id:'c3-d4', ratingKey:'43', title:'Ready film', state:'ready', progress:100, verified:true }],
+    ['active', { id: 'a1-b2', ratingKey: '42', title: 'Active film', state: 'encoding', progress: 61 }],
+    ['ready', { id: 'c3-d4', ratingKey: '43', title: 'Ready film', state: 'ready', progress: 100, verified: true }],
   ]);
-  await store.save(jobs, { paused:true });
+  await store.save(jobs, { paused: true });
   const restored = await createOptimizationStore(directory).load();
   assert.equal(restored.recovered, 1);
   assert.equal(restored.jobs[0].state, 'queued');
@@ -24,11 +24,16 @@ test('optimization jobs persist and interrupted work is safely re-queued', async
   assert.equal(restored.paused, true);
 });
 
-test('a persisted cancellation request is finalized instead of resumed', async t => {
+test('a persisted cancellation request is finalized instead of resumed', async (t) => {
   const directory = await mkdtemp(join(tmpdir(), 'plex-jobs-cancel-'));
-  t.after(() => rm(directory, { recursive:true, force:true }));
+  t.after(() => rm(directory, { recursive: true, force: true }));
   const store = createOptimizationStore(directory);
-  const jobs = new Map([['active', { id:'a1-b2', ratingKey:'42', title:'Cancelled film', state:'encoding', progress:61, cancelRequested:true }]]);
+  const jobs = new Map([
+    [
+      'active',
+      { id: 'a1-b2', ratingKey: '42', title: 'Cancelled film', state: 'encoding', progress: 61, cancelRequested: true },
+    ],
+  ]);
   await store.save(jobs);
   const restored = await createOptimizationStore(directory).load();
   assert.equal(restored.recovered, 1);

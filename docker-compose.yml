@@ -7,20 +7,20 @@ services:
     restart: unless-stopped
     init: true
     ports:
-      - "${APP_PORT:-8080}:8080"
+      - '${APP_PORT:-8080}:8080'
     extra_hosts:
-      - "host.docker.internal:host-gateway"
+      - 'host.docker.internal:host-gateway'
     volumes:
       - companion-data:/data
-      - "${MEDIA_HOST_PATH:-./media}:${MEDIA_CONTAINER_PATH:-/media}"
+      - '${MEDIA_HOST_PATH:-./media}:${MEDIA_CONTAINER_PATH:-/media}'
     environment:
-      TZ: "${TZ:-UTC}"
-      PLEX_URL: "${PLEX_URL:-}"
-      PLEX_TOKEN: "${PLEX_TOKEN:-}"
-      PLEX_MEDIA_ROOT: "${PLEX_MEDIA_ROOT:-/media}"
-      MEDIA_ROOT: "${MEDIA_CONTAINER_PATH:-/media}"
-      HEVC_CRF: "${HEVC_CRF:-20}"
-      HEVC_PRESET: "${HEVC_PRESET:-medium}"
+      TZ: '${TZ:-UTC}'
+      PLEX_URL: '${PLEX_URL:-}'
+      PLEX_TOKEN: '${PLEX_TOKEN:-}'
+      PLEX_MEDIA_ROOT: '${PLEX_MEDIA_ROOT:-/media}'
+      MEDIA_ROOT: '${MEDIA_CONTAINER_PATH:-/media}'
+      HEVC_CRF: '${HEVC_CRF:-20}'
+      HEVC_PRESET: '${HEVC_PRESET:-medium}'
     security_opt:
       - no-new-privileges:true
 

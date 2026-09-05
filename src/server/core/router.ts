@@ -1,6 +1,6 @@
 export function composeFeatureRouters(routers) {
-  const active = routers.filter(router => typeof router === 'function');
-  return async context => {
+  const active = routers.filter((router) => typeof router === 'function');
+  return async (context) => {
     for (const router of active) {
       if (await router(context)) return true;
     }
@@ -11,7 +11,7 @@ export function composeFeatureRouters(routers) {
 export async function requirePlex(context) {
   const config = await context.savedConfig();
   if (config) return config;
-  context.json(context.res, 428, { error:'Plex is not configured.' });
+  context.json(context.res, 428, { error: 'Plex is not configured.' });
   return null;
 }
 

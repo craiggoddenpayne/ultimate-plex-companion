@@ -45,5 +45,7 @@ body {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  #starfield { opacity: 0.6; }
+  #starfield {
+    opacity: 0.6;
+  }
 }

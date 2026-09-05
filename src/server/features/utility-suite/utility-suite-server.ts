@@ -1,47 +1,429 @@
 let suiteCache;
-const DAY=86400;
+const DAY = 86400;
 
-function facts(item){const media=(item.Media||[]).slice().sort((a,b)=>sumSize(b)-sumSize(a))[0]||{},parts=media.Part||[];const size=parts.reduce((sum,part)=>sum+Number(part.size||0),0);const dynamic=String(media.videoDynamicRange||media.videoDynamicRangeType||'').toUpperCase();const raw=String(media.videoResolution||'').toLowerCase();const resolution=raw.includes('4k')||Number(media.width)>=3000?'4K':raw.includes('1080')||Number(media.height)>=1000?'1080p':raw.includes('720')||Number(media.height)>=700?'720p':'SD';return{size,codec:String(media.videoCodec||'Unknown').toUpperCase(),resolution,hdr:/HDR|DOVI|DOLBY/.test(dynamic),bitrate:Number(media.bitrate||0),container:String(media.container||parts[0]?.container||'Unknown').toUpperCase()}}
-function sumSize(media){return(media.Part||[]).reduce((sum,part)=>sum+Number(part.size||0),0)}
-function title(item){return item.grandparentTitle?`${item.grandparentTitle} · ${item.title}`:item.title||'Unknown title'}
-function publicItem(item,extra={}){return{ratingKey:String(item.ratingKey||''),title:title(item),year:item.year||item.grandparentYear||null,library:item.libraryTitle||item.librarySectionTitle||'Plex',poster:item.ratingKey?`/api/art/${item.ratingKey}`:null,durationMinutes:Math.round(Number(item.duration||0)/60000),rating:Number(item.audienceRating||item.rating||0),genres:(item.Genre||[]).map(value=>value.tag).filter(Boolean).slice(0,3),...extra}}
-function module(id,name,eyebrow,description,metric,unit,tone,items,insight,route=null){return{id,name,eyebrow,description,metric,unit,tone,items:items.slice(0,16),insight,route}}
-function identity(item){return item.type==='episode'||item.grandparentTitle?`episode|${item.grandparentTitle}|${item.parentIndex}|${item.index}`.toLowerCase():`movie|${item.title}|${item.year||''}`.toLowerCase()}
+function facts(item) {
+  const media = (item.Media || []).slice().sort((a, b) => sumSize(b) - sumSize(a))[0] || {},
+    parts = media.Part || [];
+  const size = parts.reduce((sum, part) => sum + Number(part.size || 0), 0);
+  const dynamic = String(media.videoDynamicRange || media.videoDynamicRangeType || '').toUpperCase();
+  const raw = String(media.videoResolution || '').toLowerCase();
+  const resolution =
+    raw.includes('4k') || Number(media.width) >= 3000
+      ? '4K'
+      : raw.includes('1080') || Number(media.height) >= 1000
+        ? '1080p'
+        : raw.includes('720') || Number(media.height) >= 700
+          ? '720p'
+          : 'SD';
+  return {
+    size,
+    codec: String(media.videoCodec || 'Unknown').toUpperCase(),
+    resolution,
+    hdr: /HDR|DOVI|DOLBY/.test(dynamic),
+    bitrate: Number(media.bitrate || 0),
+    container: String(media.container || parts[0]?.container || 'Unknown').toUpperCase(),
+  };
+}
+function sumSize(media) {
+  return (media.Part || []).reduce((sum, part) => sum + Number(part.size || 0), 0);
+}
+function title(item) {
+  return item.grandparentTitle ? `${item.grandparentTitle} · ${item.title}` : item.title || 'Unknown title';
+}
+function publicItem(item, extra = {}) {
+  return {
+    ratingKey: String(item.ratingKey || ''),
+    title: title(item),
+    year: item.year || item.grandparentYear || null,
+    library: item.libraryTitle || item.librarySectionTitle || 'Plex',
+    poster: item.ratingKey ? `/api/art/${item.ratingKey}` : null,
+    durationMinutes: Math.round(Number(item.duration || 0) / 60000),
+    rating: Number(item.audienceRating || item.rating || 0),
+    genres: (item.Genre || [])
+      .map((value) => value.tag)
+      .filter(Boolean)
+      .slice(0, 3),
+    ...extra,
+  };
+}
+function module(id, name, eyebrow, description, metric, unit, tone, items, insight, route = null) {
+  return { id, name, eyebrow, description, metric, unit, tone, items: items.slice(0, 16), insight, route };
+}
+function identity(item) {
+  return item.type === 'episode' || item.grandparentTitle
+    ? `episode|${item.grandparentTitle}|${item.parentIndex}|${item.index}`.toLowerCase()
+    : `movie|${item.title}|${item.year || ''}`.toLowerCase();
+}
 
-export async function utilitySuite(config,{plexFetch,libraryItems},force=false){if(!force&&suiteCache&&Date.now()-suiteCache.createdAt<10*60_000)return suiteCache.data;const now=Math.floor(Date.now()/1000);const [sections,historyData]=await Promise.all([plexFetch(config,'/library/sections'),plexFetch(config,'/status/sessions/history/all?X-Plex-Container-Start=0&X-Plex-Container-Size=1000&sort=viewedAt%3Adesc')]);const libraries=(sections.MediaContainer?.Directory||[]).filter(item=>['movie','show'].includes(item.type));const batches=await Promise.all(libraries.map(async library=>(await libraryItems(config,library)).map(item=>({...item,libraryTitle:library.title,libraryKey:String(library.key),libraryType:library.type}))));const items=batches.flat().map(item=>({...item,_facts:facts(item)}));const movies=items.filter(item=>item.type==='movie'||item.libraryType==='movie');const history=historyData.MediaContainer?.Metadata||[];const watchedKeys=new Set(history.filter(item=>Number(item.viewedAt||0)>=now-180*DAY).map(item=>String(item.ratingKey)));const unwatched=item=>!Number(item.viewCount||0)&&!watchedKeys.has(String(item.ratingKey));
+export async function utilitySuite(config, { plexFetch, libraryItems }, force = false) {
+  if (!force && suiteCache && Date.now() - suiteCache.createdAt < 10 * 60_000) return suiteCache.data;
+  const now = Math.floor(Date.now() / 1000);
+  const [sections, historyData] = await Promise.all([
+    plexFetch(config, '/library/sections'),
+    plexFetch(
+      config,
+      '/status/sessions/history/all?X-Plex-Container-Start=0&X-Plex-Container-Size=1000&sort=viewedAt%3Adesc',
+    ),
+  ]);
+  const libraries = (sections.MediaContainer?.Directory || []).filter((item) => ['movie', 'show'].includes(item.type));
+  const batches = await Promise.all(
+    libraries.map(async (library) =>
+      (await libraryItems(config, library)).map((item) => ({
+        ...item,
+        libraryTitle: library.title,
+        libraryKey: String(library.key),
+        libraryType: library.type,
+      })),
+    ),
+  );
+  const items = batches.flat().map((item) => ({ ...item, _facts: facts(item) }));
+  const movies = items.filter((item) => item.type === 'movie' || item.libraryType === 'movie');
+  const history = historyData.MediaContainer?.Metadata || [];
+  const watchedKeys = new Set(
+    history.filter((item) => Number(item.viewedAt || 0) >= now - 180 * DAY).map((item) => String(item.ratingKey)),
+  );
+  const unwatched = (item) => !Number(item.viewCount || 0) && !watchedKeys.has(String(item.ratingKey));
 
-  const unfinished=items.filter(item=>Number(item.viewOffset)>0&&Number(item.duration)>0&&Number(item.viewOffset)/Number(item.duration)<.92).sort((a,b)=>Number(b.lastViewedAt||0)-Number(a.lastViewedAt||0)).map(item=>publicItem(item,{value:`${Math.round(Number(item.viewOffset)/Number(item.duration)*100)}% watched`,progress:Math.round(Number(item.viewOffset)/Number(item.duration)*100)}));
-  const fresh=items.filter(item=>unwatched(item)&&Number(item.addedAt||0)>=now-30*DAY).sort((a,b)=>Number(b.addedAt)-Number(a.addedAt)).map(item=>publicItem(item,{value:`Added ${Math.max(0,Math.floor((now-Number(item.addedAt))/DAY))}d ago`}));
-  const gems=movies.filter(item=>unwatched(item)&&Number(item.audienceRating||item.rating||0)>=7.5).sort((a,b)=>Number(b.audienceRating||b.rating)-Number(a.audienceRating||a.rating)).map(item=>publicItem(item,{value:`★ ${Number(item.audienceRating||item.rating).toFixed(1)}`}));
-  const quick=movies.filter(item=>unwatched(item)&&Number(item.duration)>=45*60000&&Number(item.duration)<=100*60000).sort((a,b)=>Number(b.audienceRating||b.rating)-Number(a.audienceRating||a.rating)).map(item=>publicItem(item,{value:`${Math.round(Number(item.duration)/60000)} min`}));
-  const epic=movies.filter(item=>unwatched(item)&&Number(item.duration)>=150*60000).sort((a,b)=>Number(b.audienceRating||b.rating)-Number(a.audienceRating||a.rating)).map(item=>publicItem(item,{value:`${Math.round(Number(item.duration)/60000)} min`}));
-  const showcase=movies.filter(item=>item._facts.resolution==='4K'||item._facts.hdr).sort((a,b)=>(b._facts.hdr-a._facts.hdr)||b._facts.bitrate-a._facts.bitrate).map(item=>publicItem(item,{value:[item._facts.resolution,item._facts.hdr&&'HDR',item._facts.codec].filter(Boolean).join(' · ')}));
-  const space=items.filter(item=>item._facts.size).sort((a,b)=>b._facts.size-a._facts.size).map(item=>publicItem(item,{value:item._facts.size,format:'bytes',detail:`${item._facts.resolution} · ${item._facts.codec} · ${item._facts.container}`}));
-  const legacy=items.filter(item=>['H264','AVC','MPEG4','MPEG2VIDEO','VC1'].includes(item._facts.codec)&&item._facts.size>2*1024**3).sort((a,b)=>b._facts.size-a._facts.size).map(item=>publicItem(item,{value:item._facts.size,format:'bytes',detail:`${item._facts.resolution} · ${item._facts.codec} · ${item._facts.bitrate?Math.round(item._facts.bitrate/1000)+' Mbps':'Unknown bitrate'}`}));
-  const codecCounts=new Map();for(const item of items)codecCounts.set(item._facts.codec,(codecCounts.get(item._facts.codec)||0)+1);const modern=items.filter(item=>['HEVC','H265','AV1'].includes(item._facts.codec)).length;const playback=[...codecCounts.entries()].sort((a,b)=>b[1]-a[1]).map(([name,count])=>({title:name,detail:`${Math.round(count/Math.max(1,items.length)*100)}% of mapped media`,value:`${count.toLocaleString()} files`}));
-  const metadata=items.map(item=>{const missing=[];if(!item.thumb)missing.push('artwork');if(!item.summary)missing.push('summary');if(!item.year&&!item.grandparentYear)missing.push('year');if(item.libraryType==='movie'&&!(item.Genre||[]).length)missing.push('genres');return{item,missing}}).filter(entry=>entry.missing.length).sort((a,b)=>b.missing.length-a.missing.length).map(({item,missing})=>publicItem(item,{value:`${missing.length} issues`,detail:`Missing ${missing.join(', ')}`}));
-  const groups=new Map();for(const item of items){const key=identity(item);if(!groups.has(key))groups.set(key,[]);groups.get(key).push(item)}const duplicates=[...groups.values()].filter(group=>group.length>1).map(group=>({title:title(group[0]),detail:[...new Set(group.map(item=>item.libraryTitle))].join(' · '),value:`${group.length} copies`,size:group.reduce((sum,item)=>sum+item._facts.size,0),poster:group[0].ratingKey?`/api/art/${group[0].ratingKey}`:null})).sort((a,b)=>b.size-a.size);
-  const recent=items.filter(item=>Number(item.addedAt||0)>=now-30*DAY),recentBytes=recent.reduce((sum,item)=>sum+item._facts.size,0);const growth=libraries.map(library=>{const owned=recent.filter(item=>item.libraryKey===String(library.key));return{title:library.title,detail:`${owned.length} additions in 30 days`,value:owned.reduce((sum,item)=>sum+item._facts.size,0),format:'bytes'}}).sort((a,b)=>b.value-a.value);
-  const decades=new Map();for(const item of movies){const year=Number(item.year||0);if(year){const decade=`${Math.floor(year/10)*10}s`;decades.set(decade,(decades.get(decade)||0)+1)}}const decadeItems=[...decades.entries()].sort((a,b)=>Number(b[0].slice(0,4))-Number(a[0].slice(0,4))).map(([name,count])=>({title:name,detail:`${Math.round(count/Math.max(1,movies.length)*100)}% of films`,value:`${count.toLocaleString()} titles`}));
-  const libraryGenres=new Map(),watchedGenres=new Map();for(const item of items)for(const genre of item.Genre||[])libraryGenres.set(genre.tag,(libraryGenres.get(genre.tag)||0)+1);for(const item of items.filter(item=>watchedKeys.has(String(item.ratingKey))))for(const genre of item.Genre||[])watchedGenres.set(genre.tag,(watchedGenres.get(genre.tag)||0)+1);const blindspots=[...libraryGenres.entries()].filter(([,count])=>count>=5).map(([name,count])=>({title:name,detail:`${count} titles owned · ${watchedGenres.get(name)||0} watched recently`,value:`${Math.max(0,Math.round((1-(watchedGenres.get(name)||0)/count)*100))}% unexplored`,gap:1-(watchedGenres.get(name)||0)/count})).sort((a,b)=>b.gap-a.gap);
-  const rewatch=items.filter(item=>Number(item.viewCount||0)>0&&Number(item.lastViewedAt||0)<now-180*DAY&&Number(item.audienceRating||item.rating||0)>=7).sort((a,b)=>Number(b.audienceRating||b.rating)-Number(a.audienceRating||a.rating)).map(item=>publicItem(item,{value:`★ ${Number(item.audienceRating||item.rating).toFixed(1)}`,detail:`Last watched ${Math.max(180,Math.floor((now-Number(item.lastViewedAt||0))/DAY))} days ago`}));
+  const unfinished = items
+    .filter(
+      (item) =>
+        Number(item.viewOffset) > 0 &&
+        Number(item.duration) > 0 &&
+        Number(item.viewOffset) / Number(item.duration) < 0.92,
+    )
+    .sort((a, b) => Number(b.lastViewedAt || 0) - Number(a.lastViewedAt || 0))
+    .map((item) =>
+      publicItem(item, {
+        value: `${Math.round((Number(item.viewOffset) / Number(item.duration)) * 100)}% watched`,
+        progress: Math.round((Number(item.viewOffset) / Number(item.duration)) * 100),
+      }),
+    );
+  const fresh = items
+    .filter((item) => unwatched(item) && Number(item.addedAt || 0) >= now - 30 * DAY)
+    .sort((a, b) => Number(b.addedAt) - Number(a.addedAt))
+    .map((item) =>
+      publicItem(item, { value: `Added ${Math.max(0, Math.floor((now - Number(item.addedAt)) / DAY))}d ago` }),
+    );
+  const gems = movies
+    .filter((item) => unwatched(item) && Number(item.audienceRating || item.rating || 0) >= 7.5)
+    .sort((a, b) => Number(b.audienceRating || b.rating) - Number(a.audienceRating || a.rating))
+    .map((item) => publicItem(item, { value: `★ ${Number(item.audienceRating || item.rating).toFixed(1)}` }));
+  const quick = movies
+    .filter((item) => unwatched(item) && Number(item.duration) >= 45 * 60000 && Number(item.duration) <= 100 * 60000)
+    .sort((a, b) => Number(b.audienceRating || b.rating) - Number(a.audienceRating || a.rating))
+    .map((item) => publicItem(item, { value: `${Math.round(Number(item.duration) / 60000)} min` }));
+  const epic = movies
+    .filter((item) => unwatched(item) && Number(item.duration) >= 150 * 60000)
+    .sort((a, b) => Number(b.audienceRating || b.rating) - Number(a.audienceRating || a.rating))
+    .map((item) => publicItem(item, { value: `${Math.round(Number(item.duration) / 60000)} min` }));
+  const showcase = movies
+    .filter((item) => item._facts.resolution === '4K' || item._facts.hdr)
+    .sort((a, b) => b._facts.hdr - a._facts.hdr || b._facts.bitrate - a._facts.bitrate)
+    .map((item) =>
+      publicItem(item, {
+        value: [item._facts.resolution, item._facts.hdr && 'HDR', item._facts.codec].filter(Boolean).join(' · '),
+      }),
+    );
+  const space = items
+    .filter((item) => item._facts.size)
+    .sort((a, b) => b._facts.size - a._facts.size)
+    .map((item) =>
+      publicItem(item, {
+        value: item._facts.size,
+        format: 'bytes',
+        detail: `${item._facts.resolution} · ${item._facts.codec} · ${item._facts.container}`,
+      }),
+    );
+  const legacy = items
+    .filter(
+      (item) =>
+        ['H264', 'AVC', 'MPEG4', 'MPEG2VIDEO', 'VC1'].includes(item._facts.codec) && item._facts.size > 2 * 1024 ** 3,
+    )
+    .sort((a, b) => b._facts.size - a._facts.size)
+    .map((item) =>
+      publicItem(item, {
+        value: item._facts.size,
+        format: 'bytes',
+        detail: `${item._facts.resolution} · ${item._facts.codec} · ${item._facts.bitrate ? Math.round(item._facts.bitrate / 1000) + ' Mbps' : 'Unknown bitrate'}`,
+      }),
+    );
+  const codecCounts = new Map();
+  for (const item of items) codecCounts.set(item._facts.codec, (codecCounts.get(item._facts.codec) || 0) + 1);
+  const modern = items.filter((item) => ['HEVC', 'H265', 'AV1'].includes(item._facts.codec)).length;
+  const playback = [...codecCounts.entries()]
+    .sort((a, b) => b[1] - a[1])
+    .map(([name, count]) => ({
+      title: name,
+      detail: `${Math.round((count / Math.max(1, items.length)) * 100)}% of mapped media`,
+      value: `${count.toLocaleString()} files`,
+    }));
+  const metadata = items
+    .map((item) => {
+      const missing = [];
+      if (!item.thumb) missing.push('artwork');
+      if (!item.summary) missing.push('summary');
+      if (!item.year && !item.grandparentYear) missing.push('year');
+      if (item.libraryType === 'movie' && !(item.Genre || []).length) missing.push('genres');
+      return { item, missing };
+    })
+    .filter((entry) => entry.missing.length)
+    .sort((a, b) => b.missing.length - a.missing.length)
+    .map(({ item, missing }) =>
+      publicItem(item, { value: `${missing.length} issues`, detail: `Missing ${missing.join(', ')}` }),
+    );
+  const groups = new Map();
+  for (const item of items) {
+    const key = identity(item);
+    if (!groups.has(key)) groups.set(key, []);
+    groups.get(key).push(item);
+  }
+  const duplicates = [...groups.values()]
+    .filter((group) => group.length > 1)
+    .map((group) => ({
+      title: title(group[0]),
+      detail: [...new Set(group.map((item) => item.libraryTitle))].join(' · '),
+      value: `${group.length} copies`,
+      size: group.reduce((sum, item) => sum + item._facts.size, 0),
+      poster: group[0].ratingKey ? `/api/art/${group[0].ratingKey}` : null,
+    }))
+    .sort((a, b) => b.size - a.size);
+  const recent = items.filter((item) => Number(item.addedAt || 0) >= now - 30 * DAY),
+    recentBytes = recent.reduce((sum, item) => sum + item._facts.size, 0);
+  const growth = libraries
+    .map((library) => {
+      const owned = recent.filter((item) => item.libraryKey === String(library.key));
+      return {
+        title: library.title,
+        detail: `${owned.length} additions in 30 days`,
+        value: owned.reduce((sum, item) => sum + item._facts.size, 0),
+        format: 'bytes',
+      };
+    })
+    .sort((a, b) => b.value - a.value);
+  const decades = new Map();
+  for (const item of movies) {
+    const year = Number(item.year || 0);
+    if (year) {
+      const decade = `${Math.floor(year / 10) * 10}s`;
+      decades.set(decade, (decades.get(decade) || 0) + 1);
+    }
+  }
+  const decadeItems = [...decades.entries()]
+    .sort((a, b) => Number(b[0].slice(0, 4)) - Number(a[0].slice(0, 4)))
+    .map(([name, count]) => ({
+      title: name,
+      detail: `${Math.round((count / Math.max(1, movies.length)) * 100)}% of films`,
+      value: `${count.toLocaleString()} titles`,
+    }));
+  const libraryGenres = new Map(),
+    watchedGenres = new Map();
+  for (const item of items)
+    for (const genre of item.Genre || []) libraryGenres.set(genre.tag, (libraryGenres.get(genre.tag) || 0) + 1);
+  for (const item of items.filter((item) => watchedKeys.has(String(item.ratingKey))))
+    for (const genre of item.Genre || []) watchedGenres.set(genre.tag, (watchedGenres.get(genre.tag) || 0) + 1);
+  const blindspots = [...libraryGenres.entries()]
+    .filter(([, count]) => count >= 5)
+    .map(([name, count]) => ({
+      title: name,
+      detail: `${count} titles owned · ${watchedGenres.get(name) || 0} watched recently`,
+      value: `${Math.max(0, Math.round((1 - (watchedGenres.get(name) || 0) / count) * 100))}% unexplored`,
+      gap: 1 - (watchedGenres.get(name) || 0) / count,
+    }))
+    .sort((a, b) => b.gap - a.gap);
+  const rewatch = items
+    .filter(
+      (item) =>
+        Number(item.viewCount || 0) > 0 &&
+        Number(item.lastViewedAt || 0) < now - 180 * DAY &&
+        Number(item.audienceRating || item.rating || 0) >= 7,
+    )
+    .sort((a, b) => Number(b.audienceRating || b.rating) - Number(a.audienceRating || a.rating))
+    .map((item) =>
+      publicItem(item, {
+        value: `★ ${Number(item.audienceRating || item.rating).toFixed(1)}`,
+        detail: `Last watched ${Math.max(180, Math.floor((now - Number(item.lastViewedAt || 0)) / DAY))} days ago`,
+      }),
+    );
 
-  const modules=[
-    module('finish','Finish Line','CONTINUE WATCHING','Rescue films and episodes left part-way through.',unfinished.length,'in progress','cyan',unfinished,'Progress comes from the connected administrator profile.'),
-    module('fresh','Fresh & Unwatched','ARRIVAL QUEUE','New additions from the last 30 days that remain unwatched.',fresh.length,'new choices','amber',fresh,'Newest additions are placed first.'),
-    module('gems','Hidden Gems','QUALITY SIGNAL','Highly rated unwatched films already waiting in your library.',gems.length,'rated gems','violet',gems,'Audience rating of 7.5 or higher.'),
-    module('quick','Under 100 Minutes','QUICK WATCH','Strong unwatched films that fit into a shorter evening.',quick.length,'quick picks','cyan',quick,'Runtime between 45 and 100 minutes.'),
-    module('epic','Epic Night','LONG-FORM MODE','Unwatched films for nights when you want something substantial.',epic.length,'epic films','rose',epic,'Runtime of at least 150 minutes.'),
-    module('showcase','4K Showcase','DISPLAY MODE','The sharpest 4K and HDR titles available on your server.',showcase.length,'showpieces','violet',showcase,'Sorted with HDR and bitrate signals first.'),
-    module('space','Space Titans','STORAGE MAP','The individual media records consuming the most storage.',space.length,'mapped files','amber',space,'Review large files before storage pressure becomes urgent.','library'),
-    module('codec','Codec Modernizer','EFFICIENCY QUEUE','Large legacy-codec media worth reviewing for safer optimization.',legacy.length,'candidates','rose',legacy,'A review list only—nothing is queued or changed.','library'),
-    module('playback','Playback Readiness','CODEC LANDSCAPE',`${modern} mapped files use HEVC, H.265 or AV1.`,Math.round(modern/Math.max(1,items.length)*100),'% modern','cyan',playback,'Codec mix is descriptive; actual direct play depends on each client.'),
-    module('metadata','Metadata Triage','LIBRARY HYGIENE','Titles missing artwork, summaries, years or genres.',metadata.length,'records','rose',metadata,'Prioritized by number of missing fields.','library'),
-    module('duplicates','Duplicate Watch','OVERLAP SIGNAL','Matching title identities that deserve a copy-by-copy review.',duplicates.length,'overlaps','amber',duplicates,'Editions can be intentional; use Edition Guardian before deleting.','library'),
-    module('growth','Growth Pulse','30-DAY VELOCITY','Where new media has added the most storage this month.',recent.length,'new items','cyan',growth,`${recentBytes} bytes added across mapped libraries.`),
-    module('decades','Decade Time Machine','ERA EXPLORER','Explore how your film collection is distributed through time.',decadeItems.length,'decades','violet',decadeItems,'Counts use release years reported by Plex.'),
-    module('blindspots','Genre Blind Spots','DISCOVERY GAP','Well-stocked genres you have explored the least recently.',blindspots.length,'blind spots','rose',blindspots,'Compares owned titles with the last 180 days of matched history.','radar'),
-    module('rewatch','Rewatch Vault','MEMORY LANE','Highly rated favourites not watched for at least six months.',rewatch.length,'old favourites','amber',rewatch,'A gentle route back to things you already loved.'),
+  const modules = [
+    module(
+      'finish',
+      'Finish Line',
+      'CONTINUE WATCHING',
+      'Rescue films and episodes left part-way through.',
+      unfinished.length,
+      'in progress',
+      'cyan',
+      unfinished,
+      'Progress comes from the connected administrator profile.',
+    ),
+    module(
+      'fresh',
+      'Fresh & Unwatched',
+      'ARRIVAL QUEUE',
+      'New additions from the last 30 days that remain unwatched.',
+      fresh.length,
+      'new choices',
+      'amber',
+      fresh,
+      'Newest additions are placed first.',
+    ),
+    module(
+      'gems',
+      'Hidden Gems',
+      'QUALITY SIGNAL',
+      'Highly rated unwatched films already waiting in your library.',
+      gems.length,
+      'rated gems',
+      'violet',
+      gems,
+      'Audience rating of 7.5 or higher.',
+    ),
+    module(
+      'quick',
+      'Under 100 Minutes',
+      'QUICK WATCH',
+      'Strong unwatched films that fit into a shorter evening.',
+      quick.length,
+      'quick picks',
+      'cyan',
+      quick,
+      'Runtime between 45 and 100 minutes.',
+    ),
+    module(
+      'epic',
+      'Epic Night',
+      'LONG-FORM MODE',
+      'Unwatched films for nights when you want something substantial.',
+      epic.length,
+      'epic films',
+      'rose',
+      epic,
+      'Runtime of at least 150 minutes.',
+    ),
+    module(
+      'showcase',
+      '4K Showcase',
+      'DISPLAY MODE',
+      'The sharpest 4K and HDR titles available on your server.',
+      showcase.length,
+      'showpieces',
+      'violet',
+      showcase,
+      'Sorted with HDR and bitrate signals first.',
+    ),
+    module(
+      'space',
+      'Space Titans',
+      'STORAGE MAP',
+      'The individual media records consuming the most storage.',
+      space.length,
+      'mapped files',
+      'amber',
+      space,
+      'Review large files before storage pressure becomes urgent.',
+      'library',
+    ),
+    module(
+      'codec',
+      'Codec Modernizer',
+      'EFFICIENCY QUEUE',
+      'Large legacy-codec media worth reviewing for safer optimization.',
+      legacy.length,
+      'candidates',
+      'rose',
+      legacy,
+      'A review list only—nothing is queued or changed.',
+      'library',
+    ),
+    module(
+      'playback',
+      'Playback Readiness',
+      'CODEC LANDSCAPE',
+      `${modern} mapped files use HEVC, H.265 or AV1.`,
+      Math.round((modern / Math.max(1, items.length)) * 100),
+      '% modern',
+      'cyan',
+      playback,
+      'Codec mix is descriptive; actual direct play depends on each client.',
+    ),
+    module(
+      'metadata',
+      'Metadata Triage',
+      'LIBRARY HYGIENE',
+      'Titles missing artwork, summaries, years or genres.',
+      metadata.length,
+      'records',
+      'rose',
+      metadata,
+      'Prioritized by number of missing fields.',
+      'library',
+    ),
+    module(
+      'duplicates',
+      'Duplicate Watch',
+      'OVERLAP SIGNAL',
+      'Matching title identities that deserve a copy-by-copy review.',
+      duplicates.length,
+      'overlaps',
+      'amber',
+      duplicates,
+      'Editions can be intentional; use Edition Guardian before deleting.',
+      'library',
+    ),
+    module(
+      'growth',
+      'Growth Pulse',
+      '30-DAY VELOCITY',
+      'Where new media has added the most storage this month.',
+      recent.length,
+      'new items',
+      'cyan',
+      growth,
+      `${recentBytes} bytes added across mapped libraries.`,
+    ),
+    module(
+      'decades',
+      'Decade Time Machine',
+      'ERA EXPLORER',
+      'Explore how your film collection is distributed through time.',
+      decadeItems.length,
+      'decades',
+      'violet',
+      decadeItems,
+      'Counts use release years reported by Plex.',
+    ),
+    module(
+      'blindspots',
+      'Genre Blind Spots',
+      'DISCOVERY GAP',
+      'Well-stocked genres you have explored the least recently.',
+      blindspots.length,
+      'blind spots',
+      'rose',
+      blindspots,
+      'Compares owned titles with the last 180 days of matched history.',
+      'radar',
+    ),
+    module(
+      'rewatch',
+      'Rewatch Vault',
+      'MEMORY LANE',
+      'Highly rated favourites not watched for at least six months.',
+      rewatch.length,
+      'old favourites',
+      'amber',
+      rewatch,
+      'A gentle route back to things you already loved.',
+    ),
   ];
-  const data={generatedAt:new Date().toISOString(),itemCount:items.length,libraryCount:libraries.length,historySample:history.length,modules};suiteCache={createdAt:Date.now(),data};return data;
+  const data = {
+    generatedAt: new Date().toISOString(),
+    itemCount: items.length,
+    libraryCount: libraries.length,
+    historySample: history.length,
+    modules,
+  };
+  suiteCache = { createdAt: Date.now(), data };
+  return data;
 }

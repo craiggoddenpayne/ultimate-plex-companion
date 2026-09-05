@@ -17,11 +17,23 @@ test('theme collection has fifteen valid and unique palettes', () => {
 });
 
 test('theme preferences validate palettes and visual energy', () => {
-  assert.deepEqual(normalizeThemePreferences({ theme: 'nebula', effects: 'still' }), { theme: 'nebula', effects: 'still' });
-  assert.deepEqual(normalizeThemePreferences({ theme: 'daylight', effects: 'ambient' }), { theme: 'daylight', effects: 'ambient' });
-  assert.deepEqual(normalizeThemePreferences({ theme: 'unknown', effects: 'maximum' }), { theme: 'solaris', effects: 'full' });
+  assert.deepEqual(normalizeThemePreferences({ theme: 'nebula', effects: 'still' }), {
+    theme: 'nebula',
+    effects: 'still',
+  });
+  assert.deepEqual(normalizeThemePreferences({ theme: 'daylight', effects: 'ambient' }), {
+    theme: 'daylight',
+    effects: 'ambient',
+  });
+  assert.deepEqual(normalizeThemePreferences({ theme: 'unknown', effects: 'maximum' }), {
+    theme: 'solaris',
+    effects: 'full',
+  });
 });
 
 test('theme preferences accept Darkula as an alias for Darcula', () => {
-  assert.deepEqual(normalizeThemePreferences({ theme: 'darkula', effects: 'full' }), { theme: 'darcula', effects: 'full' });
+  assert.deepEqual(normalizeThemePreferences({ theme: 'darkula', effects: 'full' }), {
+    theme: 'darcula',
+    effects: 'full',
+  });
 });
