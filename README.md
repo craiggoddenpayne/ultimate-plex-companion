@@ -29,6 +29,18 @@ A futuristic, local-first command centre for Plex. It combines live playback tel
 
 Screenshots use anonymized server and account labels. Library artwork and statistics illustrate the live-data interface and vary with each Plex server.
 
+## Themes and visualizers
+
+![Theme Studio showing all fifteen dark and light environments, background visualizers, motion controls and text sizes](docs/screenshots/theme-studio.png)
+
+Theme Studio changes every command surface, signal colour and ambient light immediately. Open it from the palette button in the header or press `Shift+T`. Appearance preferences stay in the current browser.
+
+| Dark environments                                                                                                                                 | Light environments                                                            |
+| ------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------- |
+| Solaris Command, Ion Horizon, Velvet Nebula, Aurora Protocol, Red Giant, Darcula IDE, OLED Void, Synthwave 2099, Matrix Terminal and Nordic Night | Lunar Daylight, Porcelain Signal, Sakura Dawn, Arctic Console and Solar Paper |
+
+Each environment can use Starfield, Vortex, Aurora, Constellations, Orbital Rings, Signal Waves or Ember Drift, with a no-visualizer option. Motion has full, ambient and still levels, while text can be standard, comfortable, large or extra large.
+
 ## Highlights
 
 - Live Plex server, stream and household telemetry
