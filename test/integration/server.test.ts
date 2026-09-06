@@ -14,6 +14,19 @@ const listen = (server) =>
 const close = (server) => new Promise((resolve) => server.close(resolve));
 const execute = promisify(execFile);
 
+async function waitForServer(url, process, timeout = 5000) {
+  const deadline = Date.now() + timeout;
+  while (Date.now() < deadline) {
+    if (process.exitCode !== null) throw new Error(`Application server exited with code ${process.exitCode}.`);
+    try {
+      const response = await fetch(url);
+      if (response.ok) return;
+    } catch {}
+    await new Promise((resolve) => setTimeout(resolve, 50));
+  }
+  throw new Error(`Application server did not become ready within ${timeout}ms.`);
+}
+
 test('saves Plex credentials securely and returns a live overview', async (t) => {
   const configDir = await mkdtemp(join(tmpdir(), 'plex-companion-'));
   const sourcePath = join(configDir, 'Large Film.mkv');
@@ -121,7 +134,7 @@ test('saves Plex credentials securely and returns a live overview', async (t) =>
     await close(mock);
     await rm(configDir, { recursive: true, force: true });
   });
-  await new Promise((resolve) => setTimeout(resolve, 180));
+  await waitForServer(`http://127.0.0.1:${appPort}/api/health`, app);
 
   const credentials = { plexUrl: `http://127.0.0.1:${mockPort}`, token: 'secret-token' };
   const saved = await fetch(`http://127.0.0.1:${appPort}/api/config`, {
