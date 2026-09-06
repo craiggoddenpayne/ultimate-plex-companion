@@ -95,7 +95,7 @@ async function openItem(ratingKey, host) {
 function setupDownloads() {
   const page = document.querySelector('#downloads-page');
   if (!page) return;
-  page.className = 'page downloads-page';
+  page.classList.add('downloads-page');
   page.innerHTML = shell();
   page
     .querySelector('[data-download-back]')
@@ -127,4 +127,8 @@ function setupDownloads() {
   });
 }
 
-setupDownloads();
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', setupDownloads);
+} else {
+  setupDownloads();
+}

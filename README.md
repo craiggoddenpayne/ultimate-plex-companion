@@ -9,11 +9,23 @@ A futuristic, local-first command centre for Plex. It combines live playback tel
 
 ## Screenshots
 
-| Command Deck                                                                                                                            | Discovery Radar                                                                                                                                |
-| --------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
-| ![Command Deck showing live Plex health, library totals, viewing activity and storage opportunities](docs/screenshots/command-deck.png) | ![Discovery Radar showing mood controls and explainable recommendations from the connected Plex library](docs/screenshots/discovery-radar.png) |
-| **Automation Core**                                                                                                                     | **Future Lab**                                                                                                                                 |
-| ![Automation Core showing recipe navigation, safety guardrails and reusable missions](docs/screenshots/automations.png)                 | ![Future Lab showing its experiment index and interactive cultural graph](docs/screenshots/future-lab.png)                                     |
+### Command Deck
+
+![Command Deck showing live Plex health, library totals, viewing activity and storage opportunities](docs/screenshots/command-deck.png)
+
+| Plex Server                                                                                                                                    | Utility Matrix                                                                                                                   |
+| ---------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------- |
+| ![Plex Server showing identity, runtime, network, capabilities and library topology](docs/screenshots/plex-server.png)                         | ![Utility Matrix showing fifteen live library and viewing analyzers](docs/screenshots/utility-matrix.png)                        |
+| **Metadata Center**                                                                                                                            | **Codec Studio**                                                                                                                 |
+| ![Metadata Center showing issue totals, repair categories and affected records](docs/screenshots/metadata-center.png)                          | ![Codec Studio showing conversion candidates, live encode telemetry and its persistent queue](docs/screenshots/codec-studio.png) |
+| **Library Pulse**                                                                                                                              | **Media Downloads**                                                                                                              |
+| ![Library Pulse showing storage analysis, optimization candidates and staged jobs](docs/screenshots/library-pulse.png)                         | ![Media Downloads showing Plex search and original-file destination controls](docs/screenshots/media-downloads.png)              |
+| **Live Streams**                                                                                                                               | **People**                                                                                                                       |
+| ![Live Streams showing current activity, playback state and recent household viewing](docs/screenshots/live-streams.png)                       | ![People showing account insights and a separate history of clients and devices](docs/screenshots/people.png)                    |
+| **Discovery Radar**                                                                                                                            | **Playlist Studio**                                                                                                              |
+| ![Discovery Radar showing mood controls and explainable recommendations from the connected Plex library](docs/screenshots/discovery-radar.png) | ![Playlist Studio showing its custom signal composer and live generators](docs/screenshots/playlist-studio.png)                  |
+| **Automation Core**                                                                                                                            | **Future Lab**                                                                                                                   |
+| ![Automation Core showing recipe navigation, safety guardrails and reusable missions](docs/screenshots/automations.png)                        | ![Future Lab showing its experiment index and interactive cultural graph](docs/screenshots/future-lab.png)                       |
 
 Screenshots use anonymized server and account labels. Library artwork and statistics illustrate the live-data interface and vary with each Plex server.
 
