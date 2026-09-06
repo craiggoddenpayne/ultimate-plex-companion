@@ -1,0 +1,130 @@
+name: Build native apps
+
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+    inputs:
+      app_url:
+        description: HTTPS URL of the deployed Ultimate Plex Companion server
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: native-builds-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  UPC_APP_URL: ${{ inputs.app_url || vars.UPC_APP_URL }}
+  CARGO_TERM_COLOR: always
+
+jobs:
+  macos:
+    name: macOS universal app and DMG
+    runs-on: macos-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: npm
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: aarch64-apple-darwin,x86_64-apple-darwin
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: src-tauri
+      - run: npm ci
+      - name: Validate native server URL
+        run: test -n "$UPC_APP_URL" || { echo "::error::Set the UPC_APP_URL repository variable or supply app_url when running this workflow."; exit 1; }
+      - name: Build universal macOS bundles
+        env:
+          APPLE_SIGNING_IDENTITY: '-'
+        run: npm run native:build:macos -- --target universal-apple-darwin --ci
+      - name: Upload macOS artifacts
+        uses: actions/upload-artifact@v6
+        with:
+          name: ultimate-plex-companion-macos-universal
+          path: |
+            src-tauri/target/universal-apple-darwin/release/bundle/macos/*.app
+            src-tauri/target/universal-apple-darwin/release/bundle/dmg/*.dmg
+          if-no-files-found: error
+          retention-days: 14
+
+  android:
+    name: Android APK and app bundle
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: npm
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: 17
+          cache: gradle
+      - uses: android-actions/setup-android@v3
+      - name: Install Android SDK and NDK
+        run: |
+          sdkmanager "platform-tools" "platforms;android-35" "build-tools;35.0.0" "ndk;27.0.12077973"
+          echo "NDK_HOME=$ANDROID_HOME/ndk/27.0.12077973" >> "$GITHUB_ENV"
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: aarch64-linux-android,armv7-linux-androideabi
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: src-tauri
+      - run: npm ci
+      - name: Validate native server URL
+        run: test -n "$UPC_APP_URL" || { echo "::error::Set the UPC_APP_URL repository variable or supply app_url when running this workflow."; exit 1; }
+      - name: Initialize Android project
+        run: npm run native:init:android -- --ci --skip-targets-install
+      - name: Build Android packages
+        run: npm run native:build:android -- --target aarch64 armv7 --apk --aab --ci
+      - name: Upload Android artifacts
+        uses: actions/upload-artifact@v6
+        with:
+          name: ultimate-plex-companion-android
+          path: |
+            src-tauri/gen/android/app/build/outputs/apk/**/*.apk
+            src-tauri/gen/android/app/build/outputs/bundle/**/*.aab
+          if-no-files-found: error
+          retention-days: 14
+
+  ios:
+    name: iOS Simulator app
+    runs-on: macos-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: npm
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: aarch64-apple-ios-sim
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: src-tauri
+      - run: npm ci
+      - name: Validate native server URL
+        run: test -n "$UPC_APP_URL" || { echo "::error::Set the UPC_APP_URL repository variable or supply app_url when running this workflow."; exit 1; }
+      - name: Initialize iOS project
+        run: npm run native:init:ios -- --ci --skip-targets-install
+      - name: Build unsigned iOS Simulator app
+        run: npm run native:build:ios -- --target aarch64-sim --no-sign --ci
+      - name: Upload iOS Simulator artifact
+        uses: actions/upload-artifact@v6
+        with:
+          name: ultimate-plex-companion-ios-simulator
+          path: src-tauri/gen/apple/build/**/*.app
+          if-no-files-found: error
+          retention-days: 14

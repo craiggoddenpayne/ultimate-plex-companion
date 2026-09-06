@@ -183,6 +183,7 @@ export function buildRuntimeWormhole(items) {
       maxMinutes: Number.isFinite(max) ? max : null,
       count: selection.length,
       hours: Math.round(selection.reduce((sum, item) => sum + minutes(item), 0) / 60),
+      titles: selection.slice(0, 24).map((item) => publicItem(item)),
     };
   });
   const sortedMinutes = timed.map(minutes).sort((a, b) => a - b);
@@ -195,6 +196,10 @@ export function buildRuntimeWormhole(items) {
     windows: [30, 60, 90, 120].map((limit) => ({
       minutes: limit,
       choices: unwatched.filter((item) => minutes(item) <= limit).length,
+      titles: unwatched
+        .filter((item) => minutes(item) <= limit)
+        .slice(0, 24)
+        .map((item) => publicItem(item)),
     })),
     longest: [...timed]
       .sort((a, b) => minutes(b) - minutes(a))

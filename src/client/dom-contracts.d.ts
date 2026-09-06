@@ -45,3 +45,9 @@ interface Document {
 interface PromiseRejectedResult {
   value?: never;
 }
+
+interface Window {
+  showSaveFilePicker?: (options?: { suggestedName?: string }) => Promise<{
+    createWritable(): Promise<WritableStream>;
+  }>;
+}

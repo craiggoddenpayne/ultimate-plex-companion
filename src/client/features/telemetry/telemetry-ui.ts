@@ -9,7 +9,17 @@ const telemetryEscape = (value) =>
 const streamIcon = '<svg class="icon" viewBox="0 0 24 24"><path d="m8 5 11 7-11 7z"/></svg>';
 const usersIcon =
   '<svg class="icon" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM22 21v-2a4 4 0 0 0-3-3.87"/></svg>';
+const deviceIcon =
+  '<svg class="icon" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="12" rx="2"/><path d="M8 20h8M12 16v4"/></svg>';
 let peopleDays = 365;
+
+function telemetryToast(message, failed = false) {
+  const node = document.createElement('div');
+  node.className = `telemetry-toast ${failed ? 'failed' : ''}`;
+  node.textContent = message;
+  document.body.append(node);
+  setTimeout(() => node.remove(), 4200);
+}
 
 function telemetryTimeAgo(timestamp) {
   const seconds = Math.max(0, Math.floor(Date.now() / 1000 - Number(timestamp || 0)));
@@ -113,10 +123,120 @@ async function loadStreams() {
 function peopleShell() {
   return (
     '<button class="back-link" data-back>← Command deck</button><div class="telemetry-hero people-hero"><div><span class="eyebrow">HOUSEHOLD SIGNAL</span><h1>The people behind<br><em>the play button.</em></h1><p>Private, local viewing patterns that help the library serve everyone better.</p></div><div class="period-tabs"><button data-days="30">30 days</button><button data-days="90">90 days</button><button class="active" data-days="365">1 year</button></div></div>' +
-    '<div class="people-summary"><span><b id="people-count">—</b>PLEX ACCOUNTS</span><span><b id="people-plays">—</b>RECENT PLAYS</span><span><b id="people-active">—</b>WATCHING NOW</span></div><div id="people-grid" class="people-grid"><div class="telemetry-loading"></div></div>' +
+    '<div class="people-summary"><span><b id="people-count">—</b>PLEX ACCOUNTS</span><span><b id="people-plays">—</b>RECENT PLAYS</span><span><b id="people-active">—</b>WATCHING NOW</span><span><b id="people-devices">—</b>PAST DEVICES</span></div><div id="people-grid" class="people-grid"><div class="telemetry-loading"></div></div>' +
+    '<section class="panel device-history-panel"><div class="panel-head"><div><span class="card-label">DEVICE HISTORY</span><h2>Where this household has watched</h2><p>Clients are linked to Plex playback history. Network addresses appear only while Plex reports an active session. Authorized clients can be revoked individually.</p></div><span id="device-history-count">—</span></div><div id="device-history-list" class="device-history-list"><div class="telemetry-loading"></div></div></section>' +
     '<div class="people-insights"><section class="panel"><div class="panel-head"><div><span class="card-label">HOUSEHOLD RHYTHM</span><h2>When watching happens</h2></div></div><div id="hour-chart" class="hour-chart"></div><div class="chart-axis"><span>MIDNIGHT</span><span>6 AM</span><span>NOON</span><span>6 PM</span><span>MIDNIGHT</span></div></section><section class="panel privacy-panel"><span>' +
     usersIcon +
     '</span><h2>Designed for a household,<br>not surveillance.</h2><p>These signals stay inside Companion and come only from Plex history. They are used to improve shared discovery and operational decisions.</p><div><i></i>Local data only</div></section></div>'
+  );
+}
+
+function renderDeviceHistory(devices) {
+  document.querySelector('#people-devices').textContent = devices.length;
+  document.querySelector('#device-history-count').textContent =
+    devices.length + (devices.length === 1 ? ' client' : ' clients');
+  const list = document.querySelector('#device-history-list');
+  list.innerHTML = devices.length
+    ? devices
+        .map((device) => {
+          const identifier = device.clientIdentifier
+            ? device.clientIdentifier.length > 18
+              ? device.clientIdentifier.slice(0, 8) + '…' + device.clientIdentifier.slice(-6)
+              : device.clientIdentifier
+            : 'Unavailable';
+          const network = device.active
+            ? [device.localAddress, device.publicAddress].filter(Boolean).join(' · ') || 'Address unavailable'
+            : 'Not retained by Plex';
+          const playback = [
+            device.plays + (device.plays === 1 ? ' play' : ' plays'),
+            device.movies ? device.movies + ' films' : null,
+            device.episodes ? device.episodes + ' episodes' : null,
+          ]
+            .filter(Boolean)
+            .join(' · ');
+          return (
+            '<article class="device-history-card' +
+            (device.active ? ' active' : '') +
+            '"><div class="device-history-icon">' +
+            deviceIcon +
+            '</div><div class="device-history-copy"><div class="device-history-title"><div><h3>' +
+            telemetryEscape(device.name) +
+            '</h3><span>' +
+            telemetryEscape([device.platform, device.product].filter(Boolean).join(' · ')) +
+            '</span></div><div class="device-history-actions">' +
+            (device.active ? '<b class="device-active"><i></i>ACTIVE NOW</b>' : '') +
+            (device.revocable
+              ? '<button type="button" data-revoke-client="' +
+                telemetryEscape(device.clientIdentifier) +
+                '" data-revoke-name="' +
+                telemetryEscape(device.name) +
+                '">Revoke access</button>'
+              : device.authorizationStatus === 'not_authorized'
+                ? '<b class="device-not-authorized">NOT AUTHORIZED</b>'
+                : '') +
+            '</div>' +
+            '</div><div class="device-history-facts"><span><small>USED BY</small><b>' +
+            telemetryEscape(device.people.join(' · ') || 'Unknown account') +
+            '</b></span><span><small>PLAYBACK</small><b>' +
+            telemetryEscape(playback) +
+            '</b></span><span><small>LAST USED</small><b title="' +
+            telemetryEscape(device.lastSeen ? new Date(device.lastSeen * 1000).toLocaleString() : '') +
+            '">' +
+            (device.lastSeen ? telemetryTimeAgo(device.lastSeen) : 'Unknown') +
+            '</b></span><span><small>IP ADDRESS</small><b>' +
+            telemetryEscape(network) +
+            '</b></span><span><small>CLIENT ID</small><b title="' +
+            telemetryEscape(device.clientIdentifier || '') +
+            '">' +
+            telemetryEscape(identifier) +
+            '</b></span><span><small>CONNECTION</small><b>' +
+            telemetryEscape(
+              device.active
+                ? [device.location?.toUpperCase(), device.secure ? 'Secure' : 'Unsecured'].filter(Boolean).join(' · ')
+                : 'Historical record',
+            ) +
+            '</b></span><span><small>ACCESS</small><b>' +
+            telemetryEscape(
+              device.authorizationStatus === 'authorized'
+                ? 'Authorized on Plex account'
+                : device.authorizationStatus === 'not_authorized'
+                  ? 'Not currently authorized'
+                  : 'Authorization unavailable',
+            ) +
+            '</b></span></div></div></article>'
+          );
+        })
+        .join('')
+    : '<div class="device-history-empty"><span>' +
+      deviceIcon +
+      '</span><div><h3>No device history in this period</h3><p>Plex has not linked any playback records to a known client.</p></div></div>';
+  list.querySelectorAll('[data-revoke-client]').forEach((button) =>
+    button.addEventListener('click', async () => {
+      const name = button.dataset.revokeName || 'this Plex client';
+      if (
+        !window.confirm(
+          `Revoke Plex access for “${name}”?\n\nThe client will need to sign in again. Active playback may stop. Historical viewing records will remain.`,
+        )
+      )
+        return;
+      button.disabled = true;
+      button.textContent = 'Revoking…';
+      try {
+        const response = await apiFetch('/api/people/devices/revoke', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ clientIdentifier: button.dataset.revokeClient, confirmed: true }),
+        });
+        const result = await response.json();
+        if (!response.ok) throw new Error(result.error || 'Plex could not revoke this client.');
+        telemetryToast(`${result.name || name} access revoked`);
+        await loadPeople();
+      } catch (error) {
+        button.disabled = false;
+        button.textContent = 'Revoke access';
+        telemetryToast(error.message, true);
+      }
+    }),
   );
 }
 
@@ -149,7 +269,15 @@ function renderPeople(data) {
             person.movies +
             '</b>movies</span><span><b>' +
             person.episodes +
-            '</b>episodes</span></div><div class="share-bar"><i style="width:' +
+            '</b>episodes</span></div><div class="person-taste"><div><span>FAVOURITE GENRES</span><b>' +
+            telemetryEscape(person.preferredGenres?.map((item) => item.genre).join(' · ') || 'Still forming') +
+            '</b></div><div><span>WATCH TIME</span><b>' +
+            Math.round(Number(person.minutesWatched || 0) / 60) +
+            'h</b></div><div><span>PEAK TIME</span><b>' +
+            (person.peakHour == null ? '—' : String(person.peakHour).padStart(2, '0') + ':00') +
+            '</b></div><div><span>PREFERS</span><b>' +
+            telemetryEscape(person.preferredFormat || 'Mixed') +
+            '</b></div></div><div class="share-bar"><i style="width:' +
             person.share +
             '%"></i></div><small>' +
             person.share +
@@ -159,6 +287,7 @@ function renderPeople(data) {
     : '<div class="observatory-empty"><span>' +
       usersIcon +
       '</span><h3>No managed accounts found</h3><p>Plex did not return any household accounts.</p></div>';
+  renderDeviceHistory(data.deviceHistory || []);
   const peak = Math.max(1, ...data.hours.map((item) => item.plays));
   document.querySelector('#hour-chart').innerHTML = data.hours
     .map(
@@ -185,6 +314,10 @@ async function loadPeople() {
       '<div class="observatory-empty error"><b>!</b><h3>People signal unavailable</h3><p>' +
       telemetryEscape(error.message) +
       '</p></div>';
+    document.querySelector('#device-history-list').innerHTML =
+      '<div class="device-history-empty error"><b>!</b><div><h3>Device history unavailable</h3><p>' +
+      telemetryEscape(error.message) +
+      '</p></div></div>';
   }
 }
 

@@ -47,7 +47,17 @@ test('automation rules persist, preview safely and execute Plex actions', async 
   const listing = await persisted.list();
   assert.equal(listing.rules[0].enabled, false);
   assert.equal(listing.runs.length, 2);
-  assert.equal(listing.templates.length, 6);
+  assert.equal(listing.templates.length, 42);
+  const instant = await persisted.runRecipe('health_snapshot');
+  assert.equal(instant.status, 'success');
+  assert.equal(instant.trigger, 'manual_recipe');
+  assert.equal(instant.ruleId, 'recipe:health_snapshot');
+  assert.equal((await persisted.list()).rules.length, 1);
+  assert.equal((await persisted.list()).runs.length, 3);
+  const expandedInstant = await persisted.runRecipe('artwork_coverage');
+  assert.equal(expandedInstant.status, 'success');
+  assert.equal(expandedInstant.result.metrics.scanned, 0);
+  assert.equal((await persisted.list()).rules.length, 1);
   assert.equal(await persisted.setPaused(true), true);
   assert.equal((await persisted.list()).paused, true);
   assert.equal(await persisted.setPaused(false), false);
@@ -56,10 +66,10 @@ test('automation rules persist, preview safely and execute Plex actions', async 
 
   const resetRule = await persisted.create({ type: 'health_snapshot', name: 'Temporary snapshot' });
   await persisted.run(resetRule.id, { dryRun: true });
-  assert.deepEqual(await persisted.dataSummary(), { rules: 1, runs: 3, running: 0, paused: false });
+  assert.deepEqual(await persisted.dataSummary(), { rules: 1, runs: 5, running: 0, paused: false });
   const cleared = await persisted.clearAll();
   assert.equal(cleared.rules, 1);
-  assert.equal(cleared.runs, 3);
+  assert.equal(cleared.runs, 5);
   assert.deepEqual((await persisted.list()).rules, []);
   assert.deepEqual((await persisted.list()).runs, []);
 });

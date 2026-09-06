@@ -103,6 +103,16 @@
 .metadata-center-controls label {
   flex: 1;
 }
+.metadata-center-controls select {
+  max-width: 230px;
+}
+.metadata-center-controls > span {
+  align-self: center;
+  padding: 0 4px;
+  color: #61707b;
+  font: calc(6px + var(--text-increase, 1px)) 'DM Mono';
+  white-space: nowrap;
+}
 .metadata-center-controls input,
 .metadata-center-controls select,
 .metadata-center-controls button {
@@ -255,6 +265,14 @@
   font: calc(6px + var(--text-increase, 1px)) 'DM Mono';
   font-style: normal;
 }
+.metadata-plex-button {
+  color: #77858f;
+  font: calc(7px + var(--text-increase, 1px)) 'DM Mono';
+  text-decoration: none;
+}
+.metadata-plex-button:hover {
+  color: #f5ad2e;
+}
 .center-loading,
 .center-empty {
   min-height: 380px;
@@ -305,6 +323,10 @@
   }
   .metadata-center-controls label {
     flex-basis: 100%;
+  }
+  .metadata-center-controls select {
+    flex: 1;
+    max-width: none;
   }
   .metadata-categories {
     grid-template-columns: 1fr 1fr;

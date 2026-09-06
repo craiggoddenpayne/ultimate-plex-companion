@@ -16,6 +16,19 @@ export function createAutomationRoutes(automationEngine) {
 
     const parts = pathname.split('/');
     if (
+      parts.length === 6 &&
+      parts[1] === 'api' &&
+      parts[2] === 'automations' &&
+      parts[3] === 'recipes' &&
+      parts[5] === 'run' &&
+      req.method === 'POST'
+    ) {
+      const input = await context.body(req);
+      const run = await automationEngine.runRecipe(parts[4], { libraryKey: input.libraryKey || 'all' });
+      json(res, run.status === 'success' ? 200 : 400, { run });
+      return true;
+    }
+    if (
       parts.length === 5 &&
       parts[1] === 'api' &&
       parts[2] === 'automations' &&

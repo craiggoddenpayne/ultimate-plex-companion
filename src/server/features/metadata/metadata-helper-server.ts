@@ -7,7 +7,14 @@ function cleanText(value, max = 500) {
     .slice(0, max);
 }
 function validDate(value) {
-  return /^\d{4}-\d{2}-\d{2}$/.test(value) && !Number.isNaN(Date.parse(value + 'T00:00:00Z'));
+  const match = value.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  if (!match) return false;
+  const date = new Date(Date.UTC(Number(match[1]), Number(match[2]) - 1, Number(match[3])));
+  return (
+    date.getUTCFullYear() === Number(match[1]) &&
+    date.getUTCMonth() === Number(match[2]) - 1 &&
+    date.getUTCDate() === Number(match[3])
+  );
 }
 
 export function publicMetadata(item) {
@@ -17,6 +24,10 @@ export function publicMetadata(item) {
   if (!item.summary) missing.push('summary');
   if (!item.year && !item.grandparentYear) missing.push('year');
   if (item.type === 'movie' && !genres.length) missing.push('genres');
+  if (!item.originallyAvailableAt) missing.push('release date');
+  if (!item.contentRating) missing.push('content rating');
+  if (item.type === 'movie' && !item.studio) missing.push('studio');
+  if (item.type === 'movie' && !item.tagline) missing.push('tagline');
   return {
     ratingKey: String(item.ratingKey || ''),
     libraryKey: String(item.librarySectionID || ''),

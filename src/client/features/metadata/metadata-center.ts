@@ -1,13 +1,13 @@
 import { apiFetch } from '../../core/api-client.ts';
 
-const centerState = { data: null, query: '', filter: 'all', category: 'all', resolved: new Set() };
+const centerState = { data: null, query: '', filter: 'all', category: 'all', library: 'all', resolved: new Set() };
 const centerEscape = (value) =>
   String(value ?? '').replace(
     /[&<>'"]/g,
     (char) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' })[char],
   );
 function shell() {
-  return '<button class="back-link" data-metadata-back>← Command deck</button><header class="metadata-center-hero"><div><span class="eyebrow">METADATA CENTER · PLEX RECORD REPAIR</span><h1>Clean signals.<br><em>Better libraries.</em></h1><p>Find missing, malformed and suspicious metadata, understand every flag, then repair records directly in Plex.</p></div><div class="metadata-radar" aria-hidden="true"><i></i><i></i><span>META</span><b>INTEGRITY SCAN</b></div></header><section class="metadata-center-stats"><article><span>HEALTH SCORE</span><b id="center-health">—</b><small>Valid scanned records</small></article><article><span>NEEDS ATTENTION</span><b id="center-issues">—</b><small>Unique records</small></article><article><span>MISSING DATA</span><b id="center-missing">—</b><small>Incomplete records</small></article><article><span>INVALID SIGNALS</span><b id="center-invalid">—</b><small>Suspicious values</small></article></section><section class="metadata-center-controls"><label><input id="center-search" placeholder="Search titles or libraries…"></label><select id="center-filter"><option value="all">All problems</option><option value="missing">Missing metadata</option><option value="invalid">Invalid metadata</option><option value="high">High priority</option></select><button id="center-next">Resolve next</button><button id="center-refresh">Refresh scan</button></section><div id="center-categories" class="metadata-categories"></div><section class="metadata-center-list" id="center-list"><div class="center-loading"><i></i><span>Inspecting Plex metadata…</span></div></section>';
+  return '<button class="back-link" data-metadata-back>← Command deck</button><header class="metadata-center-hero"><div><span class="eyebrow">METADATA CENTER · PLEX RECORD REPAIR</span><h1>Clean signals.<br><em>Better libraries.</em></h1><p>Find missing, malformed and suspicious metadata, understand every flag, then repair records directly in Plex.</p></div><div class="metadata-radar" aria-hidden="true"><i></i><i></i><span>META</span><b>INTEGRITY SCAN</b></div></header><section class="metadata-center-stats"><article><span>HEALTH SCORE</span><b id="center-health">—</b><small>Valid scanned records</small></article><article><span>NEEDS ATTENTION</span><b id="center-issues">—</b><small>Unique records</small></article><article><span>MISSING DATA</span><b id="center-missing">—</b><small>Incomplete records</small></article><article><span>INVALID SIGNALS</span><b id="center-invalid">—</b><small>Suspicious values</small></article></section><section class="metadata-center-controls"><label><input id="center-search" placeholder="Search titles or libraries…"></label><select id="center-library" aria-label="Filter by library"><option value="all">All libraries</option></select><select id="center-filter"><option value="all">All problems</option><option value="missing">Missing metadata</option><option value="invalid">Invalid metadata</option><option value="high">High priority</option></select><span id="center-result-count" aria-live="polite"></span><button id="center-next">Resolve next</button><button id="center-refresh">Refresh scan</button></section><div id="center-categories" class="metadata-categories"></div><section class="metadata-center-list" id="center-list"><div class="center-loading"><i></i><span>Inspecting Plex metadata…</span></div></section>';
 }
 function filtered() {
   if (!centerState.data) return [];
@@ -23,6 +23,7 @@ function filtered() {
       return false;
     if (centerState.category !== 'all' && !item.problems.some((problem) => problem.code === centerState.category))
       return false;
+    if (centerState.library !== 'all' && item.libraryKey !== centerState.library) return false;
     if (centerState.filter === 'high' && item.severity !== 'high') return false;
     if (
       ['missing', 'invalid'].includes(centerState.filter) &&
@@ -36,6 +37,7 @@ function render() {
   const list = document.querySelector('#center-list');
   if (!list || !centerState.data) return;
   const items = filtered();
+  document.querySelector('#center-result-count').textContent = items.length.toLocaleString() + ' records';
   document
     .querySelectorAll('[data-center-category]')
     .forEach((button) => button.classList.toggle('active', button.dataset.centerCategory === centerState.category));
@@ -67,7 +69,11 @@ function render() {
             item.problems.length +
             ' SIGNAL' +
             (item.problems.length === 1 ? '' : 'S') +
-            '</em><button class="metadata-edit-button" data-rating-key="' +
+            '</em>' +
+            (item.plexUrl
+              ? '<a class="metadata-plex-button" href="' + centerEscape(item.plexUrl) + '">Open in Plex</a>'
+              : '') +
+            '<button class="metadata-edit-button" data-rating-key="' +
             centerEscape(item.ratingKey) +
             '">Resolve metadata</button></div></article>',
         )
@@ -81,7 +87,6 @@ function categories() {
     centerState.data.issueCount.toLocaleString() +
     '</b></button>' +
     centerState.data.categories
-      .slice(0, 8)
       .map(
         (item) =>
           '<button data-center-category="' +
@@ -101,10 +106,36 @@ function categories() {
       }),
   );
 }
-async function loadCenter(force = false) {
+function libraryOptions() {
+  const select = document.querySelector('#center-library');
+  const libraries = centerState.data.libraries || [];
+  if (centerState.library !== 'all' && !libraries.some((library) => library.key === centerState.library))
+    centerState.library = 'all';
+  select.innerHTML =
+    '<option value="all">All libraries</option>' +
+    libraries
+      .map(
+        (library) =>
+          '<option value="' +
+          centerEscape(library.key) +
+          '">' +
+          centerEscape(library.title) +
+          ' · ' +
+          library.health +
+          '% healthy · ' +
+          library.issues.toLocaleString() +
+          ' issues</option>',
+      )
+      .join('');
+  select.value = centerState.library;
+}
+async function loadCenter(force = false, options: any = {}) {
   const list = document.querySelector('#center-list');
   if (!list) return;
-  list.innerHTML = '<div class="center-loading"><i></i><span>Inspecting Plex metadata…</span></div>';
+  const scrollTop = options.preserveScroll ? window.scrollY : null;
+  if (!options.silent)
+    list.innerHTML = '<div class="center-loading"><i></i><span>Inspecting Plex metadata…</span></div>';
+  list.setAttribute('aria-busy', 'true');
   try {
     const response = await apiFetch('/api/metadata-center' + (force ? '?refresh=1' : '')),
       data = await response.json();
@@ -114,13 +145,18 @@ async function loadCenter(force = false) {
     document.querySelector('#center-issues').textContent = data.issueCount.toLocaleString();
     document.querySelector('#center-missing').textContent = data.missing.toLocaleString();
     document.querySelector('#center-invalid').textContent = data.invalid.toLocaleString();
+    libraryOptions();
     categories();
     render();
   } catch (error) {
-    list.innerHTML =
-      '<div class="center-empty error"><b>!</b><h2>Metadata scan unavailable</h2><p>' +
-      centerEscape(error.message) +
-      '</p></div>';
+    if (!options.silent)
+      list.innerHTML =
+        '<div class="center-empty error"><b>!</b><h2>Metadata scan unavailable</h2><p>' +
+        centerEscape(error.message) +
+        '</p></div>';
+  } finally {
+    list.removeAttribute('aria-busy');
+    if (scrollTop !== null) requestAnimationFrame(() => window.scrollTo({ top: scrollTop, behavior: 'auto' }));
   }
 }
 function setupCenter() {
@@ -137,13 +173,20 @@ function setupCenter() {
     centerState.filter = event.target.value;
     render();
   };
+  page.querySelector('#center-library').onchange = (event) => {
+    centerState.library = event.target.value;
+    render();
+  };
   page.querySelector('#center-refresh').onclick = () => loadCenter(true);
   page.querySelector('#center-next').onclick = () =>
     document.querySelector('#center-list .metadata-edit-button')?.click();
   document.querySelector('[data-nav="metadata"]')?.addEventListener('click', () => {
     if (!centerState.data) setTimeout(() => loadCenter(), 80);
   });
-  document.addEventListener('metadata:saved', () => loadCenter(true));
+  document.addEventListener('metadata:saved', () => {
+    const visible = page.classList.contains('active');
+    loadCenter(true, { silent: true, preserveScroll: visible });
+  });
   if (location.hash === '#metadata') loadCenter();
 }
 if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', setupCenter);

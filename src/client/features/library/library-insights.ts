@@ -181,11 +181,14 @@ function renderAtlas() {
           : growthView(data);
   if (atlasState.tab === 'editions') bindOverlapActions(data, () => loadAtlas(true));
 }
-async function loadAtlas(force = false) {
+async function loadAtlas(force = false, options: any = {}) {
   const stage = document.querySelector('#atlas-stage');
   if (!stage) return;
-  stage.innerHTML =
-    '<div class="atlas-loading"><i></i><h3>Mapping media signatures</h3><p>Reading quality, editions, metadata and growth from Plex.</p></div>';
+  const scrollTop = options.preserveScroll ? window.scrollY : null;
+  if (!options.silent)
+    stage.innerHTML =
+      '<div class="atlas-loading"><i></i><h3>Mapping media signatures</h3><p>Reading quality, editions, metadata and growth from Plex.</p></div>';
+  stage.setAttribute('aria-busy', 'true');
   try {
     const response = await apiFetch('/api/library/insights' + (force ? '?refresh=1' : ''));
     const data = await response.json();
@@ -199,10 +202,14 @@ async function loadAtlas(force = false) {
     ).toLocaleString();
     renderAtlas();
   } catch (error) {
-    stage.innerHTML =
-      '<div class="atlas-none error"><b>!</b><h3>Atlas could not complete</h3><p>' +
-      atlasEscape(error.message) +
-      '</p></div>';
+    if (!options.silent)
+      stage.innerHTML =
+        '<div class="atlas-none error"><b>!</b><h3>Atlas could not complete</h3><p>' +
+        atlasEscape(error.message) +
+        '</p></div>';
+  } finally {
+    stage.removeAttribute('aria-busy');
+    if (scrollTop !== null) requestAnimationFrame(() => window.scrollTo({ top: scrollTop, behavior: 'auto' }));
   }
 }
 function setupAtlas() {
@@ -220,6 +227,9 @@ function setupAtlas() {
   page.querySelector('#refresh-atlas').onclick = () => loadAtlas(true);
   document.querySelector('[data-nav="library"]')?.addEventListener('click', () => {
     if (!atlasState.data) setTimeout(() => loadAtlas(), 160);
+  });
+  document.addEventListener('metadata:saved', () => {
+    if (page.classList.contains('active')) loadAtlas(true, { silent: true, preserveScroll: true });
   });
   if (location.hash === '#library') loadAtlas();
 }

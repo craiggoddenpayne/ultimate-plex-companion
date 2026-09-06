@@ -71,3 +71,17 @@ The source icon lives in `native-shell/icon.svg`. Regenerate platform icons afte
 ```bash
 npx tauri icon native-shell/icon.svg
 ```
+
+## GitHub Actions builds
+
+The repository workflow `.github/workflows/native-builds.yml` builds all three native targets when a version tag matching `v*` is pushed. It is also available through **Actions → Build native apps → Run workflow**.
+
+Create an Actions repository variable named `UPC_APP_URL` with the HTTPS URL of the deployed Companion server. Manual runs accept an `app_url` override. The value becomes part of the app configuration, so changing it requires another native build.
+
+The workflow produces these artifacts:
+
+- `ultimate-plex-companion-macos-universal`: an ad-hoc-signed universal `.app` and `.dmg` for Intel and Apple Silicon.
+- `ultimate-plex-companion-android`: ARM64 and ARMv7 APK/AAB outputs.
+- `ultimate-plex-companion-ios-simulator`: an unsigned Apple Silicon Simulator `.app`.
+
+Workflow artifacts are suitable for development and installation testing. Android store packages need a release keystore. Physical-device and App Store iOS builds need an Apple certificate and provisioning profile. Public macOS distribution needs Developer ID signing and notarization.

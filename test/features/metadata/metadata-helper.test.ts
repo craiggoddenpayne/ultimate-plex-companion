@@ -5,7 +5,16 @@ import { metadataUpdate, publicMetadata } from '../../../src/server/features/met
 test('metadata helper builds locked Plex edits and artwork requests', () => {
   const item = { ratingKey: '42', librarySectionID: '3', type: 'movie', title: 'Primer', Genre: [] };
   const view = publicMetadata(item);
-  assert.deepEqual(view.missing, ['artwork', 'summary', 'year', 'genres']);
+  assert.deepEqual(view.missing, [
+    'artwork',
+    'summary',
+    'year',
+    'genres',
+    'release date',
+    'content rating',
+    'studio',
+    'tagline',
+  ]);
   const update = metadataUpdate(item, {
     summary: 'Time travel engineers.',
     year: 2004,
@@ -24,5 +33,6 @@ test('metadata helper builds locked Plex edits and artwork requests', () => {
 test('metadata helper rejects invalid dates and artwork protocols', () => {
   const item = { ratingKey: '42', librarySectionID: '3', type: 'movie' };
   assert.throws(() => metadataUpdate(item, { originallyAvailableAt: 'tomorrow' }), /YYYY-MM-DD/);
+  assert.throws(() => metadataUpdate(item, { originallyAvailableAt: '2025-02-30' }), /YYYY-MM-DD/);
   assert.throws(() => metadataUpdate(item, { posterUrl: 'file:///tmp/poster.jpg' }), /HTTP or HTTPS/);
 });

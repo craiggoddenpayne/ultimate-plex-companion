@@ -25,6 +25,18 @@ function mediaCard(item, note = '') {
   );
 }
 
+function runtimeTitle(item, detail = '') {
+  return (
+    '<button type="button" class="runtime-title" data-runtime-title="' +
+    escapeHtml(item.ratingKey) +
+    '"><b>' +
+    escapeHtml(item.title) +
+    '</b><small>' +
+    escapeHtml(detail) +
+    '</small></button>'
+  );
+}
+
 function memoryView(data) {
   const memory = data.memoryLane;
   const peak = Math.max(1, ...memory.months.map((month) => month.plays));
@@ -132,7 +144,7 @@ function runtimeView(data) {
     runtime.buckets
       .map(
         (bucket) =>
-          '<article><div><b>' +
+          '<article><button type="button" class="runtime-distribution-trigger" aria-expanded="false"><div><b>' +
           escapeHtml(bucket.label) +
           '</b><span>' +
           bucket.count +
@@ -140,18 +152,33 @@ function runtimeView(data) {
           number(bucket.hours) +
           'h</span></div><i><em style="width:' +
           Math.round((bucket.count / peak) * 100) +
-          '%"></em></i></article>',
+          '%"></em></i><small>View titles</small></button><div class="runtime-title-list" hidden>' +
+          (bucket.titles?.length
+            ? bucket.titles
+                .map((item) =>
+                  runtimeTitle(
+                    item,
+                    [item.year, item.durationMinutes ? item.durationMinutes + ' min' : ''].filter(Boolean).join(' · '),
+                  ),
+                )
+                .join('')
+            : '<span>No titles in this range.</span>') +
+          '</div></article>',
       )
       .join('') +
     '</div><div class="time-portals"><span class="card-label">WHAT FITS RIGHT NOW?</span>' +
     runtime.windows
       .map(
         (window) =>
-          '<article><b>' +
+          '<article><button type="button" class="runtime-window-trigger" aria-expanded="false"><b>' +
           window.minutes +
           '<small>MIN</small></b><span>' +
           number(window.choices) +
-          ' unwatched choices</span></article>',
+          ' unwatched choices</span></button><div class="runtime-title-list" hidden>' +
+          (window.titles?.length
+            ? window.titles.map((item) => runtimeTitle(item, item.durationMinutes + ' min')).join('')
+            : '<span>No unwatched titles fit this window.</span>') +
+          '</div></article>',
       )
       .join('') +
     '</div></div><div class="experiment-section"><span class="card-label">BEYOND THE EVENT HORIZON</span><div class="lab-media-grid">' +

@@ -128,6 +128,63 @@
   border-radius: 12px;
   padding: 5px 8px;
 }
+.auto-view-tabs {
+  position: sticky;
+  top: 12px;
+  z-index: 20;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 5px;
+  margin: 0 0 28px;
+  padding: 6px;
+  border: 1px solid #2a3039;
+  border-radius: 10px;
+  background: #0d1116e8;
+  box-shadow: 0 12px 34px #0007;
+  backdrop-filter: blur(14px);
+}
+.auto-view-tabs button {
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  border: 1px solid transparent;
+  border-radius: 7px;
+  background: transparent;
+  color: #747d88;
+  padding: 11px 13px;
+  font-size: calc(9px + var(--text-increase, 1px));
+  cursor: pointer;
+}
+.auto-view-tabs button:hover {
+  color: #c8cdd4;
+  background: #171b21;
+}
+.auto-view-tabs button.active {
+  border-color: #624a25;
+  background: linear-gradient(135deg, #2c2215, #1a1815);
+  color: #f4bd59;
+}
+.auto-view-tabs b {
+  min-width: 22px;
+  border-radius: 10px;
+  background: #242930;
+  color: #aab1bb;
+  padding: 3px 6px;
+  font: calc(7px + var(--text-increase, 1px)) 'DM Mono';
+  text-align: center;
+}
+.auto-view-tabs .active b {
+  background: #4a3518;
+  color: #ffd17b;
+}
+.auto-section[data-auto-section] {
+  scroll-margin-top: 78px;
+}
+.auto-section[data-auto-section][hidden] {
+  display: none;
+}
 .auto-section {
   margin: 0 0 34px;
 }
@@ -144,6 +201,30 @@
 .auto-section-head > p {
   font: calc(8px + var(--text-increase, 1px)) 'DM Mono';
   color: #626a75;
+}
+.auto-recipe-filter {
+  display: grid;
+  gap: 5px;
+  min-width: min(290px, 42vw);
+}
+.auto-recipe-filter span {
+  font: calc(7px + var(--text-increase, 1px)) 'DM Mono';
+  color: #69717c;
+  letter-spacing: 1px;
+}
+.auto-recipe-filter input {
+  width: 100%;
+  border: 1px solid #2d323c;
+  border-radius: 6px;
+  background: #0d1015;
+  color: #d8dbe1;
+  padding: 9px 11px;
+  font-size: calc(9px + var(--text-increase, 1px));
+  outline: none;
+}
+.auto-recipe-filter input:focus {
+  border-color: #6c542d;
+  box-shadow: 0 0 0 2px #f5ad2e12;
 }
 .auto-live {
   font: calc(8px + var(--text-increase, 1px)) 'DM Mono';
@@ -165,12 +246,17 @@
   gap: 10px;
 }
 .auto-template {
-  min-height: 220px;
+  min-height: 250px;
   padding: 19px;
+  display: flex;
+  flex-direction: column;
   background: radial-gradient(circle at 15% 0, #f5ad2e10, transparent 40%), #101319;
   border: 1px solid #292d35;
   border-radius: 9px;
   position: relative;
+}
+.auto-template[hidden] {
+  display: none;
 }
 .auto-template.violet {
   background: radial-gradient(circle at 15% 0, #a77aff12, transparent 40%), #101319;
@@ -222,10 +308,16 @@
   margin: 0;
   max-width: 300px;
 }
-.auto-template button {
-  position: absolute;
-  bottom: 17px;
-  left: 19px;
+.template-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: auto;
+  padding-top: 18px;
+}
+.auto-template .template-actions button {
   border: 0;
   background: none;
   padding: 0;
@@ -233,9 +325,25 @@
   font-size: calc(9px + var(--text-increase, 1px));
   cursor: pointer;
 }
-.auto-template button b {
+.auto-template .template-actions button b {
   margin-left: 8px;
   color: var(--amber);
+}
+.auto-template .template-actions .template-run {
+  border: 1px solid #4b3a20;
+  border-radius: 5px;
+  background: #2a2114;
+  color: #f5ad2e;
+  padding: 7px 10px;
+  font-weight: 800;
+}
+.auto-template .template-actions .template-run:hover {
+  border-color: #8c6528;
+  background: #352817;
+}
+.auto-template .template-actions .template-run:disabled {
+  cursor: wait;
+  opacity: 0.6;
 }
 .auto-rules {
   display: flex;
@@ -699,6 +807,14 @@
   .auto-templates {
     grid-template-columns: 1fr;
   }
+  .auto-section-head {
+    align-items: flex-start;
+    gap: 14px;
+  }
+  .auto-recipe-filter {
+    min-width: 0;
+    width: min(240px, 48vw);
+  }
   .auto-rule {
     grid-template-columns: 36px 1fr;
   }
@@ -740,6 +856,24 @@
   }
   .auto-section-head > p {
     display: none;
+  }
+  .auto-view-tabs {
+    top: 7px;
+  }
+  .auto-view-tabs button {
+    display: grid;
+    gap: 4px;
+    padding: 9px 5px;
+    font-size: calc(7px + var(--text-increase, 1px));
+  }
+  .auto-view-tabs b {
+    margin: auto;
+  }
+  .auto-section-head:has(.auto-recipe-filter) {
+    display: grid;
+  }
+  .auto-recipe-filter {
+    width: 100%;
   }
   .modal-grid {
     grid-template-columns: 1fr;

@@ -1,4 +1,4 @@
-/* Low-cost ambient starfield: one canvas, capped DPR and a 25fps paint cycle. */
+/* One non-interactive canvas hosts every capped, throttled background visualizer. */
 body {
   background: radial-gradient(ellipse at 64% -14%, #151a2b 0, #080a0f 50%);
 }

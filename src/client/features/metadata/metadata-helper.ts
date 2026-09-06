@@ -102,10 +102,7 @@ async function openMetadataHelper(ratingKey) {
         result.className = 'metadata-helper-result success';
         result.textContent = 'Saved · ' + saved.changed.join(', ');
         document.dispatchEvent(new CustomEvent('metadata:saved', { detail: { ratingKey } }));
-        setTimeout(() => {
-          close();
-          document.querySelector('#refresh-atlas')?.click();
-        }, 700);
+        setTimeout(close, 700);
       } catch (error) {
         result.className = 'metadata-helper-result error';
         result.textContent = error.message;

@@ -1,6 +1,17 @@
 import { apiFetch } from '../../core/api-client.ts';
 
-const state = { mood: 'any', mode: 'tonight', maxMinutes: 150, unwatchedOnly: true, results: [], loaded: false };
+const pageSize = 18;
+const state = {
+  mood: 'any',
+  mode: 'tonight',
+  maxMinutes: 150,
+  unwatchedOnly: true,
+  results: [],
+  totalMatches: 0,
+  hasMore: false,
+  loaded: false,
+  requestId: 0,
+};
 const escapeText = (value) =>
   String(value == null ? '' : value).replace(
     /[&<>'"]/g,
@@ -74,6 +85,7 @@ function radarMarkup() {
     '<div class="discovery-results" id="discovery-results">' +
     Array.from({ length: 6 }, () => '<div class="discovery-skeleton"></div>').join('') +
     '</div>' +
+    '<div class="discovery-more" id="discovery-more" hidden><button type="button" id="discovery-show-more">Show more films</button><span id="discovery-progress" aria-live="polite"></span></div>' +
     '<div class="discovery-method"><span>' +
     sparkSvg +
     '</span><p><b>Why these titles?</b> Radar balances mood, audience rating, runtime, recency, and watch state. Viewing data never leaves your server.</p></div>'
@@ -109,7 +121,7 @@ function detailMarkup(item) {
     escapeText(item.reason) +
     '</span></div><div class="detail-actions"><a class="open-in-plex" href="' +
     plexOpenUrl(item) +
-    '" target="_blank" rel="noopener noreferrer">Open in Plex ' +
+    '">Open in Plex ' +
     plexSvg +
     '</a></div></div></section></div>'
   );
@@ -134,7 +146,7 @@ function cardMarkup(item, index) {
     String(index + 1).padStart(2, '0') +
     '</i><a class="discovery-open-icon" data-open-plex href="' +
     plexOpenUrl(item) +
-    '" target="_blank" rel="noopener noreferrer" aria-label="Open ' +
+    '" aria-label="Open ' +
     escapeText(item.title) +
     ' in Plex" title="Open in Plex">' +
     plexSvg +
@@ -155,43 +167,83 @@ function cardMarkup(item, index) {
   );
 }
 
-async function loadRadar(force) {
+function renderResults(results) {
+  results.innerHTML = state.results.length
+    ? state.results.map(cardMarkup).join('')
+    : '<div class="discovery-empty"><span>' +
+      radarSvg +
+      '</span><h3>No signal at this range</h3><p>Try allowing watched titles, choosing a broader mood, or adding more time.</p></div>';
+  results
+    .querySelectorAll('[data-result]')
+    .forEach((card) => card.addEventListener('click', () => openDetail(state.results[Number(card.dataset.result)])));
+  results
+    .querySelectorAll('[data-open-plex]')
+    .forEach((link) => link.addEventListener('click', (event) => event.stopPropagation()));
+}
+
+function updatePagination() {
+  const more = document.querySelector('#discovery-more');
+  const progress = document.querySelector('#discovery-progress');
+  if (!more || !progress) return;
+  more.hidden = !state.results.length;
+  progress.textContent = `Showing ${state.results.length.toLocaleString()} of ${state.totalMatches.toLocaleString()} matches`;
+  more.querySelector('#discovery-show-more').hidden = !state.hasMore;
+}
+
+async function loadRadar(force, append = false) {
   const results = document.querySelector('#discovery-results');
   if (!results) return;
-  results.classList.add('loading');
+  const button = document.querySelector('#discovery-show-more');
+  const more = document.querySelector('#discovery-more');
+  const progress = document.querySelector('#discovery-progress');
+  const requestId = ++state.requestId;
+  if (append) {
+    button.disabled = true;
+    button.textContent = 'Scanning deeper…';
+  } else {
+    results.classList.add('loading');
+    more.hidden = true;
+  }
   const params = new URLSearchParams({
     mood: state.mood,
     mode: state.mode,
     maxMinutes: String(state.maxMinutes),
     unwatchedOnly: String(state.unwatchedOnly),
+    offset: String(append ? state.results.length : 0),
+    limit: String(pageSize),
   });
   if (force) params.set('refresh', '1');
   try {
     const data = await api('/api/discovery?' + params);
-    state.results = data.results;
+    if (requestId !== state.requestId) return;
+    state.results = append ? [...state.results, ...data.results] : data.results;
+    state.totalMatches = data.totalMatches ?? state.results.length;
+    state.hasMore = Boolean(data.hasMore);
     state.loaded = true;
-    document.querySelector('#catalog-size').textContent = data.catalogSize.toLocaleString() + ' films in range';
+    document.querySelector('#catalog-size').textContent =
+      state.totalMatches.toLocaleString() + ' matches across ' + data.catalogSize.toLocaleString() + ' films';
     const moodButton = document.querySelector('[data-mood="' + state.mood + '"]');
     document.querySelector('#discovery-title').textContent =
-      (moodButton ? moodButton.textContent : 'All signals') + ' · ' + data.results.length + ' strong matches';
-    results.innerHTML = data.results.length
-      ? data.results.map(cardMarkup).join('')
-      : '<div class="discovery-empty"><span>' +
-        radarSvg +
-        '</span><h3>No signal at this range</h3><p>Try allowing watched titles, choosing a broader mood, or adding more time.</p></div>';
-    results
-      .querySelectorAll('[data-result]')
-      .forEach((card) => card.addEventListener('click', () => openDetail(data.results[Number(card.dataset.result)])));
-    results
-      .querySelectorAll('[data-open-plex]')
-      .forEach((link) => link.addEventListener('click', (event) => event.stopPropagation()));
+      (moodButton ? moodButton.textContent : 'All signals') + ' · ranked for you';
+    renderResults(results);
+    updatePagination();
   } catch (error) {
-    results.innerHTML =
-      '<div class="discovery-empty error"><span>!</span><h3>Radar is offline</h3><p>' +
-      escapeText(error.message) +
-      '</p></div>';
+    if (requestId !== state.requestId) return;
+    if (append && state.results.length) {
+      more.hidden = false;
+      progress.textContent = error.message + ' Try again.';
+    } else {
+      results.innerHTML =
+        '<div class="discovery-empty error"><span>!</span><h3>Radar is offline</h3><p>' +
+        escapeText(error.message) +
+        '</p></div>';
+    }
   } finally {
-    results.classList.remove('loading');
+    if (requestId === state.requestId) {
+      results.classList.remove('loading');
+      button.disabled = false;
+      button.textContent = 'Show more films';
+    }
   }
 }
 
@@ -228,6 +280,7 @@ function setupRadar() {
     state.unwatchedOnly = event.target.checked;
     loadRadar(false);
   });
+  page.querySelector('#discovery-show-more').addEventListener('click', () => loadRadar(false, true));
   document.querySelector('[data-nav="radar"]').addEventListener('click', () => {
     if (!state.loaded) setTimeout(() => loadRadar(false), 80);
   });

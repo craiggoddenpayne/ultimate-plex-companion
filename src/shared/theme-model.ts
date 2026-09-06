@@ -142,6 +142,16 @@ export const COMPANION_THEMES = [
 
 export const EFFECT_LEVELS = ['full', 'ambient', 'still'];
 export const TEXT_SIZES = ['standard', 'comfortable', 'large', 'extra-large'];
+export const BACKGROUND_VISUALIZATIONS = [
+  { id: 'starfield', name: 'Starfield', tagline: 'A calm flight through distant light' },
+  { id: 'vortex', name: 'Vortex', tagline: 'A slow spiral around the command deck' },
+  { id: 'aurora', name: 'Aurora', tagline: 'Soft ribbons of atmospheric colour' },
+  { id: 'constellation', name: 'Constellations', tagline: 'Drifting points with quiet connections' },
+  { id: 'orbits', name: 'Orbital Rings', tagline: 'Measured paths and travelling satellites' },
+  { id: 'waves', name: 'Signal Waves', tagline: 'Layered telemetry moving across the horizon' },
+  { id: 'embers', name: 'Ember Drift', tagline: 'Warm particles rising through the interface' },
+  { id: 'off', name: 'No visualizer', tagline: 'Theme colour and haze only' },
+];
 
 export function normalizeThemePreferences(input: any = {}) {
   // Accept the common misspelling while storing the canonical Darcula id.
@@ -149,5 +159,8 @@ export function normalizeThemePreferences(input: any = {}) {
   const theme = COMPANION_THEMES.some((item) => item.id === requestedTheme) ? requestedTheme : 'solaris';
   const effects = EFFECT_LEVELS.includes(input.effects) ? input.effects : 'full';
   const textSize = TEXT_SIZES.includes(input.textSize) ? input.textSize : 'comfortable';
-  return { theme, effects, textSize };
+  const background = BACKGROUND_VISUALIZATIONS.some((item) => item.id === input.background)
+    ? input.background
+    : 'starfield';
+  return { theme, effects, textSize, background };
 }

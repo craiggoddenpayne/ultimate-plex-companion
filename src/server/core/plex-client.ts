@@ -83,5 +83,17 @@ export function createPlexClient(fetchImpl: typeof fetch = fetch, logger?: Logge
     return response;
   }
 
-  return { fetchJson, command, deleteMedia, artwork };
+  async function media(config: PlexConfig, path: string, range?: string) {
+    if (!/^\/library\/parts\/\d+(?:\/\d+)?\/file(?:\.[a-z0-9]{1,12})?$/i.test(path))
+      throw new Error('Invalid Plex media path.');
+    const response = await request(config, path, {
+      timeout: 30_000,
+      headers: { Accept: 'application/octet-stream', ...(range ? { Range: range } : {}) },
+    });
+    if (!response.ok && response.status !== 206)
+      throw new Error(`Plex could not provide this media file (HTTP ${response.status}).`);
+    return response;
+  }
+
+  return { fetchJson, command, deleteMedia, artwork, media };
 }

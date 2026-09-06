@@ -34,8 +34,8 @@ test('playlist generators produce useful live criteria', () => {
   assert.equal(generators.find((item) => item.id === 'short').count, 3);
   assert.equal(generators.find((item) => item.id === 'showcase').items[0].title, 'Epic');
   assert.equal(generators.find((item) => item.id === 'finish').items[0].title, 'Partial');
-  assert.equal(generators.length, 22);
-  assert.equal(new Set(generators.map((item) => item.id)).size, 22);
+  assert.equal(generators.length, 62);
+  assert.equal(new Set(generators.map((item) => item.id)).size, 62);
 });
 
 test('playlist studio derives discovery, cinema, runtime, mood and era signals', () => {
@@ -85,7 +85,92 @@ test('playlist studio derives discovery, cinema, runtime, mood and era signals',
   }
   assert.deepEqual(
     new Set(generators.map((item) => item.category)),
-    new Set(['Discovery', 'Progress', 'Runtime', 'Cinema', 'Mood', 'Household', 'Era']),
+    new Set(['Discovery', 'Progress', 'Runtime', 'Cinema', 'Mood', 'Household', 'Era', 'Genre', 'Quality']),
+  );
+});
+
+test('playlist studio exposes all forty advanced signals with stable identifiers', () => {
+  const generators = buildPlaylistGenerators([], 1_800_000_000);
+  const added = [
+    'action-surge',
+    'adventure-map',
+    'drama-depths',
+    'fantasy-realms',
+    'romance-orbit',
+    'animation-vault',
+    'history-war',
+    'music-stage',
+    'western-trails',
+    'remarkable-lives',
+    'golden-age',
+    'sixties-scope',
+    'seventies-grit',
+    'twenty-tens',
+    'current-decade',
+    'ninety-minute-window',
+    'two-hour-sweet-spot',
+    'mini-episodes',
+    'prestige-episodes',
+    'audience-nines',
+    'critical-consensus',
+    'audience-defenders',
+    'critic-champions',
+    'unrated-frontier',
+    'full-hd-showcase',
+    'sd-rescue',
+    'hevc-showcase',
+    'av1-future',
+    'high-bitrate',
+    'multi-version',
+    'barely-started',
+    'almost-finished',
+    'frequent-rewatches',
+    'recently-loved',
+    'feel-good',
+    'adrenaline',
+    'rainy-day',
+    'date-night',
+    'mind-benders',
+    'true-stories',
+  ];
+  assert.equal(added.length, 40);
+  for (const id of added)
+    assert.ok(
+      generators.some((generator) => generator.id === id),
+      `${id} should exist`,
+    );
+});
+
+test('advanced signals use genre, rating, format, progress and edition evidence', () => {
+  const now = 1_800_000_000;
+  const items = [
+    movie(60, 'AV1 Action', {
+      year: 2026,
+      audienceRating: 9.4,
+      rating: 8.7,
+      Genre: [{ tag: 'Action' }, { tag: 'Science Fiction' }],
+      Media: [
+        { videoResolution: '4k', videoCodec: 'av1', bitrate: 20_000 },
+        { videoResolution: '1080', videoCodec: 'hevc', bitrate: 8_000 },
+      ],
+    }),
+    movie(61, 'Nearly There', { viewOffset: 85 * 60_000, viewCount: 1, lastViewedAt: now - 100 }),
+    movie(62, 'Household Classic', { viewCount: 4, Genre: [{ tag: 'Comedy' }] }),
+  ];
+  const generators = buildPlaylistGenerators(items, now);
+  for (const id of [
+    'action-surge',
+    'audience-nines',
+    'critical-consensus',
+    'av1-future',
+    'high-bitrate',
+    'multi-version',
+  ])
+    assert.equal(generators.find((generator) => generator.id === id).items[0].title, 'AV1 Action');
+  assert.equal(generators.find((generator) => generator.id === 'almost-finished').items[0].title, 'Nearly There');
+  assert.equal(
+    generators.find((generator) => generator.id === 'frequent-rewatches').items[0].title,
+    'Household Classic',
   );
 });
 

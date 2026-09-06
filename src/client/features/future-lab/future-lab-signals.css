@@ -1,0 +1,281 @@
+.signal-view {
+  padding: 32px;
+}
+.signal-view > header {
+  display: flex;
+  justify-content: space-between;
+  gap: 24px;
+}
+.signal-view > header h2 {
+  margin: 8px 0 6px;
+  font-size: calc(25px + var(--text-increase, 1px));
+}
+.signal-view > header p {
+  max-width: 650px;
+  margin: 0;
+  color: var(--muted, #747c87);
+  font-size: calc(9px + var(--text-increase, 1px));
+  line-height: 1.65;
+}
+.signal-orbit {
+  width: 72px;
+  height: 72px;
+  flex: none;
+  display: grid;
+  place-items: center;
+  position: relative;
+  border: 1px solid #4a3b5c;
+  border-radius: 50%;
+  color: #c9a8ef;
+  font: 7px 'DM Mono';
+}
+.signal-orbit i {
+  position: absolute;
+  inset: 7px;
+  border: 1px dashed #5b466f;
+  border-radius: 50%;
+  animation: labOrbit 18s linear infinite;
+}
+.signal-metrics {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+  margin: 24px 0;
+}
+.signal-metrics article {
+  min-width: 0;
+  padding: 14px;
+  border: 1px solid color-mix(in srgb, var(--border, #293139) 82%, transparent);
+  border-radius: 7px;
+  background: color-mix(in srgb, var(--card, #11151a) 88%, transparent);
+}
+.signal-metrics b,
+.signal-metrics span,
+.signal-metrics small {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.signal-metrics b {
+  color: var(--text, #dddde0);
+  font: calc(17px + var(--text-increase, 1px)) 'DM Mono';
+  white-space: nowrap;
+}
+.signal-metrics span,
+.signal-metrics small {
+  margin-top: 5px;
+  color: var(--muted, #717985);
+  font: calc(6px + var(--text-increase, 1px)) 'DM Mono';
+  text-transform: uppercase;
+}
+.signal-section {
+  min-width: 0;
+  margin-top: 20px;
+}
+.signal-section > .card-label {
+  display: block;
+  margin-bottom: 9px;
+}
+.signal-bars-list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px 16px;
+}
+.signal-bars-list article > div {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 5px;
+}
+.signal-bars-list b {
+  overflow: hidden;
+  font-size: calc(8px + var(--text-increase, 1px));
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.signal-bars-list span {
+  flex: none;
+  color: var(--muted, #737b86);
+  font: calc(6px + var(--text-increase, 1px)) 'DM Mono';
+}
+.signal-bars-list i,
+.passport-grid i {
+  height: 5px;
+  display: block;
+  overflow: hidden;
+  border-radius: 5px;
+  background: #262c34;
+}
+.signal-bars-list em,
+.passport-grid em {
+  height: 100%;
+  display: block;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #9e63d2, #50d6d1);
+}
+.signal-media-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+}
+.signal-media-grid a {
+  min-width: 0;
+  display: flex;
+  gap: 9px;
+  align-items: center;
+  padding: 8px;
+  border: 1px solid #2b3139;
+  border-radius: 7px;
+  color: inherit;
+  background: #11151a;
+  text-decoration: none;
+}
+.signal-media-grid a:hover,
+.signal-media-grid a:focus-visible {
+  border-color: #6a4d86;
+  outline: none;
+}
+.signal-media-grid img {
+  width: 38px;
+  height: 56px;
+  flex: none;
+  object-fit: cover;
+  border-radius: 3px;
+  background: #252a31;
+}
+.signal-media-grid div {
+  min-width: 0;
+}
+.signal-media-grid b,
+.signal-media-grid span,
+.signal-media-grid small {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.signal-media-grid b {
+  font-size: calc(8px + var(--text-increase, 1px));
+}
+.signal-media-grid span,
+.signal-media-grid small {
+  margin-top: 4px;
+  color: var(--muted, #707985);
+  font: calc(6px + var(--text-increase, 1px)) 'DM Mono';
+}
+.signal-media-grid small {
+  color: #b990dc;
+}
+.signal-columns {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 20px;
+}
+.signal-columns.two {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+.signal-columns .signal-bars-list {
+  grid-template-columns: 1fr;
+}
+.expanded-lab-columns {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 22px;
+}
+.expanded-lab-columns > :only-child {
+  grid-column: 1/-1;
+}
+.expanded-facts {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 7px;
+}
+.expanded-facts > span {
+  padding: 10px;
+  border: 1px solid #2c333c;
+  border-radius: 6px;
+  background: #11161c;
+}
+.expanded-facts b,
+.expanded-facts small {
+  display: block;
+}
+.expanded-facts b {
+  overflow: hidden;
+  font-size: calc(8px + var(--text-increase, 1px));
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.expanded-facts small {
+  margin-top: 4px;
+  color: #8b69ae;
+  font: calc(6px + var(--text-increase, 1px)) 'DM Mono';
+}
+.chronotype-grid {
+  display: grid;
+  grid-template-columns: 36px repeat(6, 1fr);
+  gap: 5px;
+  align-items: center;
+}
+.chronotype-grid b,
+.chronotype-grid span {
+  color: #737b86;
+  text-align: center;
+  font: 6px 'DM Mono';
+}
+.chronotype-grid i {
+  height: 25px;
+  border: 1px solid color-mix(in srgb, #a36dd3 calc(var(--heat) * 60%), #292e37);
+  border-radius: 4px;
+  background: color-mix(in srgb, #8854b8 calc(var(--heat) * 82%), #171b21);
+}
+.passport-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+.passport-grid article {
+  padding: 12px;
+  border: 1px solid #2d333c;
+  border-radius: 7px;
+  background: #11151a;
+}
+.passport-grid b,
+.passport-grid span {
+  display: block;
+}
+.passport-grid b {
+  margin-bottom: 8px;
+  font: calc(12px + var(--text-increase, 1px)) 'DM Mono';
+}
+.passport-grid span {
+  margin-top: 7px;
+  color: #707985;
+  font: calc(6px + var(--text-increase, 1px)) 'DM Mono';
+}
+@media (max-width: 900px) {
+  .signal-media-grid,
+  .signal-metrics {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .signal-columns {
+    grid-template-columns: 1fr;
+  }
+  .expanded-lab-columns {
+    grid-template-columns: 1fr;
+  }
+}
+@media (max-width: 600px) {
+  .signal-view {
+    padding: 22px 14px;
+  }
+  .signal-orbit {
+    display: none;
+  }
+  .signal-bars-list,
+  .signal-media-grid,
+  .signal-columns.two,
+  .passport-grid {
+    grid-template-columns: 1fr;
+  }
+}

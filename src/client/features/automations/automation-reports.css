@@ -251,6 +251,26 @@
   color: #8ca0b7;
   font-weight: 500;
 }
+.run-report-body footer .run-download {
+  margin-left: auto;
+  border: 1px solid color-mix(in srgb, var(--run-tone) 36%, transparent);
+  border-radius: 6px;
+  background: color-mix(in srgb, var(--run-tone) 8%, transparent);
+  color: var(--run-tone);
+  padding: 7px 10px;
+  font: 700 calc(8px + var(--text-increase, 1px)) 'DM Mono';
+  letter-spacing: 0.7px;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+.run-report-body footer .run-download:hover {
+  background: color-mix(in srgb, var(--run-tone) 15%, transparent);
+  border-color: color-mix(in srgb, var(--run-tone) 60%, transparent);
+}
+.run-report-body footer .run-download:disabled {
+  cursor: wait;
+  opacity: 0.45;
+}
 .history-empty {
   padding: 28px;
   text-align: center;
@@ -282,5 +302,9 @@
   }
   .run-finding em {
     grid-column: 2;
+  }
+  .run-report-body footer .run-download {
+    width: 100%;
+    margin: 4px 0 0;
   }
 }

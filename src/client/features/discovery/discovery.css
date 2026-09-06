@@ -355,6 +355,45 @@
   color: #707884;
   font-size: calc(9px + var(--text-increase, 1px));
 }
+.discovery-more {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 9px;
+  padding: 22px 0 10px;
+}
+.discovery-more[hidden] {
+  display: none;
+}
+.discovery-more button {
+  min-width: 180px;
+  padding: 11px 20px;
+  border: 1px solid #795827;
+  border-radius: 6px;
+  color: #ffc25b;
+  background: #1c1710;
+  font: 600 calc(8px + var(--text-increase, 1px)) 'DM Mono';
+  letter-spacing: 0.7px;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: 0.2s;
+}
+.discovery-more button:hover:not(:disabled) {
+  border-color: #c58a32;
+  background: #292013;
+  transform: translateY(-1px);
+}
+.discovery-more button:disabled {
+  cursor: wait;
+  opacity: 0.6;
+}
+.discovery-more button[hidden] {
+  display: none;
+}
+.discovery-more span {
+  color: #606873;
+  font: calc(7px + var(--text-increase, 1px)) 'DM Mono';
+}
 .discovery-method {
   display: flex;
   align-items: center;

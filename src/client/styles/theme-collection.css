@@ -225,6 +225,7 @@ html[data-theme-mode='light']
     .icon-button,
     .server-chip,
     .effect-options,
+    .background-choice,
     .theme-modal footer button,
     .theme-card
   ) {

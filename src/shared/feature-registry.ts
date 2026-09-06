@@ -1,6 +1,22 @@
 export const features = Object.freeze([
   { id: 'dashboard', icon: 'grid', label: 'Command deck' },
   {
+    id: 'server',
+    icon: 'server',
+    label: 'Plex server',
+    copy: [
+      'PLEX SERVER INTELLIGENCE',
+      'Every subsystem. Fully exposed.',
+      'A technical view of identity, resources, networking, libraries, transcoding, maintenance and live server state.',
+    ],
+    concepts: [
+      ['Identity Matrix', 'Version, platform, API, claim state and immutable server identity.'],
+      ['Resource Telemetry', 'Live host and Plex process CPU and memory evidence.'],
+      ['Library Topology', 'Agents, scanners, paths, counts, UUIDs and scan timestamps.'],
+      ['Configuration Registry', 'Safe technical settings with defaults and override state.'],
+    ],
+  },
+  {
     id: 'intel',
     icon: 'spark',
     label: 'Utility matrix',
@@ -62,6 +78,22 @@ export const features = Object.freeze([
       ['Quality Ladder', 'Map every title by resolution, HDR and bitrate.'],
       ['Storage Forecast', 'Predict growth and plan disk expansion early.'],
       ['Metadata Lens', 'Surface weak artwork, titles and match confidence.'],
+    ],
+  },
+  {
+    id: 'downloads',
+    icon: 'download',
+    label: 'Media downloads',
+    copy: [
+      'MEDIA DOWNLOADS',
+      'Your media. Where you want it.',
+      'Find a title in Plex, choose the exact media version, and save the original file to your device.',
+    ],
+    concepts: [
+      ['Search Plex', 'Find films and episodes across every accessible library.'],
+      ['Choose a Version', 'Review resolution, format and size before downloading.'],
+      ['Pick a Destination', 'Use your browser’s save picker to choose the destination.'],
+      ['Original Quality', 'Stream the existing Plex file without transcoding it.'],
     ],
   },
   {

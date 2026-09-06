@@ -13,6 +13,24 @@ const metricLabels = {
   missingArtwork: 'Missing artwork',
   missingSummary: 'Missing summaries',
   missingYear: 'Missing years',
+  unwatched: 'Unwatched',
+  aged: 'Waiting 1+ year',
+  highRated: 'Highly rated',
+  versions: 'Media versions',
+  legacy: 'Legacy versions',
+  fourK: '4K versions',
+  unknownFormats: 'Unknown formats',
+  multiVersion: 'Multi-version',
+  additionalStorage: 'Additional storage',
+  today: 'Added today',
+  thisWeek: 'This week',
+  thisMonth: 'This month',
+  addedBytes: '30-day growth',
+  previousWeek: 'Previous week',
+  uniqueTitles: 'Unique titles',
+  viewers: 'Viewers',
+  checked: 'Arrivals checked',
+  clean: 'Clean arrivals',
 };
 
 function formatDuration(run) {
@@ -31,7 +49,17 @@ function formatDuration(run) {
 }
 
 function metricValue(key, value, bytes) {
-  if (key === 'estimatedSaving') return bytes(value);
+  if (
+    [
+      'estimatedSaving',
+      'additionalStorage',
+      'addedBytes',
+      'totalBytes',
+      'largestBytes',
+      'largestLibraryBytes',
+    ].includes(key)
+  )
+    return bytes(value);
   if (key === 'confidence') return `${value}%`;
   return typeof value === 'number' ? value.toLocaleString() : value;
 }
@@ -80,7 +108,7 @@ export function renderAutomationReports(runs, { escape, relativeTime, bytes }) {
         : '';
       return `<details class="auto-run-report ${escape(run.status)}" ${index === 0 ? 'open' : ''}>
       <summary><span class="history-status"><i></i>${escape(run.status)}</span><div class="run-summary-title"><b>${escape(run.ruleName)}</b><small>${escape(headline)}</small></div><span class="run-trigger">${trigger}</span><time>${relativeTime(run.finishedAt || run.startedAt)}</time><i class="run-chevron"></i></summary>
-      <div class="run-report-body"><div class="run-outcome"><span class="run-report-label">${failed ? 'FAILURE REPORT' : run.dryRun ? 'PREVIEW OUTCOME' : 'RUN OUTCOME'}</span><h3>${escape(headline)}</h3><p>${escape(detail)}</p></div>${metricsMarkup}${factsMarkup}${itemsMarkup}${recommendation}<footer><span>Started <b>${escape(exactTime(run.startedAt))}</b></span><span>Completed in <b>${escape(formatDuration(run))}</b></span><span>Trigger <b>${trigger}</b></span><span>Run ID <b>${escape(String(run.id || '').slice(0, 8) || 'Legacy')}</b></span></footer></div>
+      <div class="run-report-body"><div class="run-outcome"><span class="run-report-label">${failed ? 'FAILURE REPORT' : run.dryRun ? 'PREVIEW OUTCOME' : 'RUN OUTCOME'}</span><h3>${escape(headline)}</h3><p>${escape(detail)}</p></div>${metricsMarkup}${factsMarkup}${itemsMarkup}${recommendation}<footer><span>Started <b>${escape(exactTime(run.startedAt))}</b></span><span>Completed in <b>${escape(formatDuration(run))}</b></span><span>Trigger <b>${trigger}</b></span><span>Run ID <b>${escape(String(run.id || '').slice(0, 8) || 'Legacy')}</b></span><button type="button" class="run-download" data-download-run="${escape(run.id || '')}" ${run.status === 'running' ? 'disabled' : ''}>Download result</button></footer></div>
     </details>`;
     })
     .join('');

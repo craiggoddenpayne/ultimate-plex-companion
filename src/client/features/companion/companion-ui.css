@@ -105,6 +105,28 @@
   color: #53616b;
   font-style: normal;
 }
+#notification-count {
+  position: absolute;
+  right: -6px;
+  top: -7px;
+  min-width: 17px;
+  height: 17px;
+  display: grid;
+  place-items: center;
+  border: 2px solid #0d1015;
+  border-radius: 9px;
+  background: var(--amber);
+  color: #17120a;
+  padding: 0 3px;
+  font: 800 7px 'DM Mono';
+  line-height: 1;
+}
+#notification-count[hidden] {
+  display: none;
+}
+.icon-button:has(#notification-count:not([hidden])) .notice {
+  display: none;
+}
 .search-idle,
 .search-scanning {
   min-height: 95px;

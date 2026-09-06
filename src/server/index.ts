@@ -19,6 +19,7 @@ import { createCommandDeckRoutes } from './features/command-deck/routes.ts';
 import { createCompanionRoutes } from './features/companion/routes.ts';
 import { createConnectionRoutes } from './features/connection/routes.ts';
 import { createDiscoveryRoutes } from './features/discovery/routes.ts';
+import { buildDiscoveryRecommendations } from './features/discovery/discovery-recommendations.ts';
 import { createDiagnosticsRoutes } from './features/diagnostics/routes.ts';
 import { createFutureLabRoutes } from './features/future-lab/routes.ts';
 import { createLibraryRoutes } from './features/library/routes.ts';
@@ -26,6 +27,7 @@ import { createMetadataRoutes } from './features/metadata/routes.ts';
 import { createPlaylistRoutes } from './features/playlists/routes.ts';
 import { createPlexRoutes } from './features/plex/routes.ts';
 import { createRecommendationRoutes } from './features/recommendations/routes.ts';
+import { createServerInfoRoutes } from './features/server-info/routes.ts';
 import { createTelemetryRoutes } from './features/telemetry/routes.ts';
 import { createUtilityRoutes } from './features/utility-suite/routes.ts';
 import { createDataManagementRoutes } from './features/data-management/routes.ts';
@@ -34,6 +36,8 @@ import { createOptimizationStore } from './features/codec-studio/optimization-st
 import {
   optimizationEta,
   optimizationSummary,
+  parseFfmpegProgress,
+  removeOptimizationJob,
   requestOptimizationCancellation,
 } from './features/codec-studio/optimization-queue-server.ts';
 import {
@@ -92,6 +96,7 @@ const plexClient = createPlexClient(fetch, logger.child({ component: 'plex' }));
 const plexFetch = plexClient.fetchJson;
 const plexCommand = plexClient.command;
 const plexDelete = plexClient.deleteMedia;
+const plexMedia = plexClient.media;
 
 async function inspectPlex(config) {
   const [root, identity] = await Promise.all([plexFetch(config, '/'), plexFetch(config, '/identity')]);
@@ -174,6 +179,7 @@ async function libraryItems(config, library) {
     const query = new URLSearchParams({
       type: String(mediaType),
       includeMedia: '1',
+      includeAllStreams: '1',
       'X-Plex-Container-Start': String(start),
       'X-Plex-Container-Size': String(pageSize),
     });
@@ -258,22 +264,6 @@ async function storageAnalysis(config, force = false) {
   return data;
 }
 
-const moodGenres = {
-  any: [],
-  intense: ['Thriller', 'Action', 'Crime', 'Horror'],
-  comfort: ['Comedy', 'Family', 'Animation', 'Romance'],
-  mindbend: ['Science Fiction', 'Mystery', 'Fantasy'],
-  epic: ['Adventure', 'Action', 'History', 'War'],
-  funny: ['Comedy'],
-  real: ['Documentary', 'History', 'Biography', 'Music'],
-};
-
-function stableNoise(value) {
-  let hash = 2166136261;
-  for (const char of String(value)) hash = Math.imul(hash ^ char.charCodeAt(0), 16777619);
-  return ((hash >>> 0) % 1000) / 1000;
-}
-
 async function discoveryCatalog(config, force = false) {
   if (!force && discoveryCache && Date.now() - discoveryCache.createdAt < 15 * 60_000) return discoveryCache.items;
   const sections = await plexFetch(config, '/library/sections');
@@ -284,63 +274,8 @@ async function discoveryCatalog(config, force = false) {
 }
 
 async function discoveryRecommendations(config, options) {
-  const mood = moodGenres[options.mood] ? options.mood : 'any';
-  const mode = ['tonight', 'hidden', 'top', 'recent', 'surprise'].includes(options.mode) ? options.mode : 'tonight';
-  const maxMinutes = Math.min(300, Math.max(45, Number(options.maxMinutes || 180)));
-  const unwatchedOnly = options.unwatchedOnly !== 'false';
   const catalog = await discoveryCatalog(config, options.refresh === '1');
-  const now = Date.now() / 1000;
-  const ranked = catalog
-    .map((item) => {
-      const genres = (item.Genre || []).map((genre) => genre.tag).filter(Boolean);
-      const durationMinutes = Math.round(Number(item.duration || 0) / 60_000);
-      const rating = Number(item.audienceRating || item.rating || 0);
-      const watched = Number(item.viewCount || 0) > 0;
-      const moodMatches = moodGenres[mood].filter((genre) => genres.includes(genre));
-      let score = 35 + rating * 3 + (watched ? -5 : 8) + moodMatches.length * 8;
-      const ageDays = item.addedAt ? (now - Number(item.addedAt)) / 86400 : 9999;
-      if (mode === 'hidden') score += watched ? -18 : 8 + Math.min(5, rating / 2);
-      if (mode === 'top') score += rating * 2;
-      if (mode === 'recent') score += Math.max(0, 14 - ageDays / 20);
-      if (mode === 'surprise') score += stableNoise(`${item.ratingKey}-${new Date().toISOString().slice(0, 10)}`) * 14;
-      if (durationMinutes && durationMinutes <= maxMinutes)
-        score += Math.max(1, 5 - (maxMinutes - durationMinutes) / 30);
-      const reasons = [];
-      if (moodMatches.length) reasons.push(`matches ${moodMatches.slice(0, 2).join(' + ').toLowerCase()} mood`);
-      if (!watched) reasons.push('unwatched in your library');
-      if (rating >= 8) reasons.push(`${rating.toFixed(1)} audience rating`);
-      if (durationMinutes <= maxMinutes) reasons.push(`fits your ${maxMinutes}-minute window`);
-      if (mode === 'recent' && ageDays < 90) reasons.push('recently added');
-      return { item, score, genres, durationMinutes, rating, watched, reasons };
-    })
-    .filter(
-      (result) =>
-        (!unwatchedOnly || !result.watched) && result.durationMinutes > 0 && result.durationMinutes <= maxMinutes,
-    )
-    .sort((a, b) => b.score - a.score)
-    .slice(0, 18);
-  return {
-    catalogSize: catalog.length,
-    mood,
-    mode,
-    maxMinutes,
-    unwatchedOnly,
-    results: ranked.map(({ item, genres, durationMinutes, rating, watched, reasons, score }) => ({
-      ratingKey: item.ratingKey,
-      title: item.title,
-      year: item.year || null,
-      summary: item.summary || '',
-      library: item.libraryTitle,
-      genres: genres.slice(0, 4),
-      durationMinutes,
-      rating,
-      watched,
-      score: Math.min(99, Math.max(50, Math.round(score))),
-      reason: reasons.length ? reasons.slice(0, 3).join(' · ') : 'a strong fit from your Plex library',
-      poster: `/api/art/${item.ratingKey}`,
-      plexUrl: `/api/plex/open/${item.ratingKey}`,
-    })),
-  };
+  return buildDiscoveryRecommendations(catalog, options);
 }
 
 async function servePlexArt(res, ratingKey) {
@@ -422,9 +357,9 @@ async function probe(file) {
     '-v',
     'error',
     '-show_entries',
-    'format=duration,size',
+    'format=duration,size,format_name,bit_rate',
     '-show_entries',
-    'stream=codec_type,codec_name',
+    'stream=codec_type,codec_name,profile,width,height,pix_fmt,avg_frame_rate,channels,channel_layout,sample_rate',
     '-of',
     'json',
     file,
@@ -472,6 +407,11 @@ async function encodeJob(job, config) {
     const source = await probe(prepared.sourcePath);
     const sourceSize = Number(source.format?.size || prepared.version.size);
     const duration = Number(source.format?.duration || 0);
+    const sourceVideo = (source.streams || []).find((stream) => stream.codec_type === 'video') || {};
+    const sourceStreams = (source.streams || []).reduce(
+      (counts, stream) => ({ ...counts, [stream.codec_type]: (counts[stream.codec_type] || 0) + 1 }),
+      {},
+    );
     const extension = extname(prepared.sourcePath);
     const stem = basename(prepared.sourcePath, extension);
     const outputPath = join(
@@ -498,14 +438,45 @@ async function encodeJob(job, config) {
       plexDirectory: prepared.plexDirectory,
       sourceSize,
       duration,
+      sourceTechnical: {
+        container: source.format?.format_name || prepared.version.media.container || 'unknown',
+        bitrate: Number(
+          source.format?.bit_rate ||
+            (prepared.version.media.bitrate ? Number(prepared.version.media.bitrate) * 1000 : 0),
+        ),
+        video: {
+          codec: sourceVideo.codec_name || prepared.version.media.videoCodec || job.sourceCodec,
+          profile: sourceVideo.profile || null,
+          width: Number(sourceVideo.width || prepared.version.media.width || 0),
+          height: Number(sourceVideo.height || prepared.version.media.height || 0),
+          pixelFormat: sourceVideo.pix_fmt || null,
+          frameRate: sourceVideo.avg_frame_rate || null,
+        },
+        streams: sourceStreams,
+      },
       state: 'encoding',
       progress: 0,
+      telemetry: {},
       startedAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
     });
     await persistOptimizationJobs();
     if (job.cancelRequested)
       throw Object.assign(new Error('Optimization cancelled.'), { code: 'OPTIMIZATION_CANCELLED' });
+    const encoderArguments = videoArguments(target.key, prepared.settings);
+    const argumentValue = (name) => {
+      const index = encoderArguments.indexOf(name);
+      return index >= 0 ? encoderArguments[index + 1] : null;
+    };
+    job.encodingSettings = {
+      encoder: target.encoder,
+      crf: Number(argumentValue('-crf')),
+      preset: argumentValue('-preset') || argumentValue('-deadline'),
+      cpuUsed: argumentValue('-cpu-used'),
+      container: 'Matroska',
+      copiedStreams: ['audio', 'subtitles', 'chapters', 'metadata'],
+    };
+    await persistOptimizationJobs();
     const args = [
       '-hide_banner',
       '-nostdin',
@@ -520,20 +491,29 @@ async function encodeJob(job, config) {
       '0',
       '-c',
       'copy',
-      ...videoArguments(target.key, prepared.settings),
+      ...encoderArguments,
       '-progress',
       'pipe:1',
       '-nostats',
       outputPath,
     ];
+    let progressBuffer = '';
     try {
       await runProcess(
         'ffmpeg',
         args,
         (text) => {
-          const match = text.match(/out_time_us=(\d+)/);
-          if (match && duration)
-            job.progress = Math.min(99, Math.round((Number(match[1]) / 1_000_000 / duration) * 100));
+          progressBuffer += text;
+          const completeAt = progressBuffer.lastIndexOf('\n');
+          if (completeAt < 0) return;
+          const complete = progressBuffer.slice(0, completeAt + 1);
+          progressBuffer = progressBuffer.slice(completeAt + 1);
+          job.telemetry = {
+            ...parseFfmpegProgress(complete, job.telemetry),
+            sampledAt: new Date().toISOString(),
+          };
+          if (job.telemetry.encodedSeconds && duration)
+            job.progress = Math.min(99, Math.round((job.telemetry.encodedSeconds / duration) * 100));
           job.updatedAt = new Date().toISOString();
           if (Date.now() - lastJobPersistAt > 2000) {
             lastJobPersistAt = Date.now();
@@ -557,10 +537,6 @@ async function encodeJob(job, config) {
       throw Object.assign(new Error('Optimization cancelled.'), { code: 'OPTIMIZATION_CANCELLED' });
     const outputSize = Number(output.format?.size || 0);
     const outputDuration = Number(output.format?.duration || 0);
-    const sourceStreams = (source.streams || []).reduce(
-      (counts, stream) => ({ ...counts, [stream.codec_type]: (counts[stream.codec_type] || 0) + 1 }),
-      {},
-    );
     const outputStreams = (output.streams || []).reduce(
       (counts, stream) => ({ ...counts, [stream.codec_type]: (counts[stream.codec_type] || 0) + 1 }),
       {},
@@ -741,6 +717,13 @@ const queueController = {
     }
     return publicJob(job);
   },
+  async remove(id) {
+    const job = removeOptimizationJob(jobs, id, activeJob);
+    await persistOptimizationJobs();
+    logger.info('optimization.removed', { jobId: job.id, ratingKey: job.ratingKey, previousState: job.state });
+    runNextJob();
+    return publicJob(job);
+  },
   async setPaused(paused) {
     queuePaused = paused;
     await persistOptimizationJobs();
@@ -771,6 +754,7 @@ const featureRouter = composeFeatureRouters([
   createDataManagementRoutes({ queue: queueController, automations: automationEngine }),
   createCompanionRoutes(automationEngine),
   createRecommendationRoutes(),
+  createServerInfoRoutes(),
   createPlaylistRoutes(),
   createAutomationRoutes(automationEngine),
   createFutureLabRoutes(),
@@ -840,6 +824,7 @@ function requestContext(req, res, pathname) {
     plexFetch,
     plexCommand,
     plexDelete,
+    plexMedia,
     libraryItems,
     overview,
     storageAnalysis,

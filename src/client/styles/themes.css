@@ -360,6 +360,173 @@ html[data-theme] .theme-launcher .icon {
   font: calc(6px + var(--text-increase, 1px)) 'DM Mono';
   letter-spacing: 0.8px;
 }
+.background-control {
+  margin-top: 16px;
+  padding: 17px;
+  border: 1px solid var(--theme-line);
+  border-radius: 9px;
+  background: color-mix(in srgb, var(--theme-panel2) 72%, transparent);
+}
+.background-control > div:first-child > span {
+  color: var(--theme-secondary);
+  font: calc(7px + var(--text-increase, 1px)) 'DM Mono';
+  letter-spacing: 1px;
+}
+.background-control h3 {
+  margin: 5px 0 3px;
+  font-size: calc(12px + var(--text-increase, 1px));
+}
+.background-control > div:first-child p {
+  margin: 0;
+  color: var(--theme-muted);
+  font-size: calc(7px + var(--text-increase, 1px));
+}
+.background-options {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 7px;
+  margin-top: 13px;
+}
+.background-choice {
+  min-width: 0;
+  padding: 7px;
+  border: 1px solid var(--theme-line);
+  border-radius: 7px;
+  background: color-mix(in srgb, var(--theme-panel) 82%, transparent);
+  color: var(--theme-text);
+  text-align: left;
+  cursor: pointer;
+  transition: 0.2s;
+}
+.background-choice:hover,
+.background-choice.active {
+  border-color: color-mix(in srgb, var(--theme-secondary) 65%, var(--theme-line));
+  background: color-mix(in srgb, var(--theme-secondary) 7%, var(--theme-panel));
+  transform: translateY(-1px);
+}
+.background-choice b,
+.background-choice small {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.background-choice b {
+  margin-top: 6px;
+  color: color-mix(in srgb, var(--theme-text) 88%, var(--theme-secondary));
+  font-size: calc(8px + var(--text-increase, 1px));
+}
+.background-choice small {
+  margin-top: 2px;
+  color: var(--theme-muted);
+  font-size: calc(6px + var(--text-increase, 1px));
+}
+.background-preview {
+  height: 43px;
+  position: relative;
+  display: block;
+  overflow: hidden;
+  border-radius: 4px;
+  background: color-mix(in srgb, var(--theme-bg) 90%, #000);
+}
+.background-preview i,
+.background-preview:before,
+.background-preview:after {
+  content: '';
+  position: absolute;
+  pointer-events: none;
+}
+.background-preview.starfield {
+  background:
+    radial-gradient(circle at 18% 28%, var(--theme-text) 0 1px, transparent 1.5px),
+    radial-gradient(circle at 70% 20%, var(--theme-secondary) 0 1px, transparent 1.5px),
+    radial-gradient(circle at 54% 68%, var(--theme-text) 0 1px, transparent 1.5px),
+    radial-gradient(circle at 88% 72%, var(--theme-primary) 0 1px, transparent 1.5px), var(--theme-bg);
+}
+.background-preview.vortex {
+  background: repeating-radial-gradient(
+    ellipse at 58% 50%,
+    transparent 0 4px,
+    color-mix(in srgb, var(--theme-secondary) 32%, transparent) 5px,
+    transparent 6px 9px
+  );
+  transform: rotate(-7deg);
+}
+.background-preview.aurora {
+  background:
+    linear-gradient(
+      160deg,
+      transparent 15%,
+      color-mix(in srgb, var(--theme-secondary) 32%, transparent),
+      transparent 58%
+    ),
+    linear-gradient(
+      25deg,
+      transparent 28%,
+      color-mix(in srgb, var(--theme-tertiary) 28%, transparent),
+      transparent 75%
+    ),
+    var(--theme-bg);
+}
+.background-preview.constellation i {
+  left: 18%;
+  top: 25%;
+  width: 2px;
+  height: 2px;
+  border-radius: 50%;
+  background: var(--theme-secondary);
+  box-shadow:
+    24px 14px var(--theme-text),
+    55px -4px var(--theme-primary),
+    84px 18px var(--theme-secondary),
+    112px 4px var(--theme-text);
+}
+.background-preview.constellation:after {
+  left: 20%;
+  top: 27%;
+  width: 68%;
+  height: 1px;
+  background: color-mix(in srgb, var(--theme-secondary) 35%, transparent);
+  transform: rotate(7deg);
+  transform-origin: left;
+}
+.background-preview.orbits:before,
+.background-preview.orbits:after {
+  left: 50%;
+  top: 50%;
+  width: 75%;
+  height: 45%;
+  border: 1px solid color-mix(in srgb, var(--theme-secondary) 36%, transparent);
+  border-radius: 50%;
+  transform: translate(-50%, -50%) rotate(-8deg);
+}
+.background-preview.orbits:after {
+  width: 42%;
+  height: 72%;
+  border-color: color-mix(in srgb, var(--theme-primary) 40%, transparent);
+  transform: translate(-50%, -50%) rotate(56deg);
+}
+.background-preview.waves {
+  background: repeating-radial-gradient(
+    ellipse at 50% 112%,
+    transparent 0 7px,
+    color-mix(in srgb, var(--theme-secondary) 30%, transparent) 8px,
+    transparent 9px 13px
+  );
+}
+.background-preview.embers {
+  background:
+    radial-gradient(circle at 18% 78%, var(--theme-primary) 0 1px, transparent 2px),
+    radial-gradient(circle at 39% 42%, var(--theme-rose) 0 1px, transparent 2px),
+    radial-gradient(circle at 63% 72%, var(--theme-primary) 0 1.5px, transparent 2.5px),
+    radial-gradient(circle at 82% 28%, var(--theme-primary) 0 1px, transparent 2px),
+    linear-gradient(0deg, color-mix(in srgb, var(--theme-primary) 10%, transparent), transparent 70%), var(--theme-bg);
+}
+.background-preview.off:after {
+  inset: 10px 17%;
+  border-top: 1px solid var(--theme-muted);
+  transform: rotate(-12deg);
+}
 .effect-control {
   display: flex;
   align-items: center;
@@ -465,6 +632,9 @@ html[data-effects='ambient'] :is(.auto-reactor, .atlas-orbit, .lab-orbit) {
 html[data-effects='ambient'] #starfield {
   opacity: 0.42;
 }
+html[data-background='off'] .cosmic-haze {
+  opacity: 0.45;
+}
 html[data-effects='still'] #starfield {
   opacity: 0.28;
 }
@@ -486,6 +656,9 @@ html[data-effects='still'] *:after {
   }
   .theme-grid .theme-card:last-child {
     grid-column: span 2;
+  }
+  .background-options {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
   .effect-control {
     align-items: flex-start;
@@ -516,5 +689,8 @@ html[data-effects='still'] *:after {
   }
   .effect-options button {
     flex: 1;
+  }
+  .background-choice small {
+    display: none;
   }
 }

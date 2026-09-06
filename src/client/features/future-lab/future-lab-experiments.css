@@ -409,7 +409,72 @@
 .runtime-distribution article {
   margin: 11px 0;
 }
-.runtime-distribution article > div {
+.runtime-distribution-trigger,
+.runtime-window-trigger {
+  width: 100%;
+  padding: 0;
+  color: inherit;
+  text-align: left;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+}
+.runtime-distribution-trigger > small {
+  display: block;
+  margin-top: 6px;
+  color: #b48adf;
+  font: 7px 'DM Mono';
+  text-align: right;
+  text-transform: uppercase;
+}
+.runtime-title-list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 6px;
+  margin: 10px 0 4px;
+  padding: 10px;
+  border: 1px solid #312943;
+  border-radius: 7px;
+  background: #0b0d13;
+}
+.runtime-title-list[hidden] {
+  display: none;
+}
+.runtime-title-list span,
+.runtime-title,
+.runtime-title-list b,
+.runtime-title-list small {
+  display: block;
+}
+.runtime-title {
+  min-width: 0;
+  padding: 7px;
+  border: 1px solid transparent;
+  border-radius: 5px;
+  color: inherit;
+  text-align: left;
+  background: #14121b;
+  cursor: pointer;
+}
+.runtime-title:hover,
+.runtime-title:focus-visible {
+  border-color: #6d5191;
+  outline: none;
+  background: #1b1626;
+}
+.runtime-title-list b {
+  overflow: hidden;
+  color: #c7c4cd;
+  font-size: 9px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.runtime-title-list small {
+  margin-top: 2px;
+  color: #696574;
+  font-size: 7px;
+}
+.runtime-distribution-trigger > div {
   display: flex;
   justify-content: space-between;
   margin-bottom: 5px;
@@ -421,7 +486,7 @@
   color: var(--muted, #747c87);
   font: calc(6px + var(--text-increase, 1px)) 'DM Mono';
 }
-.runtime-distribution article > i {
+.runtime-distribution-trigger > i {
   display: block;
   height: 5px;
   overflow: hidden;
@@ -453,6 +518,62 @@
 .time-portals b,
 .time-portals span {
   display: block;
+}
+
+.runtime-detail-modal {
+  position: relative;
+  z-index: 1;
+  width: min(570px, calc(100vw - 30px));
+  display: grid;
+  grid-template-columns: 125px minmax(0, 1fr);
+  gap: 24px;
+  padding: 28px;
+  border: 1px solid #493960;
+  border-radius: 12px;
+  background: radial-gradient(circle at 20% 0, #4b316044, transparent 45%), #101117;
+  box-shadow: 0 30px 100px #000;
+}
+.runtime-detail-modal > img {
+  width: 125px;
+  aspect-ratio: 2 / 3;
+  object-fit: cover;
+  border-radius: 6px;
+  background: #26232c;
+}
+.runtime-detail-modal h2 {
+  margin: 8px 28px 6px 0;
+  font-size: calc(24px + var(--text-increase, 1px));
+}
+.runtime-detail-facts,
+.runtime-detail-genres {
+  color: var(--muted, #7a7482);
+  font: calc(7px + var(--text-increase, 1px)) 'DM Mono';
+  line-height: 1.6;
+}
+.runtime-detail-modal a {
+  display: inline-block;
+  margin-top: 15px;
+  padding: 9px 12px;
+  border: 1px solid #7652a0;
+  border-radius: 5px;
+  color: #d4b4f5;
+  font: calc(7px + var(--text-increase, 1px)) 'DM Mono';
+  text-decoration: none;
+}
+.time-portals .runtime-title-list {
+  grid-template-columns: 1fr;
+  text-align: left;
+}
+.time-portals .runtime-title-list b {
+  color: #c7c4cd;
+  font:
+    9px Manrope,
+    sans-serif;
+}
+.time-portals .runtime-title-list small {
+  margin: 2px 0 0;
+  color: #696574;
+  font: 7px 'DM Mono';
 }
 .time-portals b {
   color: #64d9d4;
@@ -589,6 +710,17 @@
   }
 }
 @media (max-width: 650px) {
+  .runtime-detail-modal {
+    grid-template-columns: 80px minmax(0, 1fr);
+    gap: 15px;
+    padding: 20px;
+  }
+  .runtime-detail-modal > img {
+    width: 80px;
+  }
+  .runtime-detail-modal h2 {
+    font-size: calc(18px + var(--text-increase, 1px));
+  }
   .experiment-view {
     padding: 23px 14px;
   }

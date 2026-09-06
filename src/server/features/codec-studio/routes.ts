@@ -79,7 +79,9 @@ export function createCodecRoutes(queue) {
       const job =
         input.action === 'cancel'
           ? await queue.cancel(action[1])
-          : updateQueuedJob(queue.jobs, action[1], input.action);
+          : input.action === 'remove'
+            ? await queue.remove(action[1])
+            : updateQueuedJob(queue.jobs, action[1], input.action);
       await queue.persist();
       if (input.action === 'retry') queue.runNext();
       json(res, 200, { job: queue.publicJob(job), summary: optimizationSummary(queue.jobs, queue.activeJob()) });

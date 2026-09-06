@@ -1,6 +1,7 @@
 import { renderAutomationReports } from './automation-report-ui.ts';
+import { expandedSuggestedSchedules, expandedTypeMeta } from './automation-expanded.ts';
 import { apiFetch } from '../../core/api-client.ts';
-const autoState = { data: null, loaded: false };
+const autoState = { data: null, loaded: false, view: 'recipes' };
 const autoIcon = {
   bolt: '<svg viewBox="0 0 24 24"><path d="m13 2-9 12h8l-1 8 9-12h-8z"/></svg>',
   shield:
@@ -60,6 +61,58 @@ const typeMeta = {
     verb: 'Sample playback',
     note: 'Read-only transcode pressure snapshot',
   },
+  backlog_radar: {
+    label: 'Backlog Age Radar',
+    icon: 'clock',
+    verb: 'Measure backlog age',
+    note: 'Read-only unwatched shelf forecast',
+  },
+  format_sentinel: {
+    label: 'Format Drift Sentinel',
+    icon: 'scan',
+    verb: 'Map media formats',
+    note: 'Read-only codec and resolution audit',
+  },
+  edition_sentinel: {
+    label: 'Edition Storage Sentinel',
+    icon: 'shield',
+    verb: 'Inspect stored editions',
+    note: 'Read-only multi-version storage audit',
+  },
+  growth_chronicle: {
+    label: 'Library Growth Chronicle',
+    icon: 'bolt',
+    verb: 'Measure library growth',
+    note: 'Read-only arrival and storage timeline',
+  },
+  playback_digest: {
+    label: 'Weekly Playback Digest',
+    icon: 'clock',
+    verb: 'Summarize playback',
+    note: 'Read-only seven-day household report',
+  },
+  new_media_guard: {
+    label: 'New Media Integrity Guard',
+    icon: 'shield',
+    verb: 'Verify new arrivals',
+    note: 'Read-only recent media integrity check',
+  },
+  ...expandedTypeMeta,
+};
+const suggestedSchedules = {
+  quality_guardian: { frequency: 'weekly', time: '03:00', weekday: 0 },
+  library_refresh: { frequency: 'daily', time: '03:00', weekday: 1 },
+  health_snapshot: { frequency: 'every6h', time: '03:00', weekday: 1 },
+  arrival_digest: { frequency: 'daily', time: '08:00', weekday: 1 },
+  metadata_sentinel: { frequency: 'weekly', time: '04:00', weekday: 0 },
+  stream_sentinel: { frequency: 'hourly', time: '03:00', weekday: 1 },
+  backlog_radar: { frequency: 'weekly', time: '09:00', weekday: 6 },
+  format_sentinel: { frequency: 'weekly', time: '04:30', weekday: 0 },
+  edition_sentinel: { frequency: 'weekly', time: '05:00', weekday: 0 },
+  growth_chronicle: { frequency: 'daily', time: '08:15', weekday: 1 },
+  playback_digest: { frequency: 'weekly', time: '08:00', weekday: 1 },
+  new_media_guard: { frequency: 'daily', time: '06:00', weekday: 1 },
+  ...expandedSuggestedSchedules,
 };
 
 function autoRequest(path, options: any = {}) {
@@ -100,9 +153,31 @@ function shell() {
     <header class="automation-hero"><div><span class="eyebrow">AUTOMATION CORE · LOCAL-FIRST</span><h1>Put the routine<br><em>on autopilot.</em></h1><p>Scheduled Plex care with previews, guardrails and a permanent record of every action.</p></div><div class="auto-reactor" aria-hidden="true"><i></i><i></i><i></i><span><b></b></span><em>CORE ONLINE</em></div><button class="auto-primary" id="new-automation">${autoIcon.bolt} Create automation</button></header>
     <section class="auto-metrics"><article><span>ACTIVE RULES</span><strong id="auto-active">—</strong><small>Enabled by you</small></article><article><span>NEXT EVENT</span><strong id="auto-next">—</strong><small id="auto-next-name">Nothing scheduled</small></article><article><span>SUCCESS RATE</span><strong id="auto-success">—</strong><small>Across recorded runs</small></article><article><span>TIMEZONE</span><strong id="auto-timezone">LOCAL</strong><small>Schedules follow the container</small></article></section>
     <div class="auto-safety">${autoIcon.shield}<div><b>Guardrails are always active</b><p>Automations cannot delete or replace media. Every rule can be previewed with a dry run, and new rules begin disabled unless you explicitly enable them.</p></div><span>SAFE MODE</span></div>
-    <section class="auto-section"><div class="auto-section-head"><div><span class="card-label">MISSION PROFILES</span><h2>Start with a trusted recipe</h2></div><p>Configured for your server after creation</p></div><div class="auto-templates" id="auto-templates"></div></section>
-    <section class="auto-section"><div class="auto-section-head"><div><span class="card-label">CONTROL MATRIX</span><h2>Your automations</h2></div><div class="auto-toolbar"><span class="auto-live" id="scheduler-state"><i></i> Scheduler online</span><button id="preview-all">Dry-run all</button><button id="export-automations">Export</button><button id="pause-scheduler">Pause core</button></div></div><div class="auto-rules" id="auto-rules"><div class="auto-loading"><i></i><span>Synchronising rules…</span></div></div></section>
-    <section class="auto-section history-section"><div class="auto-section-head"><div><span class="card-label">IMMUTABLE MEMORY</span><h2>Run history</h2></div><p>Latest 40 events</p></div><div class="auto-history" id="auto-history"></div></section>`;
+    <nav class="auto-view-tabs" aria-label="Automation sections"><button class="active" data-auto-view="recipes"><span>Recipe catalogue</span><b id="auto-recipe-count">42</b></button><button data-auto-view="rules"><span>Your automations</span><b id="auto-rule-count">0</b></button><button data-auto-view="history"><span>Run history</span><b id="auto-run-count">0</b></button></nav>
+    <section class="auto-section" data-auto-section="recipes"><div class="auto-section-head"><div><span class="card-label">MISSION PROFILES</span><h2>Start with a trusted recipe</h2></div><label class="auto-recipe-filter"><span>FILTER 42 RECIPES</span><input id="auto-recipe-filter" type="search" placeholder="Metadata, storage, playback…"></label></div><div class="auto-templates" id="auto-templates"></div></section>
+    <section class="auto-section" data-auto-section="rules" hidden><div class="auto-section-head"><div><span class="card-label">CONTROL MATRIX</span><h2>Your automations</h2></div><div class="auto-toolbar"><span class="auto-live" id="scheduler-state"><i></i> Scheduler online</span><button id="preview-all">Dry-run all</button><button id="export-automations">Export</button><button id="pause-scheduler">Pause core</button></div></div><div class="auto-rules" id="auto-rules"><div class="auto-loading"><i></i><span>Synchronising rules…</span></div></div></section>
+    <section class="auto-section history-section" data-auto-section="history" hidden><div class="auto-section-head"><div><span class="card-label">IMMUTABLE MEMORY</span><h2>Run history</h2></div><p>Latest 40 events</p></div><div class="auto-history" id="auto-history"></div></section>`;
+}
+
+function setAutomationView(view, { scroll = false } = {}) {
+  if (!['recipes', 'rules', 'history'].includes(view)) return;
+  autoState.view = view;
+  document.querySelectorAll('[data-auto-view]').forEach((button) => {
+    const selected = button.dataset.autoView === view;
+    button.classList.toggle('active', selected);
+    button.setAttribute('aria-selected', String(selected));
+  });
+  document.querySelectorAll('[data-auto-section]').forEach((section) => {
+    section.hidden = section.dataset.autoSection !== view;
+  });
+  if (scroll) document.querySelector(`[data-auto-section="${view}"]`)?.scrollIntoView({ behavior: 'smooth' });
+}
+
+function renderViewTabs() {
+  document.querySelector('#auto-recipe-count').textContent = String(autoState.data.templates.length);
+  document.querySelector('#auto-rule-count').textContent = String(autoState.data.rules.length);
+  document.querySelector('#auto-run-count').textContent = String(Math.min(40, autoState.data.runs.length));
+  setAutomationView(autoState.view);
 }
 
 function renderTemplates() {
@@ -110,12 +185,37 @@ function renderTemplates() {
   container.innerHTML = autoState.data.templates
     .map(
       (item, index) =>
-        `<article class="auto-template ${item.tone}"><span class="template-index">0${index + 1}</span><div class="template-orb">${autoIcon[typeMeta[item.type].icon]}</div><span class="template-access">${item.readOnly ? 'READ ONLY' : 'PLEX ACTION'}</span><h3>${autoEscape(item.name)}</h3><p>${autoEscape(item.description)}</p><button data-template="${item.type}">Configure recipe <b>→</b></button></article>`,
+        `<article class="auto-template ${item.tone}" data-recipe-card><span class="template-index">${String(index + 1).padStart(2, '0')}</span><div class="template-orb">${autoIcon[typeMeta[item.type].icon]}</div><span class="template-access">${item.category ? `${autoEscape(item.category).toUpperCase()} · ` : ''}${item.readOnly ? 'READ ONLY' : 'PLEX ACTION'}</span><h3>${autoEscape(item.name)}</h3><p>${autoEscape(item.description)}</p><div class="template-actions"><button data-template="${item.type}">Configure recipe <b>→</b></button><button class="template-run" data-template-run="${item.type}" ${item.running ? 'disabled' : ''}>${item.running ? 'Running…' : 'Run now'}</button></div></article>`,
     )
     .join('');
   container
     .querySelectorAll('[data-template]')
     .forEach((button) => button.addEventListener('click', () => openRuleModal(button.dataset.template)));
+  container.querySelectorAll('[data-template-run]').forEach((button) =>
+    button.addEventListener('click', async () => {
+      const type = button.dataset.templateRun;
+      button.disabled = true;
+      button.textContent = 'Running…';
+      try {
+        await autoRequest(`/api/automations/recipes/${type}/run`, {
+          method: 'POST',
+          body: JSON.stringify({}),
+        });
+        await loadAutomations();
+        autoToast(`${typeMeta[type].label} completed`);
+        setAutomationView('history', { scroll: true });
+      } catch (error) {
+        button.disabled = false;
+        button.textContent = 'Run now';
+        autoToast(error.message, true);
+      }
+    }),
+  );
+  const query = document.querySelector('#auto-recipe-filter')?.value.trim().toLowerCase();
+  if (query)
+    container.querySelectorAll('[data-recipe-card]').forEach((card) => {
+      card.hidden = !card.textContent.toLowerCase().includes(query);
+    });
 }
 
 function renderRules() {
@@ -144,6 +244,36 @@ function renderHistory() {
   const runs = autoState.data.runs,
     container = document.querySelector('#auto-history');
   container.innerHTML = renderAutomationReports(runs, { escape: autoEscape, relativeTime, bytes: autoBytes });
+  container.querySelectorAll('[data-download-run]').forEach((button) =>
+    button.addEventListener('click', () => {
+      const run = runs.find((item) => item.id === button.dataset.downloadRun);
+      if (run) downloadAutomationResult(run);
+    }),
+  );
+}
+
+function downloadAutomationResult(run) {
+  const payload = {
+    exportedAt: new Date().toISOString(),
+    application: 'Ultimate Plex Companion',
+    reportVersion: 1,
+    run,
+  };
+  const slug = String(run.ruleName || run.type || 'automation')
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-|-$/g, '')
+    .slice(0, 60);
+  const date = String(run.finishedAt || run.startedAt || new Date().toISOString()).slice(0, 10);
+  const url = URL.createObjectURL(
+    new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json;charset=utf-8' }),
+  );
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = `plex-automation-${slug || 'result'}-${date}.json`;
+  link.click();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+  autoToast('Automation result downloaded');
 }
 
 function renderMetrics() {
@@ -185,6 +315,7 @@ function renderAll() {
   renderRules();
   renderHistory();
   renderMetrics();
+  renderViewTabs();
 }
 async function loadAutomations() {
   try {
@@ -210,8 +341,10 @@ async function mutate(path, options, message) {
     await autoRequest(path, options);
     await loadAutomations();
     autoToast(message);
+    return true;
   } catch (error) {
     autoToast(error.message, true);
+    return false;
   }
 }
 function bindRule(card, rule) {
@@ -228,11 +361,12 @@ function bindRule(card, rule) {
     button.addEventListener('click', async () => {
       button.disabled = true;
       button.textContent = button.dataset.run === 'dry' ? 'Previewing…' : 'Running…';
-      await mutate(
+      const completed = await mutate(
         `/api/automations/${rule.id}/run`,
         { method: 'POST', body: JSON.stringify({ dryRun: button.dataset.run === 'dry' }) },
         button.dataset.run === 'dry' ? 'Dry run completed' : 'Automation completed',
       );
+      if (completed) setAutomationView('history', { scroll: true });
     }),
   );
   card.querySelector('[data-edit]').addEventListener('click', () => openRuleModal(rule.type, rule));
@@ -252,6 +386,7 @@ async function previewAll() {
       });
     await loadAutomations();
     autoToast(rules.length + ' safe preview' + (rules.length === 1 ? '' : 's') + ' completed');
+    setAutomationView('history', { scroll: true });
   } catch (error) {
     autoToast(error.message, true);
   } finally {
@@ -289,7 +424,7 @@ function exportAutomations() {
 function modalMarkup(type, rule) {
   const meta = typeMeta[type],
     editing = Boolean(rule),
-    schedule = rule?.schedule || { frequency: 'daily', time: '03:00', weekday: 1 };
+    schedule = rule?.schedule || suggestedSchedules[type] || { frequency: 'daily', time: '03:00', weekday: 1 };
   const libraryOptions = (autoState.data?.libraries || [])
     .map(
       (item) =>
@@ -313,14 +448,14 @@ function modalMarkup(type, rule) {
     : '<label>Automation recipe<select name="recipe">' +
       recipeOptions +
       '</select><small>Choose what Companion should do. You can preview it safely before the first live run.</small></label>';
-  return `<div class="auto-modal-wrap"><div class="auto-modal-backdrop"></div><section class="auto-modal"><button class="auto-modal-close">×</button><div class="modal-symbol">${autoIcon[meta.icon]}</div><span class="eyebrow">${editing ? 'EDIT MISSION' : 'NEW MISSION'} · ${autoEscape(meta.label).toUpperCase()}</span><h2>${editing ? 'Tune the routine.' : 'Configure the routine.'}</h2><p>${autoEscape(meta.note)}. Times use ${autoEscape(autoState.data?.timezone || 'the container timezone')}.</p><form id="auto-rule-form">${recipeField}<div class="modal-grid"><label>Frequency<select name="frequency"><option value="manual">Manual only</option><option value="hourly">Every hour</option><option value="every6h">Every six hours</option><option value="daily">Daily</option><option value="weekly">Weekly</option></select></label><label data-time>Start time<input name="time" type="time" value="${autoEscape(schedule.time)}"></label><label data-weekday>Day<select name="weekday">${['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'].map((day, i) => `<option value="${i}">${day}</option>`).join('')}</select></label></div>${['library_refresh', 'metadata_sentinel'].includes(type) ? `<label>Library<select name="libraryKey"><option value="all">All libraries</option>${libraryOptions}</select></label>` : ''}<label class="modal-enable"><input name="enabled" type="checkbox" ${rule?.enabled ? 'checked' : ''}><span></span><div><b>Enable immediately</b><small>The next run will be calculated when saved.</small></div></label><div class="modal-actions">${editing ? '<button type="button" class="auto-delete">Delete rule</button>' : ''}<button type="button" class="auto-cancel">Cancel</button><button type="submit" class="auto-primary">${editing ? 'Save changes' : 'Create mission'}</button></div></form></section></div>`;
+  return `<div class="auto-modal-wrap"><div class="auto-modal-backdrop"></div><section class="auto-modal"><button class="auto-modal-close">×</button><div class="modal-symbol">${autoIcon[meta.icon]}</div><span class="eyebrow">${editing ? 'EDIT MISSION' : 'NEW MISSION'} · ${autoEscape(meta.label).toUpperCase()}</span><h2>${editing ? 'Tune the routine.' : 'Configure the routine.'}</h2><p>${autoEscape(meta.note)}. Times use ${autoEscape(autoState.data?.timezone || 'the container timezone')}.</p><form id="auto-rule-form">${recipeField}<div class="modal-grid"><label>Frequency<select name="frequency"><option value="manual">Manual only</option><option value="hourly">Every hour</option><option value="every6h">Every six hours</option><option value="daily">Daily</option><option value="weekly">Weekly</option></select></label><label data-time>Start time<input name="time" type="time" value="${autoEscape(schedule.time)}"></label><label data-weekday>Day<select name="weekday">${['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'].map((day, i) => `<option value="${i}">${day}</option>`).join('')}</select></label></div>${typeMeta[type]?.catalog || ['library_refresh', 'metadata_sentinel'].includes(type) ? `<label>Library<select name="libraryKey"><option value="all">All libraries</option>${libraryOptions}</select></label>` : ''}<label class="modal-enable"><input name="enabled" type="checkbox" ${rule?.enabled ? 'checked' : ''}><span></span><div><b>Enable immediately</b><small>The next run will be calculated when saved.</small></div></label><div class="modal-actions">${editing ? '<button type="button" class="auto-delete">Delete rule</button>' : ''}<button type="button" class="auto-cancel">Cancel</button><button type="submit" class="auto-primary">${editing ? 'Save changes' : 'Create mission'}</button></div></form></section></div>`;
 }
 
 function openRuleModal(type, rule = null) {
   document.body.insertAdjacentHTML('beforeend', modalMarkup(type, rule));
   const modal = document.querySelector('.auto-modal-wrap'),
     form = modal.querySelector('form');
-  form.frequency.value = rule?.schedule?.frequency || 'daily';
+  form.frequency.value = rule?.schedule?.frequency || suggestedSchedules[type]?.frequency || 'daily';
   if (form.recipe) {
     form.recipe.value = type;
     form.recipe.onchange = () => {
@@ -329,7 +464,7 @@ function openRuleModal(type, rule = null) {
       openRuleModal(selected);
     };
   }
-  form.weekday.value = String(rule?.schedule?.weekday ?? 1);
+  form.weekday.value = String(rule?.schedule?.weekday ?? suggestedSchedules[type]?.weekday ?? 1);
   if (form.libraryKey) form.libraryKey.value = rule?.libraryKey || 'all';
   const fields = () => {
     modal.querySelector('[data-time]').hidden = ['manual', 'hourly', 'every6h'].includes(form.frequency.value);
@@ -367,6 +502,7 @@ function openRuleModal(type, rule = null) {
       close();
       await loadAutomations();
       autoToast(rule ? 'Automation updated' : 'Automation created');
+      setAutomationView('rules', { scroll: true });
     } catch (error) {
       submit.disabled = false;
       autoToast(error.message, true);
@@ -383,9 +519,20 @@ function setupAutomations() {
     location.hash = '#dashboard';
   };
   page.querySelector('#new-automation').onclick = () => openRuleModal('quality_guardian');
+  page
+    .querySelectorAll('[data-auto-view]')
+    .forEach((button) =>
+      button.addEventListener('click', () => setAutomationView(button.dataset.autoView, { scroll: true })),
+    );
   page.querySelector('#preview-all').onclick = previewAll;
   page.querySelector('#export-automations').onclick = exportAutomations;
   page.querySelector('#pause-scheduler').onclick = toggleScheduler;
+  page.querySelector('#auto-recipe-filter').addEventListener('input', (event) => {
+    const query = event.target.value.trim().toLowerCase();
+    page.querySelectorAll('[data-recipe-card]').forEach((card) => {
+      card.hidden = Boolean(query) && !card.textContent.toLowerCase().includes(query);
+    });
+  });
   document.querySelector('[data-nav="automation"]')?.addEventListener('click', () => {
     if (!autoState.loaded) setTimeout(loadAutomations, 100);
   });

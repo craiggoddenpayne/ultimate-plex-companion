@@ -26,6 +26,7 @@ const icons = {
   clock: '<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
   shield: '<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/>',
   wand: '<path d="m15 4 5 5L8 21H3v-5zM12 7l5 5M6 3v3M4.5 4.5h3M19 16v4M17 18h4"/>',
+  download: '<path d="M12 3v12M7 10l5 5 5-5M5 20h14"/>',
 };
 
 const icon = (name, cls = '') => `<svg class="icon ${cls}" viewBox="0 0 24 24" aria-hidden="true">${icons[name]}</svg>`;
@@ -58,7 +59,7 @@ function sidebar() {
     <a class="brand" href="#dashboard" aria-label="Ultimate Plex Companion home">
       <span class="brand-mark"><i></i><i></i></span><span><b>ULTIMATE</b><small>PLEX COMPANION</small></span>
     </a>
-    <nav>${nav.map(([id, ico, label]) => `<a href="#${id}" data-nav="${id}" class="nav-link ${id === 'dashboard' ? 'active' : ''}">${icon(ico)}<span>${label}</span>${id === 'streams' ? '<em id="nav-stream-count">—</em>' : ''}</a>`).join('')}</nav>
+    <nav>${nav.map(([id, ico, label]) => `<a href="#${id}" data-nav="${id}" class="nav-link ${id === 'dashboard' ? 'active' : ''}">${icon(ico)}<span>${label}</span>${id === 'streams' ? '<em id="nav-stream-count" aria-label="Active streams">—</em>' : id === 'codec' ? '<em id="nav-codec-count" aria-label="Queued codec jobs">—</em>' : ''}</a>`).join('')}</nav>
     <div class="sidebar-foot">
       <button class="server-chip" data-action="settings"><span class="status-dot pending" id="server-dot"></span><div><small>PLEX SERVER</small><strong id="server-name">Not connected</strong></div><span id="server-state">SET UP</span></button>
       <button class="profile"><span class="avatar">AD</span><span><b>Administrator</b><small>Administrator</small></span>${icon('chevron')}</button>
@@ -70,7 +71,7 @@ function header() {
   return `<header class="topbar">
     <button class="mobile-brand" aria-label="Open navigation"><span></span><span></span></button>
     <div class="search">${icon('search')}<input id="global-search" placeholder="Search your Plex universe…" /><kbd>⌘ K</kbd></div>
-    <div class="top-actions"><span class="sync" id="sync-state"><i></i>Waiting for Plex</span><button class="icon-button" data-action="notifications" aria-label="Notifications">${icon('bell')}<i class="notice"></i></button><button class="icon-button" data-action="settings" aria-label="Settings">${icon('settings')}</button></div>
+    <div class="top-actions"><span class="sync" id="sync-state"><i></i>Waiting for Plex</span><button class="icon-button" data-action="notifications" aria-label="Notifications">${icon('bell')}<i class="notice" aria-hidden="true"></i><b id="notification-count" hidden></b></button><button class="icon-button" data-action="settings" aria-label="Settings">${icon('settings')}</button></div>
   </header>`;
 }
 

@@ -1,4 +1,4 @@
-import { COMPANION_THEMES, normalizeThemePreferences } from '../../shared/theme-model.ts';
+import { BACKGROUND_VISUALIZATIONS, COMPANION_THEMES, normalizeThemePreferences } from '../../shared/theme-model.ts';
 
 const storageKey = 'ultimate-plex-companion:appearance';
 const themeEscape = (value) =>
@@ -31,6 +31,7 @@ function applyPreferences(next, { persist = true, announce = false } = {}) {
   document.documentElement.dataset.themeMode = selected.mode;
   document.documentElement.dataset.effects = preferences.effects;
   document.documentElement.dataset.textSize = preferences.textSize;
+  document.documentElement.dataset.background = preferences.background;
   document.querySelector('meta[name="theme-color"]')?.setAttribute('content', selected.preview[0]);
   if (persist) localStorage.setItem(storageKey, JSON.stringify(preferences));
   window.dispatchEvent(new CustomEvent('companionthemechange', { detail: { ...preferences, mode: selected.mode } }));
@@ -69,7 +70,11 @@ function modalMarkup() {
         `<button data-text-choice="${value}" class="${preferences.textSize === value ? 'active' : ''}" aria-pressed="${preferences.textSize === value}"><i></i>${label}</button>`,
     )
     .join('');
-  return `<div class="theme-modal-wrap"><div class="theme-backdrop"></div><section class="theme-modal" role="dialog" aria-modal="true" aria-labelledby="theme-title"><button class="theme-close" aria-label="Close">×</button><header><div class="theme-prism"><i></i><i></i><i></i></div><div><span class="eyebrow">VISUAL SYSTEM · 15 ENVIRONMENTS</span><h2 id="theme-title">Choose your universe.</h2><p>Every command surface, signal and ambient light responds instantly.</p></div></header><div class="theme-grid">${COMPANION_THEMES.map(themeCard).join('')}</div><div class="theme-preference-grid"><section class="effect-control"><div><span>VISUAL ENERGY</span><h3>Control ambient motion</h3><p>Still mode pauses decorative animation while preserving the complete interface.</p></div><div class="effect-options">${effectOptions}</div></section><section class="effect-control typography-control"><div><span>TEXT SIZE</span><h3>Make every signal readable</h3><p>Adjust type independently without enlarging artwork, panels or navigation.</p></div><div class="effect-options text-options">${textOptions}</div></section></div><footer><span>Saved on this browser · No account data leaves your network</span><button class="theme-reset">Restore defaults</button><button class="theme-done">Done</button></footer></section></div>`;
+  const backgroundOptions = BACKGROUND_VISUALIZATIONS.map(
+    (item) =>
+      `<button data-background-choice="${item.id}" class="background-choice ${preferences.background === item.id ? 'active' : ''}" aria-pressed="${preferences.background === item.id}"><span class="background-preview ${item.id}"><i></i><i></i><i></i></span><b>${themeEscape(item.name)}</b><small>${themeEscape(item.tagline)}</small></button>`,
+  ).join('');
+  return `<div class="theme-modal-wrap"><div class="theme-backdrop"></div><section class="theme-modal" role="dialog" aria-modal="true" aria-labelledby="theme-title"><button class="theme-close" aria-label="Close">×</button><header><div class="theme-prism"><i></i><i></i><i></i></div><div><span class="eyebrow">VISUAL SYSTEM · 15 ENVIRONMENTS</span><h2 id="theme-title">Choose your universe.</h2><p>Every command surface, signal and ambient light responds instantly.</p></div></header><div class="theme-grid">${COMPANION_THEMES.map(themeCard).join('')}</div><section class="background-control"><div><span>BACKGROUND VISUALIZER</span><h3>Set the space behind your library</h3><p>One lightweight canvas renders the selected scene behind every control.</p></div><div class="background-options">${backgroundOptions}</div></section><div class="theme-preference-grid"><section class="effect-control"><div><span>VISUAL ENERGY</span><h3>Control ambient motion</h3><p>Still mode pauses decorative animation while preserving the complete interface.</p></div><div class="effect-options">${effectOptions}</div></section><section class="effect-control typography-control"><div><span>TEXT SIZE</span><h3>Make every signal readable</h3><p>Adjust type independently without enlarging artwork, panels or navigation.</p></div><div class="effect-options text-options">${textOptions}</div></section></div><footer><span>Saved on this browser · No account data leaves your network</span><button class="theme-reset">Restore defaults</button><button class="theme-done">Done</button></footer></section></div>`;
 }
 
 function themeToast(message) {
@@ -117,6 +122,16 @@ export function openThemeStudio() {
         .forEach((item) => item.classList.toggle('active', item.dataset.effectChoice === preferences.effects));
     };
   });
+  wrap.querySelectorAll('[data-background-choice]').forEach((button) => {
+    button.onclick = () => {
+      applyPreferences({ ...preferences, background: button.dataset.backgroundChoice });
+      wrap.querySelectorAll('[data-background-choice]').forEach((item) => {
+        const active = item.dataset.backgroundChoice === preferences.background;
+        item.classList.toggle('active', active);
+        item.setAttribute('aria-pressed', String(active));
+      });
+    };
+  });
   wrap.querySelectorAll('[data-text-choice]').forEach((button) => {
     button.onclick = () => {
       applyPreferences({ ...preferences, textSize: button.dataset.textChoice });
@@ -130,7 +145,10 @@ export function openThemeStudio() {
   });
   wrap.querySelector('.theme-reset').onclick = () => {
     close();
-    applyPreferences({ theme: 'solaris', effects: 'full', textSize: 'comfortable' }, { announce: true });
+    applyPreferences(
+      { theme: 'solaris', effects: 'full', textSize: 'comfortable', background: 'starfield' },
+      { announce: true },
+    );
   };
   wrap.addEventListener('keydown', (event) => {
     if (event.key === 'Escape') close();

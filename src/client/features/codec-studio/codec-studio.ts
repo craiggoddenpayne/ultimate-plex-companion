@@ -36,9 +36,20 @@ const studioDuration = (seconds) => {
     minutes = Math.ceil((seconds % 3600) / 60);
   return hours + 'h ' + minutes + 'm';
 };
+const studioBitrate = (kbps) => {
+  const value = Number(kbps) || 0;
+  return value >= 1000 ? (value / 1000).toFixed(2) + ' Mbps' : Math.round(value) + ' kbps';
+};
+const studioFrameRate = (value) => {
+  const [numerator, denominator] = String(value || '')
+    .split('/')
+    .map(Number);
+  if (!numerator) return 'Unknown';
+  return (denominator ? numerator / denominator : numerator).toFixed(2) + ' fps';
+};
 
 function shell() {
-  return '<button class="back-link" data-studio-back>← Command deck</button><header class="codec-studio-hero"><div><span class="eyebrow">CODEC STUDIO · VERIFIED MEDIA CONVERSION</span><h1>Smaller files.<br><em>Your quality target.</em></h1><p>Modernize legacy films into HEVC, AV1 or VP9 while preserving audio, subtitles, chapters, metadata and the original source.</p></div><div class="codec-reactor" aria-hidden="true"><i></i><i></i><span>01</span><b>ENCODE CORE</b></div></header><section class="codec-stats"><article><span>CONVERSION CANDIDATES</span><b id="studio-count">—</b><small>Legacy-codec media</small></article><article><span>SOURCE FOOTPRINT</span><b id="studio-size">—</b><small>Review candidates</small></article><article><span>POTENTIAL SAVING</span><b id="studio-saving">—</b><small>Conservative estimate</small></article><article><span>ACTIVE QUEUE</span><b id="studio-active">—</b><small id="studio-active-note">Persistent jobs</small></article></section><section class="studio-targets" id="studio-targets"><div class="studio-loading-line">Checking modern encoders…</div></section><section class="studio-controls"><label><input id="studio-search" placeholder="Search conversion candidates…"></label><select id="studio-source"><option value="all">All source codecs</option></select><button id="studio-refresh">Refresh scan</button></section><div class="codec-studio-layout"><section class="studio-candidates"><header><div><span>CONVERSION MATRIX</span><h2>Films ready to modernize</h2></div><em>OUTPUT · MKV</em></header><div id="studio-candidate-list"><div class="studio-loading"><i></i><span>Mapping legacy codecs…</span></div></div></section><aside class="studio-queue"><header><div><span>PERSISTENT PIPELINE</span><h2>Conversion queue</h2></div><div class="studio-queue-tools" id="studio-queue-tools" hidden><button id="studio-pause">Pause after current</button><select id="studio-filter"><option value="all">All jobs</option><option value="active">Active queue</option><option value="review">Ready to review</option><option value="attention">Needs attention</option></select></div></header><div class="studio-queue-summary" id="studio-queue-summary" hidden><span><b id="studio-queued-count">0</b><small>WAITING</small></span><span><b id="studio-queue-saving">—</b><small>EST. SAVING</small></span><span><b id="studio-ready-count">0</b><small>READY</small></span><button id="studio-clear">Clear history</button></div><div id="studio-job-list"><div class="studio-empty">No conversion jobs yet.</div></div></aside></div><div class="studio-safety"><b>Original-first safety</b><p>Every conversion is written beside the source, then checked for codec, duration, size, audio and subtitle streams. Replacement always requires an explicit “Are you sure?” decision.</p></div>';
+  return '<button class="back-link" data-studio-back>← Command deck</button><header class="codec-studio-hero"><div><span class="eyebrow">CODEC STUDIO · VERIFIED MEDIA CONVERSION</span><h1>Smaller files.<br><em>Your quality target.</em></h1><p>Modernize legacy films into HEVC, AV1 or VP9 while preserving audio, subtitles, chapters, metadata and the original source.</p></div><div class="codec-reactor" aria-hidden="true"><i></i><i></i><span>01</span><b>ENCODE CORE</b></div></header><section class="codec-stats"><article><span>CONVERSION CANDIDATES</span><b id="studio-count">—</b><small>Legacy-codec media</small></article><article><span>SOURCE FOOTPRINT</span><b id="studio-size">—</b><small>Review candidates</small></article><article><span>POTENTIAL SAVING</span><b id="studio-saving">—</b><small>Conservative estimate</small></article><article><span>ACTIVE QUEUE</span><b id="studio-active">—</b><small id="studio-active-note">Persistent jobs</small></article></section><section class="studio-live-telemetry" id="studio-live-telemetry" hidden></section><section class="studio-targets" id="studio-targets"><div class="studio-loading-line">Checking modern encoders…</div></section><section class="studio-controls"><label><input id="studio-search" placeholder="Search conversion candidates…"></label><select id="studio-source"><option value="all">All source codecs</option></select><button id="studio-refresh">Refresh scan</button></section><div class="codec-studio-layout"><section class="studio-candidates"><header><div><span>CONVERSION MATRIX</span><h2>Films ready to modernize</h2></div><em>OUTPUT · MKV</em></header><div id="studio-candidate-list"><div class="studio-loading"><i></i><span>Mapping legacy codecs…</span></div></div></section><aside class="studio-queue"><header><div><span>PERSISTENT PIPELINE</span><h2>Conversion queue</h2></div><div class="studio-queue-tools" id="studio-queue-tools" hidden><button id="studio-pause">Pause after current</button><select id="studio-filter"><option value="all">All jobs</option><option value="active">Active queue</option><option value="review">Ready to review</option><option value="attention">Needs attention</option></select></div></header><div class="studio-queue-summary" id="studio-queue-summary" hidden><span><b id="studio-queued-count">0</b><small>WAITING</small></span><span><b id="studio-queue-saving">—</b><small>EST. SAVING</small></span><span><b id="studio-ready-count">0</b><small>READY</small></span><button id="studio-clear">Clear history</button></div><div id="studio-job-list"><div class="studio-empty">No conversion jobs yet.</div></div></aside></div><div class="studio-safety"><b>Original-first safety</b><p>Every conversion is written beside the source, then checked for codec, duration, size, audio and subtitle streams. Replacement always requires an explicit “Are you sure?” decision.</p></div>';
 }
 
 function renderTargets() {
@@ -196,9 +207,9 @@ function jobButtons(job) {
       job.id +
       '" title="Move earlier">↑</button><button data-studio-action="down" data-job="' +
       job.id +
-      '" title="Move later">↓</button><button data-studio-action="cancel" data-job="' +
+      '" title="Move later">↓</button><button data-studio-action="remove" data-job="' +
       job.id +
-      '">Cancel</button></div>'
+      '">Remove from queue</button></div>'
     );
   if (['preparing', 'encoding', 'verifying'].includes(job.state))
     return (
@@ -210,11 +221,54 @@ function jobButtons(job) {
     return (
       '<div class="studio-job-actions"><button data-studio-action="retry" data-job="' +
       job.id +
-      '">Retry</button></div>'
+      '">Retry</button><button data-studio-action="remove" data-job="' +
+      job.id +
+      '">Remove</button></div>'
     );
   if (job.state === 'ready')
     return '<button data-studio-replace="' + studioEscape(job.id) + '">Review & replace</button>';
   return '';
+}
+function renderLiveTelemetry() {
+  const panel = document.querySelector('#studio-live-telemetry');
+  if (!panel) return;
+  const activeId = studioState.summary?.activeJob,
+    job = studioState.jobs.find((item) => item.id === activeId);
+  if (!job || !['preparing', 'encoding', 'verifying'].includes(job.state)) {
+    panel.hidden = true;
+    panel.innerHTML = '';
+    return;
+  }
+  const telemetry = job.telemetry || {},
+    source = job.sourceTechnical || {},
+    video = source.video || {},
+    settings = job.encodingSettings || {},
+    elapsedSeconds = job.startedAt ? Math.max(0, (Date.now() - Date.parse(job.startedAt)) / 1000) : 0,
+    encodedSeconds = Number(telemetry.encodedSeconds || 0),
+    fraction = job.duration ? encodedSeconds / Number(job.duration) : Number(job.progress || 0) / 100,
+    projectedBytes = fraction > 0.005 ? Number(telemetry.outputBytes || 0) / fraction : 0,
+    projectedSaving = projectedBytes ? Math.max(0, Number(job.sourceSize || 0) - projectedBytes) : 0,
+    streams = source.streams || {},
+    sampleAge = telemetry.sampledAt
+      ? Math.max(0, Math.round((Date.now() - Date.parse(telemetry.sampledAt)) / 1000))
+      : null;
+  panel.hidden = false;
+  panel.innerHTML = `<header><div><span class="studio-live-label"><i></i>LIVE ENCODE TELEMETRY</span><h2>${studioEscape(job.title)}</h2><p>${studioEscape(job.sourceCodec || video.codec || 'SOURCE')} → ${studioEscape(job.targetLabel || job.targetCodec)} · ${studioEscape(job.state).toUpperCase()}</p></div><code>${studioEscape(job.id.slice(0, 8))}</code></header>
+    <div class="studio-live-progress"><i><b style="width:${Math.max(0, Math.min(100, job.progress || 0))}%"></b></i><span><b>${job.progress || 0}%</b><small>${studioDuration(encodedSeconds)} encoded of ${studioDuration(job.duration)}</small></span></div>
+    <div class="studio-live-metrics">
+      <article><span>PROCESSING SPEED</span><b>${telemetry.speed ? Number(telemetry.speed).toFixed(2) + '×' : '—'}</b><small>Relative to real time</small></article>
+      <article><span>ENCODE RATE</span><b>${telemetry.fps ? Number(telemetry.fps).toFixed(1) + ' fps' : '—'}</b><small>${Number(telemetry.frame || 0).toLocaleString()} frames emitted</small></article>
+      <article><span>OUTPUT BITRATE</span><b>${telemetry.bitrateKbps ? studioBitrate(telemetry.bitrateKbps) : '—'}</b><small>Current muxed average</small></article>
+      <article><span>OUTPUT WRITTEN</span><b>${telemetry.outputBytes ? studioBytes(telemetry.outputBytes) : '—'}</b><small>${projectedBytes ? studioBytes(projectedBytes) + ' projected final' : 'Waiting for sample'}</small></article>
+      <article><span>ELAPSED</span><b>${studioDuration(elapsedSeconds)}</b><small>Since encoder start</small></article>
+      <article><span>ETA</span><b>${job.etaSeconds != null ? studioDuration(job.etaSeconds) : 'Calculating'}</b><small>Based on observed progress</small></article>
+      <article><span>QUALITY VALUE</span><b>${telemetry.quality != null ? Number(telemetry.quality).toFixed(1) : '—'}</b><small>Live encoder quantizer</small></article>
+      <article><span>PROJECTED SAVING</span><b>${projectedSaving ? studioBytes(projectedSaving) : '—'}</b><small>${projectedBytes && job.sourceSize ? Math.max(0, Math.round((projectedSaving / job.sourceSize) * 100)) + '% below source' : 'Estimate stabilizing'}</small></article>
+    </div>
+    <div class="studio-live-detail">
+      <article><header><span>INPUT TOPOLOGY</span><b>${studioBytes(job.sourceSize)}</b></header><dl><div><dt>Container</dt><dd>${studioEscape(source.container || 'Unknown')}</dd></div><div><dt>Video codec</dt><dd>${studioEscape(video.codec || job.sourceCodec || 'Unknown')}</dd></div><div><dt>Profile</dt><dd>${studioEscape(video.profile || 'Unknown')}</dd></div><div><dt>Raster</dt><dd>${video.width && video.height ? `${video.width} × ${video.height}` : 'Unknown'}</dd></div><div><dt>Pixel format</dt><dd>${studioEscape(video.pixelFormat || 'Unknown')}</dd></div><div><dt>Frame rate</dt><dd>${studioFrameRate(video.frameRate)}</dd></div><div><dt>Source bitrate</dt><dd>${source.bitrate ? studioBitrate(source.bitrate / 1000) : 'Unknown'}</dd></div><div><dt>Streams</dt><dd>${Number(streams.video || 0)}V · ${Number(streams.audio || 0)}A · ${Number(streams.subtitle || 0)}S</dd></div></dl></article>
+      <article><header><span>ENCODER PIPELINE</span><b>${studioEscape(settings.encoder || 'Initializing')}</b></header><dl><div><dt>Target</dt><dd>${studioEscape(job.targetLabel || job.targetCodec)}</dd></div><div><dt>Container</dt><dd>${studioEscape(settings.container || 'Matroska')}</dd></div><div><dt>CRF</dt><dd>${settings.crf ?? '—'}</dd></div><div><dt>Preset</dt><dd>${studioEscape(settings.preset || '—')}</dd></div><div><dt>CPU tuning</dt><dd>${studioEscape(settings.cpuUsed ?? 'Default')}</dd></div><div><dt>Stream policy</dt><dd>${studioEscape((settings.copiedStreams || []).join(', ') || 'Initializing')}</dd></div><div><dt>Restarts</dt><dd>${job.resumeCount || 0}</dd></div><div><dt>Telemetry age</dt><dd>${sampleAge == null ? 'Waiting' : sampleAge + ' sec'}</dd></div><div><dt>Dropped / duplicate</dt><dd>${telemetry.droppedFrames || 0} / ${telemetry.duplicateFrames || 0}</dd></div><div><dt>FFmpeg phase</dt><dd>${studioEscape(telemetry.phase || job.state)}</dd></div></dl></article>
+    </div>`;
 }
 function renderJobs() {
   const list = document.querySelector('#studio-job-list');
@@ -235,6 +289,14 @@ function renderJobs() {
     document.querySelector('#studio-ready-count').textContent = String(studioState.summary?.counts?.ready || 0);
     document.querySelector('#studio-queue-saving').textContent = studioBytes(studioState.summary?.estimatedSaving || 0);
   }
+  const navCount = document.querySelector('#nav-codec-count');
+  if (navCount) {
+    const queued = Number(studioState.summary?.counts?.queued || 0);
+    navCount.textContent = queued > 99 ? '99+' : String(queued);
+    navCount.setAttribute('aria-label', queued + (queued === 1 ? ' codec job queued' : ' codec jobs queued'));
+    navCount.title = queued + (queued === 1 ? ' item waiting to encode' : ' items waiting to encode');
+  }
+  renderLiveTelemetry();
   const visible = filteredJobs();
   list.innerHTML = visible.length
     ? visible
@@ -268,7 +330,7 @@ function renderJobs() {
     );
   list.querySelectorAll('[data-studio-action]').forEach((button) => (button.onclick = () => jobAction(button)));
   clearTimeout(studioState.timer);
-  if (active.length) studioState.timer = setTimeout(loadJobs, 3000);
+  if (active.length) studioState.timer = setTimeout(loadJobs, location.hash === '#codec' ? 3000 : 15_000);
 }
 
 async function requestQueue(url, options) {
@@ -305,8 +367,18 @@ async function jobAction(button) {
         : 'This removes the job from the queue. No media files will be changed.';
     if (!window.confirm('Are you sure you want to cancel “' + job.title + '”?\n\n' + warning)) return;
   }
+  if (
+    action === 'remove' &&
+    !window.confirm(
+      'Remove “' +
+        job.title +
+        '” from the optimization queue?\n\nOnly the queue record will be removed. The media file will remain untouched and you can stage it again later.',
+    )
+  )
+    return;
   button.disabled = true;
   if (action === 'cancel') button.textContent = 'Stopping…';
+  if (action === 'remove') button.textContent = 'Removing…';
   try {
     await requestQueue('/api/optimization/jobs/' + encodeURIComponent(job.id) + '/action', {
       method: 'POST',
@@ -429,10 +501,8 @@ function setupStudio() {
     if (!studioState.analysis) loadAnalysis();
     loadJobs();
   });
-  if (location.hash === '#codec') {
-    loadAnalysis();
-    loadJobs();
-  }
+  loadJobs();
+  if (location.hash === '#codec') loadAnalysis();
 }
 if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', setupStudio);
 else setupStudio();

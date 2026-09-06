@@ -11,16 +11,22 @@ import {
   refreshReport,
   streamReport,
 } from './automation-report-server.ts';
+import {
+  backlogReport,
+  editionReport,
+  formatReport,
+  growthReport,
+  newMediaReport,
+  playbackDigestReport,
+} from './automation-insight-server.ts';
+import {
+  buildExpandedAutomationReport,
+  expandedAutomationTemplates,
+  expandedAutomationTypes,
+  expandedPreviewReport,
+} from './automation-expanded-server.ts';
 
 const FREQUENCIES = new Set(['manual', 'hourly', 'every6h', 'daily', 'weekly']);
-const TYPES = new Set([
-  'quality_guardian',
-  'library_refresh',
-  'health_snapshot',
-  'arrival_digest',
-  'metadata_sentinel',
-  'stream_sentinel',
-]);
 const templates = [
   {
     type: 'quality_guardian',
@@ -64,7 +70,51 @@ const templates = [
     tone: 'violet',
     readOnly: true,
   },
+  {
+    type: 'backlog_radar',
+    name: 'Backlog Age Radar',
+    description: 'Track old and highly rated unwatched titles before they disappear into the archive.',
+    tone: 'amber',
+    readOnly: true,
+  },
+  {
+    type: 'format_sentinel',
+    name: 'Format Drift Sentinel',
+    description: 'Chronicle codec and resolution drift across selected libraries.',
+    tone: 'cyan',
+    readOnly: true,
+  },
+  {
+    type: 'edition_sentinel',
+    name: 'Edition Storage Sentinel',
+    description: 'Find multi-version titles and measure their additional storage footprint.',
+    tone: 'rose',
+    readOnly: true,
+  },
+  {
+    type: 'growth_chronicle',
+    name: 'Library Growth Chronicle',
+    description: 'Record daily, weekly and monthly arrival velocity and storage growth.',
+    tone: 'violet',
+    readOnly: true,
+  },
+  {
+    type: 'playback_digest',
+    name: 'Weekly Playback Digest',
+    description: 'Summarize seven-day activity, viewing momentum, top titles and household participation.',
+    tone: 'cyan',
+    readOnly: true,
+  },
+  {
+    type: 'new_media_guard',
+    name: 'New Media Integrity Guard',
+    description: 'Check recent arrivals for missing media, duration, codec, resolution or size information.',
+    tone: 'amber',
+    readOnly: true,
+  },
+  ...expandedAutomationTemplates,
 ];
+const TYPES = new Set(templates.map((item) => item.type));
 
 function nextOccurrence(schedule, from = new Date()) {
   const frequency = schedule?.frequency || 'manual';
@@ -161,6 +211,25 @@ export function createAutomationEngine({
     }));
   }
 
+  async function selectedCatalog(config, rule) {
+    const selected = await libraries(config);
+    const targets = rule.libraryKey === 'all' ? selected : selected.filter((item) => item.key === rule.libraryKey);
+    if (!targets.length) throw new Error('The selected Plex library no longer exists.');
+    const pages = await Promise.all(
+      targets.map((library) =>
+        plexFetch(
+          config,
+          '/library/sections/' +
+            encodeURIComponent(library.key) +
+            '/all?includeMedia=1&includeGuids=1&includeAllStreams=1&X-Plex-Container-Start=0&X-Plex-Container-Size=5000',
+        ).then((page) =>
+          (page.MediaContainer?.Metadata || []).map((item) => ({ ...item, libraryTitle: library.title })),
+        ),
+      ),
+    );
+    return { targets, items: pages.flat() };
+  }
+
   async function perform(rule, dryRun) {
     const config = await savedConfig();
     if (!config) throw new Error('Plex is not configured.');
@@ -191,21 +260,53 @@ export function createAutomationEngine({
     }
     if (rule.type === 'metadata_sentinel') {
       if (dryRun) return previewReports.metadata_sentinel;
-      const selected = await libraries(config);
-      const targets = rule.libraryKey === 'all' ? selected : selected.filter((item) => item.key === rule.libraryKey);
-      const pages = await Promise.all(
-        targets.map((library) =>
-          plexFetch(
-            config,
-            '/library/sections/' +
-              encodeURIComponent(library.key) +
-              '/all?X-Plex-Container-Start=0&X-Plex-Container-Size=5000',
-          ),
-        ),
-      );
-      const items = pages.flatMap((page) => page.MediaContainer?.Metadata || []);
+      const { targets, items } = await selectedCatalog(config, rule);
       const issues = items.filter((item) => !item.thumb || !item.summary || !item.year);
       return metadataReport(items, issues, targets);
+    }
+    if (rule.type === 'backlog_radar') {
+      if (dryRun) return previewReports.backlog_radar;
+      const { targets, items } = await selectedCatalog(config, rule);
+      return backlogReport(items, targets);
+    }
+    if (rule.type === 'format_sentinel') {
+      if (dryRun) return previewReports.format_sentinel;
+      const { targets, items } = await selectedCatalog(config, rule);
+      return formatReport(items, targets);
+    }
+    if (rule.type === 'edition_sentinel') {
+      if (dryRun) return previewReports.edition_sentinel;
+      const { targets, items } = await selectedCatalog(config, rule);
+      return editionReport(items, targets);
+    }
+    if (rule.type === 'growth_chronicle') {
+      if (dryRun) return previewReports.growth_chronicle;
+      const response = await plexFetch(
+        config,
+        '/library/recentlyAdded?includeMedia=1&X-Plex-Container-Start=0&X-Plex-Container-Size=100',
+      );
+      return growthReport(response.MediaContainer?.Metadata || []);
+    }
+    if (rule.type === 'playback_digest') {
+      if (dryRun) return previewReports.playback_digest;
+      const response = await plexFetch(
+        config,
+        '/status/sessions/history/all?X-Plex-Container-Start=0&X-Plex-Container-Size=1000&sort=viewedAt%3Adesc',
+      );
+      return playbackDigestReport(response.MediaContainer?.Metadata || []);
+    }
+    if (rule.type === 'new_media_guard') {
+      if (dryRun) return previewReports.new_media_guard;
+      const response = await plexFetch(
+        config,
+        '/library/recentlyAdded?includeMedia=1&X-Plex-Container-Start=0&X-Plex-Container-Size=50',
+      );
+      return newMediaReport(response.MediaContainer?.Metadata || []);
+    }
+    if (expandedAutomationTypes.has(rule.type)) {
+      if (dryRun) return expandedPreviewReport(rule.type);
+      const { targets, items } = await selectedCatalog(config, rule);
+      return buildExpandedAutomationReport(rule.type, items, targets);
     }
     const allLibraries = await libraries(config);
     const targets =
@@ -217,15 +318,13 @@ export function createAutomationEngine({
     return refreshReport(targets, false);
   }
 
-  async function run(id, { dryRun = false, trigger = 'manual' } = {}) {
+  async function execute(rule, runKey, { dryRun = false, trigger = 'manual', persistedRule = false } = {}) {
     const data = await load();
-    const rule = data.rules.find((item) => item.id === id);
-    if (!rule) throw new Error('Automation not found.');
-    if (running.has(id)) throw new Error('This automation is already running.');
-    running.add(id);
+    if (running.has(runKey)) throw new Error('This automation is already running.');
+    running.add(runKey);
     const entry: any = {
       id: randomUUID(),
-      ruleId: id,
+      ruleId: rule.id,
       ruleName: rule.name,
       type: rule.type,
       trigger,
@@ -236,25 +335,48 @@ export function createAutomationEngine({
     data.runs.unshift(entry);
     data.runs = data.runs.slice(0, 100);
     await save();
-    logger?.info('automation.started', { runId: entry.id, ruleId: id, type: rule.type, trigger, dryRun });
+    logger?.info('automation.started', { runId: entry.id, ruleId: rule.id, type: rule.type, trigger, dryRun });
     try {
       entry.result = await perform(rule, Boolean(dryRun));
       entry.status = 'success';
-      if (!dryRun) rule.lastRunAt = new Date().toISOString();
-      logger?.info('automation.completed', { runId: entry.id, ruleId: id, type: rule.type, dryRun });
+      if (!dryRun && persistedRule) rule.lastRunAt = new Date().toISOString();
+      logger?.info('automation.completed', { runId: entry.id, ruleId: rule.id, type: rule.type, dryRun });
     } catch (error) {
       entry.status = 'failed';
       entry.error = error.message;
-      logger?.error('automation.failed', { runId: entry.id, ruleId: id, type: rule.type, error });
+      logger?.error('automation.failed', { runId: entry.id, ruleId: rule.id, type: rule.type, error });
     } finally {
       entry.finishedAt = new Date().toISOString();
       entry.durationMs = Math.max(0, Date.parse(entry.finishedAt) - Date.parse(entry.startedAt));
-      rule.nextRunAt = rule.enabled ? nextOccurrence(rule.schedule) : null;
-      rule.updatedAt = new Date().toISOString();
-      running.delete(id);
+      if (persistedRule) {
+        rule.nextRunAt = rule.enabled ? nextOccurrence(rule.schedule) : null;
+        rule.updatedAt = new Date().toISOString();
+      }
+      running.delete(runKey);
       await save();
     }
     return entry;
+  }
+
+  async function run(id, { dryRun = false, trigger = 'manual' } = {}) {
+    const data = await load();
+    const rule = data.rules.find((item) => item.id === id);
+    if (!rule) throw new Error('Automation not found.');
+    return execute(rule, id, { dryRun, trigger, persistedRule: true });
+  }
+
+  async function runRecipe(type, { libraryKey = 'all' } = {}) {
+    if (!TYPES.has(type)) throw new Error('Unknown automation recipe.');
+    const recipe = templates.find((item) => item.type === type);
+    const rule = cleanRule({
+      type,
+      name: recipe.name,
+      enabled: false,
+      libraryKey,
+      schedule: { frequency: 'manual' },
+    });
+    rule.id = `recipe:${type}`;
+    return execute(rule, rule.id, { trigger: 'manual_recipe' });
   }
 
   async function list() {
@@ -268,7 +390,10 @@ export function createAutomationEngine({
         logger?.warn('automation.libraries_unavailable', { error });
       }
     return {
-      templates,
+      templates: templates.map((template) => ({
+        ...template,
+        running: running.has(`recipe:${template.type}`),
+      })),
       libraries: plexLibraries,
       paused: data.paused,
       rules: data.rules.map((rule) => ({ ...rule, running: running.has(rule.id) })),
@@ -346,7 +471,7 @@ export function createAutomationEngine({
 
   const timer = setInterval(() => tick().catch((error) => logger?.error('automation.tick_failed', { error })), 30_000);
   timer.unref();
-  return { list, create, update, remove, run, tick, setPaused, dataSummary, clearAll };
+  return { list, create, update, remove, run, runRecipe, tick, setPaused, dataSummary, clearAll };
 }
 
 export { nextOccurrence };

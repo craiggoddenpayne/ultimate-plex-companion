@@ -1,4 +1,5 @@
 import { apiFetch } from '../../core/api-client.ts';
+import { companionDestinations } from './companion-search.ts';
 
 const cEscape = (value) =>
   String(value ?? '').replace(
@@ -41,7 +42,7 @@ function searchShell() {
 }
 function renderSearch(data) {
   const panel = document.querySelector('#universe-search');
-  searchResults = data.results || [];
+  searchResults = [...companionDestinations(data.query), ...(data.results || [])];
   searchIndex = -1;
   if (!searchResults.length) {
     panel.innerHTML =
@@ -92,7 +93,7 @@ function renderSearch(data) {
 function bindSearchResults() {
   document
     .querySelectorAll('.search-result')
-    .forEach((button) => (button.onclick = () => openMedia(searchResults[Number(button.dataset.index)])));
+    .forEach((button) => (button.onclick = () => openSearchChoice(searchResults[Number(button.dataset.index)])));
 }
 async function runSearch(query) {
   const panel = document.querySelector('#universe-search');
@@ -101,7 +102,8 @@ async function runSearch(query) {
   try {
     renderSearch(await cRequest('/api/search?q=' + encodeURIComponent(query)));
   } catch (error) {
-    panel.innerHTML = '<div class="search-idle empty"><b>!</b><span>' + cEscape(error.message) + '</span></div>';
+    if (companionDestinations(query).length) renderSearch({ query, results: [] });
+    else panel.innerHTML = '<div class="search-idle empty"><b>!</b><span>' + cEscape(error.message) + '</span></div>';
   }
 }
 function selectSearch(direction) {
@@ -141,6 +143,17 @@ function openMedia(item) {
   const overlay = document.querySelector('.media-overlay');
   overlay.querySelector('.companion-close').onclick = () => overlay.remove();
   overlay.querySelector('.companion-backdrop').onclick = () => overlay.remove();
+}
+
+function openSearchChoice(item) {
+  if (item.kind === 'route') {
+    document.querySelector('#universe-search')?.classList.remove('open');
+    const input = document.querySelector('#global-search');
+    if (input) input.value = '';
+    location.hash = '#' + item.route;
+    return;
+  }
+  openMedia(item);
 }
 
 function assistantMarkup() {
@@ -264,13 +277,37 @@ function openNotifications() {
             close();
           }),
       );
-      document.querySelector('.icon-button[data-action="notifications"] .notice')?.remove();
-      localStorage.setItem('companion-notifications-seen', new Date().toISOString());
+      localStorage.setItem('companion-notifications-seen', data.generatedAt || new Date().toISOString());
+      setNotificationCount(0);
     })
     .catch((error) => {
       overlay.querySelector('#notification-list').innerHTML =
         '<div class="notification-empty"><b>!</b><p>' + cEscape(error.message) + '</p></div>';
     });
+}
+
+function setNotificationCount(count) {
+  const button = document.querySelector('.icon-button[data-action="notifications"]');
+  const badge = document.querySelector('#notification-count');
+  const dot = button?.querySelector('.notice');
+  if (!button || !badge) return;
+  badge.hidden = count <= 0;
+  badge.textContent = count > 9 ? '9+' : String(count);
+  if (dot) dot.hidden = count <= 0;
+  button.setAttribute('aria-label', count ? `Notifications · ${count} unread` : 'Notifications · none unread');
+}
+
+async function refreshNotificationCount() {
+  try {
+    const data = await cRequest('/api/notifications');
+    const seenAt = Date.parse(localStorage.getItem('companion-notifications-seen') || '');
+    const unread = (data.notifications || []).filter(
+      (item) => !Number.isFinite(seenAt) || Date.parse(item.at || 0) > seenAt,
+    ).length;
+    setNotificationCount(unread);
+  } catch {
+    setNotificationCount(0);
+  }
 }
 
 function setupCompanionUI() {
@@ -303,7 +340,7 @@ function setupCompanionUI() {
       } else if (event.key === 'Enter') {
         event.preventDefault();
         event.stopImmediatePropagation();
-        if (searchIndex >= 0) openMedia(searchResults[searchIndex]);
+        if (searchIndex >= 0) openSearchChoice(searchResults[searchIndex]);
         else if (input.value.trim().length >= 2) runSearch(input.value.trim());
       } else if (event.key === 'Escape') document.querySelector('#universe-search').classList.remove('open');
     },
@@ -324,6 +361,10 @@ function setupCompanionUI() {
     },
     { capture: true },
   );
+  setTimeout(refreshNotificationCount, 500);
+  setInterval(() => {
+    if (!document.hidden) refreshNotificationCount();
+  }, 60_000);
 }
 if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', setupCompanionUI);
 else setupCompanionUI();

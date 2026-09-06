@@ -1,10 +1,24 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import { companionDestinations } from '../../../src/client/features/companion/companion-search.ts';
 import {
   universalSearch,
   answerCompanion,
   companionNotifications,
 } from '../../../src/server/features/companion/companion-server.ts';
+
+test('command palette finds Companion destinations by label and purpose', () => {
+  assert.deepEqual(
+    companionDestinations('automation').map((item) => item.route),
+    ['automation'],
+  );
+  assert.deepEqual(
+    companionDestinations('scheduled reports').map((item) => item.route),
+    ['automation'],
+  );
+  assert.equal(companionDestinations('bandwidth')[0].route, 'streams');
+  assert.equal(companionDestinations('does-not-exist').length, 0);
+});
 
 test('universal search normalizes Plex hubs and removes duplicates', async () => {
   const plexFetch = async () => ({

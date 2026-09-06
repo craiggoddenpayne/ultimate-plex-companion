@@ -29,3 +29,21 @@ test('Plex client injects identity and keeps the token at the transport boundary
   assert.equal(request.options.headers['X-Plex-Token'], 'secret');
   assert.equal(request.options.headers['X-Plex-Product'], 'Ultimate Plex Companion');
 });
+
+test('Plex client streams only validated media parts and forwards byte ranges', async () => {
+  let request;
+  const client = createPlexClient(async (url, options) => {
+    request = { url, options };
+    return new Response('media', { status: 206, headers: { 'content-type': 'video/x-matroska' } });
+  });
+  const response = await client.media(
+    { plexUrl: 'http://plex.local', token: 'secret' },
+    '/library/parts/987/1698365684/file.mkv',
+    'bytes=10-20',
+  );
+  assert.equal(response.status, 206);
+  assert.equal(request.url, 'http://plex.local/library/parts/987/1698365684/file.mkv');
+  assert.equal(request.options.headers.Range, 'bytes=10-20');
+  assert.equal(request.options.headers['X-Plex-Token'], 'secret');
+  await assert.rejects(() => client.media({ plexUrl: 'http://plex.local', token: 'secret' }, '/etc/passwd'));
+});

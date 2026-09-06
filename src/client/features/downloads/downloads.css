@@ -1,0 +1,186 @@
+.download-hero {
+  min-height: 235px;
+  display: flex;
+  align-items: center;
+  background: radial-gradient(circle at 85% 20%, #2c6c7044, transparent 35%);
+}
+.download-hero h1 {
+  margin: 9px 0 8px;
+  font-size: calc(37px + var(--text-increase, 1px));
+  line-height: 1.13;
+}
+.download-hero h1 em {
+  color: #8ba4a7;
+  font-style: normal;
+  font-weight: 500;
+}
+.download-hero p {
+  max-width: 690px;
+  color: #747b87;
+  line-height: 1.7;
+}
+.download-panel {
+  max-width: 980px;
+}
+#download-search label > span {
+  display: block;
+  margin-bottom: 9px;
+  color: #747d89;
+  font: calc(8px + var(--text-increase, 1px)) 'DM Mono';
+  letter-spacing: 1.2px;
+}
+#download-search label > div {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 8px;
+}
+#download-search input {
+  min-width: 0;
+  padding: 13px 14px;
+  color: #eef1ef;
+  border: 1px solid #303640;
+  border-radius: 7px;
+  outline: 0;
+  background: #0b0e13;
+}
+#download-search input:focus {
+  border-color: #50d6d1;
+  box-shadow: 0 0 0 3px #50d6d118;
+}
+#download-search button,
+.download-version button {
+  padding: 0 18px;
+  color: #091313;
+  border: 0;
+  border-radius: 7px;
+  background: #50d6d1;
+  font-weight: 750;
+  cursor: pointer;
+}
+.download-results {
+  display: grid;
+  gap: 8px;
+  margin-top: 18px;
+}
+.download-result {
+  width: 100%;
+  display: grid;
+  grid-template-columns: 44px 1fr auto;
+  align-items: center;
+  gap: 12px;
+  padding: 9px;
+  color: inherit;
+  text-align: left;
+  border: 1px solid #252b33;
+  border-radius: 8px;
+  background: #0d1015;
+  cursor: pointer;
+}
+.download-result:hover {
+  border-color: #397375;
+  background: #10171b;
+}
+.download-result img,
+.download-selection header img {
+  width: 44px;
+  height: 58px;
+  border-radius: 4px;
+  object-fit: cover;
+  background: #171b21;
+}
+.download-result span b,
+.download-result span small {
+  display: block;
+}
+.download-result span small {
+  margin-top: 4px;
+  color: #737c87;
+  text-transform: capitalize;
+}
+.download-result > i {
+  color: #70c9c7;
+  font-style: normal;
+  font-size: 12px;
+}
+.download-empty {
+  padding: 32px;
+  color: #6f7884;
+  text-align: center;
+  border: 1px dashed #29313a;
+  border-radius: 8px;
+}
+.download-empty p {
+  margin: 8px 0 0;
+}
+.download-selection > button {
+  padding: 0;
+  color: #87919d;
+  border: 0;
+  background: none;
+  cursor: pointer;
+}
+.download-selection header {
+  display: flex;
+  gap: 14px;
+  align-items: center;
+  margin: 18px 0;
+}
+.download-selection header span {
+  color: #50d6d1;
+  font: 10px 'DM Mono';
+  letter-spacing: 1px;
+}
+.download-selection header h2 {
+  margin: 5px 0;
+}
+.download-selection header p {
+  margin: 0;
+  color: #747d89;
+}
+.download-versions {
+  display: grid;
+  gap: 8px;
+}
+.download-version {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 15px;
+  border: 1px solid #29313a;
+  border-radius: 8px;
+  background: #0d1015;
+}
+.download-version b,
+.download-version span {
+  display: block;
+  overflow-wrap: anywhere;
+}
+.download-version span {
+  margin-top: 5px;
+  color: #747d89;
+  font-size: 12px;
+}
+.download-version button {
+  min-height: 39px;
+  white-space: nowrap;
+}
+.download-version button:disabled {
+  opacity: 0.65;
+  cursor: wait;
+}
+@media (max-width: 650px) {
+  .download-result {
+    grid-template-columns: 44px 1fr;
+  }
+  .download-result > i {
+    grid-column: 2;
+  }
+  .download-version {
+    align-items: stretch;
+    flex-direction: column;
+  }
+  .download-version button {
+    min-height: 44px;
+  }
+}

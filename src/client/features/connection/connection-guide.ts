@@ -75,7 +75,7 @@ function enhanceConnectionModal(modal) {
   );
   modal
     .querySelector('[data-open-plex-web]')
-    .addEventListener('click', () => window.open(plexWebUrl(urlInput.value), '_blank', 'noopener'));
+    .addEventListener('click', () => window.location.assign(plexWebUrl(urlInput.value)));
   const pasteButton = modal.querySelector('[data-token-paste]');
   const visibilityButton = modal.querySelector('[data-token-visibility]');
   if (tokenInput.disabled) {

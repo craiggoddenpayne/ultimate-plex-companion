@@ -1,7 +1,7 @@
 import { renderPlaylistComposer } from './playlist-composer.ts';
 import { apiFetch } from '../../core/api-client.ts';
 
-const playlistState = { data: null, selected: null, filter: 'All' };
+const playlistState = { data: null, selected: null, filter: 'All', query: '' };
 const playlistEscape = (value) =>
   String(value ?? '').replace(
     /[&<>'"]/g,
@@ -44,7 +44,7 @@ function studioShell() {
         <div><span>AUTO-GENERATE</span><h2>Choose a signal</h2><p>Buttons are enabled only when your library has matching titles.</p></div>
         <button id="playlist-refresh" type="button">Refresh criteria</button>
       </header>
-      <nav class="playlist-signal-filters" id="playlist-signal-filters" aria-label="Filter playlist signals"></nav>
+      <div class="playlist-signal-toolbar"><label><span>SEARCH SIGNALS</span><input id="playlist-signal-search" type="search" placeholder="Genre, mood, era or format…" autocomplete="off"></label><nav class="playlist-signal-filters" id="playlist-signal-filters" aria-label="Filter playlist signals"></nav></div>
       <div class="playlist-generators" id="playlist-generators-grid" aria-live="polite">
         <div class="playlist-loading"><i></i><span>Reading Plex criteria…</span></div>
       </div>
@@ -79,13 +79,23 @@ function renderGeneratorGrid() {
   const data = playlistState.data;
   const grid = document.querySelector('#playlist-generators-grid');
   if (!data || !grid) return;
-  const visible =
+  const categoryMatches =
     playlistState.filter === 'All'
       ? data.generators
       : data.generators.filter((item) => item.category === playlistState.filter);
+  const query = playlistState.query.trim().toLowerCase();
+  const visible = query
+    ? categoryMatches.filter((item) =>
+        [item.name, item.eyebrow, item.description, item.category].some((value) =>
+          String(value || '')
+            .toLowerCase()
+            .includes(query),
+        ),
+      )
+    : categoryMatches;
   grid.innerHTML =
     visible.map(generatorCard).join('') ||
-    '<div class="playlist-empty">No signals are available in this category.</div>';
+    '<div class="playlist-empty">No playlist signals match this search and category.</div>';
   grid.querySelectorAll('[data-playlist-generate]').forEach((button) => {
     button.addEventListener('click', () =>
       openGenerator(data.generators.find((item) => item.id === button.dataset.playlistGenerate)),
@@ -120,6 +130,12 @@ function renderStudio() {
       renderGeneratorGrid();
     }),
   );
+  const search = document.querySelector('#playlist-signal-search');
+  search.value = playlistState.query;
+  search.addEventListener('input', () => {
+    playlistState.query = search.value;
+    renderGeneratorGrid();
+  });
   renderGeneratorGrid();
 
   const existing = document.querySelector('#playlist-existing');
@@ -134,7 +150,7 @@ function renderStudio() {
 }
 
 function previewItem(item, index) {
-  return `<article><span>${String(index + 1).padStart(2, '0')}</span><img src="${playlistEscape(item.poster)}" loading="lazy" alt=""><div><b>${playlistEscape(item.title)}</b><small>${playlistEscape(item.detail)}</small></div><a href="${playlistEscape(item.plexUrl)}" target="_blank" rel="noopener noreferrer" aria-label="Open ${playlistEscape(item.title)} in Plex">Plex ↗</a></article>`;
+  return `<article><span>${String(index + 1).padStart(2, '0')}</span><img src="${playlistEscape(item.poster)}" loading="lazy" alt=""><div><b>${playlistEscape(item.title)}</b><small>${playlistEscape(item.detail)}</small></div><a href="${playlistEscape(item.plexUrl)}" aria-label="Open ${playlistEscape(item.title)} in Plex">Plex ↗</a></article>`;
 }
 
 function openGenerator(generator) {

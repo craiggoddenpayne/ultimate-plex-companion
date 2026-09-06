@@ -30,4 +30,5 @@ export interface PlexClient {
   command(config: PlexConfig, path: string, method?: string): Promise<void>;
   deleteMedia(config: PlexConfig, path: string): Promise<void>;
   artwork(config: PlexConfig, ratingKey: string | number): Promise<Response>;
+  media(config: PlexConfig, path: string, range?: string): Promise<Response>;
 }

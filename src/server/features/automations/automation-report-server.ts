@@ -209,4 +209,52 @@ export const previewReports = {
       { label: 'Fields checked', value: 'Artwork · Summary · Year' },
     ],
   },
+  backlog_radar: {
+    headline: 'Backlog radar ready',
+    detail: 'Selected libraries will be scanned for old and highly rated unwatched titles.',
+    facts: [
+      { label: 'Access', value: 'Read only' },
+      { label: 'Watch state changes', value: 'None' },
+    ],
+  },
+  format_sentinel: {
+    headline: 'Format drift scan ready',
+    detail: 'Codec and resolution metadata will be mapped across selected libraries.',
+    facts: [
+      { label: 'Access', value: 'Read only' },
+      { label: 'Encode jobs created', value: 'None' },
+    ],
+  },
+  edition_sentinel: {
+    headline: 'Edition storage scan ready',
+    detail: 'Titles with multiple Plex media versions and their storage will be measured.',
+    facts: [
+      { label: 'Access', value: 'Read only' },
+      { label: 'Automatic deletion', value: 'Never' },
+    ],
+  },
+  growth_chronicle: {
+    headline: 'Growth chronicle ready',
+    detail: 'The latest 100 arrivals will be measured across daily, weekly and monthly windows.',
+    facts: [
+      { label: 'Access', value: 'Read only' },
+      { label: 'Metadata changes', value: 'None' },
+    ],
+  },
+  playback_digest: {
+    headline: 'Playback digest ready',
+    detail: 'The latest history sample will be summarized into seven-day household patterns.',
+    facts: [
+      { label: 'Access', value: 'Read only' },
+      { label: 'Playback impact', value: 'None' },
+    ],
+  },
+  new_media_guard: {
+    headline: 'New media guard ready',
+    detail: 'Recent arrivals will be checked for core media and technical metadata.',
+    facts: [
+      { label: 'Access', value: 'Read only' },
+      { label: 'Automatic repair', value: 'None' },
+    ],
+  },
 };

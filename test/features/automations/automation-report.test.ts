@@ -33,4 +33,15 @@ test('arrival digest retains and renders every Plex media path', () => {
   assert.match(html, /PATH 1/);
   assert.match(html, /\/media\/Films\/Arrival\/Arrival\.mkv/);
   assert.match(html, /\/archive\/Arrival &lt;4K&gt;\.mkv/);
+  assert.match(html, /data-download-run="run-1"/);
+  assert.match(html, />Download result<\/button>/);
+});
+
+test('running reports keep result downloads disabled until the report is complete', () => {
+  const html = renderAutomationReports([{ id: 'active-run', ruleName: 'Active scan', status: 'running' }], {
+    escape,
+    relativeTime: () => 'now',
+    bytes: String,
+  });
+  assert.match(html, /data-download-run="active-run" disabled/);
 });

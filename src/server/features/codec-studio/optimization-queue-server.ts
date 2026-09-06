@@ -10,6 +10,37 @@ export function optimizationEta(job, now = Date.now()) {
   return Math.max(0, Math.round((elapsed * (100 - Number(job.progress))) / Number(job.progress)));
 }
 
+export function parseFfmpegProgress(output, previous: any = {}) {
+  const values: Record<string, string> = {};
+  for (const line of String(output).split(/\r?\n/)) {
+    const separator = line.indexOf('=');
+    if (separator < 1) continue;
+    values[line.slice(0, separator)] = line.slice(separator + 1).trim();
+  }
+  const number = (key) => {
+    const parsed = Number(values[key]);
+    return Number.isFinite(parsed) ? parsed : undefined;
+  };
+  const suffixedNumber = (key) => {
+    const parsed = Number.parseFloat(values[key]);
+    return Number.isFinite(parsed) ? parsed : undefined;
+  };
+  return {
+    ...previous,
+    ...(number('frame') == null ? {} : { frame: number('frame') }),
+    ...(suffixedNumber('fps') == null ? {} : { fps: suffixedNumber('fps') }),
+    ...(suffixedNumber('stream_0_0_q') == null ? {} : { quality: suffixedNumber('stream_0_0_q') }),
+    ...(suffixedNumber('bitrate') == null ? {} : { bitrateKbps: suffixedNumber('bitrate') }),
+    ...(number('total_size') == null ? {} : { outputBytes: number('total_size') }),
+    ...(number('out_time_us') == null ? {} : { encodedSeconds: number('out_time_us') / 1_000_000 }),
+    ...(values.out_time ? { encodedTime: values.out_time } : {}),
+    ...(number('dup_frames') == null ? {} : { duplicateFrames: number('dup_frames') }),
+    ...(number('drop_frames') == null ? {} : { droppedFrames: number('drop_frames') }),
+    ...(suffixedNumber('speed') == null ? {} : { speed: suffixedNumber('speed') }),
+    ...(values.progress ? { phase: values.progress } : {}),
+  };
+}
+
 export function optimizationSummary(jobs, activeJob = null) {
   const list = [...jobs.values()];
   const counts = Object.fromEntries(
@@ -71,6 +102,9 @@ export function updateQueuedJob(jobs, id, action, now = new Date().toISOString()
     Object.assign(job, { state: 'queued', progress: 0, updatedAt: now });
     delete job.error;
     delete job.startedAt;
+    delete job.telemetry;
+    delete job.sourceTechnical;
+    delete job.encodingSettings;
     return job;
   }
   if (['up', 'down'].includes(action)) {
@@ -89,6 +123,15 @@ export function requestOptimizationCancellation(jobs, id, activeJob = null, now 
     throw new Error('Only a queued or active optimization can be cancelled.');
   job.cancelRequested = true;
   job.updatedAt = now;
+  return job;
+}
+
+export function removeOptimizationJob(jobs, id, activeJob = null) {
+  const job = jobs.get(id);
+  if (!job) throw new Error('Optimization job not found.');
+  if (activeJob === id || !['queued', 'failed', 'cancelled'].includes(job.state))
+    throw new Error('Only queued, failed or cancelled jobs that are not actively encoding can be removed.');
+  jobs.delete(id);
   return job;
 }
 
