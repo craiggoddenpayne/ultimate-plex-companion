@@ -29,7 +29,7 @@
     "native:open:ios": "node scripts/native-config.mjs ios && tauri ios dev --config src-tauri/tauri.generated.conf.json --open"
   },
   "devDependencies": {
-    "@tauri-apps/cli": "^2.11.4",
+    "@tauri-apps/cli": "^2.11.5",
     "@types/node": "^26.4.1",
     "oxlint": "^1.81.0",
     "prettier": "^3.9.6",
